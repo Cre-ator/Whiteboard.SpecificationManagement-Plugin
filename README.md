@@ -1,10 +1,6 @@
-# UserProjectView
+# SpecificationManagement
 
-Plugin for MantisBT to display all projects and the amount of assigned issues to the specific users
-
-Features
-
-+ Display all users with their projects and amount of issues
+Plugin for MantisBT to add Specification - Requirement and Specification -Resource fields into bug-management
 
 Requirements
 

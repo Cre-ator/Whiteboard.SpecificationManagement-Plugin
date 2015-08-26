@@ -6,7 +6,7 @@ $s_plugin_SpecificationManagement_bug_add_form_specification_src = 'Ursprung der
 
 $s_plugin_SpecificationManagement_footer = 'Plugin Info in Footer anzeigen?';
 $s_plugin_SpecificationManagement_fields = 'Felder in Eintragsfenstern anzeigen?';
-$s_plugin_SpecificationManagement_menu = 'Plugin Menueeintrag anzeigen?';
+$s_plugin_SpecificationManagement_menu = 'Plugin Menüeintrag anzeigen?';
 $s_plugin_SpecificationManagement_accesslevel = 'SpecificationManagement Zugriffslevel';
 
 $s_plugin_SpecificationManagement_config_title = 'SpecificationManagement - Konfiguration';
@@ -15,7 +15,7 @@ $s_plugin_SpecificationManagement_config_caption = 'SpecificationManagement - Al
 $s_plugin_SpecificationManagement_menu_title = 'Spezifikationen';
 $s_plugin_SpecificationManagement_page_title = 'Spezifikationen';
 
-$s_plugin_SpecificationManagement_table_title = 'Bug Uebersicht';
+$s_plugin_SpecificationManagement_table_title = 'Bug Übersicht';
 $s_plugin_SpecificationManagement_print_button = 'Drucken';
 $s_plugin_SpecificationManagement_bug_thead = 'Eintrag';
 $s_plugin_SpecificationManagement_prio_thead = 'P';
@@ -27,3 +27,7 @@ $s_plugin_SpecificationManagement_sum_thead = 'Zusammenfassung';
 $s_plugin_SpecificationManagement_requirement_thead = 'Anforderungsnummer';
 $s_plugin_SpecificationManagement_resource_thead = 'Ursprung der Anforderung';
 $s_plugin_SpecificationManagement_version_thead = 'Version';
+$s_plugin_SpecificationManagement_subproject_thead = 'Unterprojekt';
+
+$s_plugin_SpecificationManagement_severity_enum_string = '10:Feature-Wunsch,20:Trivial,30:Fehler im Text,40:Unschönheit,50:kleinerer Fehler,60:schwerer Fehler,70:Absturz,80:Blocker';
+$s_plugin_SpecificationManagement_status_enum_string = '10:neu,20:Rückmeldung,30:anerkannt,40:bestätigt,50:zugewiesen,80:erledigt,90:geschlossen';

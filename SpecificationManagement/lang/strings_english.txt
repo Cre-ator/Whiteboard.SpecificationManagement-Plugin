@@ -27,3 +27,7 @@ $s_plugin_SpecificationManagement_sum_thead = 'Summary';
 $s_plugin_SpecificationManagement_requirement_thead = 'Requirement';
 $s_plugin_SpecificationManagement_resource_thead = 'Resource';
 $s_plugin_SpecificationManagement_version_thead = 'Version';
+$s_plugin_SpecificationManagement_subproject_thead = 'Subproject';
+
+$s_plugin_SpecificationManagement_status_enum_string = '10:new,20:feedback,30:acknowledged,40:confirmed,50:assigned,80:resolved,90:closed';
+$s_plugin_SpecificationManagement_severity_enum_string = '10:feature,20:trivial,30:text,40:tweak,50:minor,60:major,70:crash,80:block';

@@ -56,7 +56,7 @@ class SpecificationManagementPlugin extends MantisPlugin
 			'ShowFields' => ON,
 			'ShowUserMenu' => ON,
 			'ShowMenu' => ON,
-			'SpecificationManagementAccessLevel' => ADMINISTRATOR
+			'SpecManagementAccessLevel' => ADMINISTRATOR
 		);
 	}
    
@@ -93,7 +93,7 @@ class SpecificationManagementPlugin extends MantisPlugin
 		$projectId = helper_get_current_project();
 		$userId = auth_get_current_user_id();
 		
-		return user_get_access_level( $userId, $projectId ) >= plugin_config_get( 'SpecificationManagementAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT );
+		return user_get_access_level( $userId, $projectId ) >= plugin_config_get( 'SpecManagementAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT );
 	}
 
 	function footer()

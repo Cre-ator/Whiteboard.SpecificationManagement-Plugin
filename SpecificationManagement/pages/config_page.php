@@ -1,5 +1,5 @@
 <?php
-access_ensure_global_level( plugin_config_get( 'SpecificationManagementAccessLevel' ) );
+access_ensure_global_level( plugin_config_get( 'SpecManagementAccessLevel' ) );
 auth_reauthenticate();
 
 $mantis_version = substr( MANTIS_VERSION, 0, 4 );
@@ -97,8 +97,8 @@ else
 			echo '<span class="required">*</span>' . plugin_lang_get( 'accesslevel' );
 		echo '</td>';
 		echo '<td width="200px">';
-			echo '<select name="SpecificationManagementAccessLevel">';
-				print_enum_string_option_list( 'access_levels', plugin_config_get( 'SpecificationManagementAccessLevel', PLUGINS_USERPROJECTVIEW_THRESHOLD_LEVEL_DEFAULT ) );
+			echo '<select name="SpecManagementAccessLevel">';
+				print_enum_string_option_list( 'access_levels', plugin_config_get( 'SpecManagementAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
 			echo '</select>';
 		echo '</td>';
 	echo '</tr>';

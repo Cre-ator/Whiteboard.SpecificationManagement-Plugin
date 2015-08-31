@@ -1,7 +1,7 @@
 <?php
 form_security_validate( 'plugin_SpecificationManagement_config_update' );
 
-access_ensure_global_level( config_get( 'SpecificationManagementAccessLevel' ) );
+access_ensure_global_level( config_get( 'SpecManagementAccessLevel' ) );
 auth_reauthenticate();
 
 $ShowInFooter = gpc_get_int( 'ShowInFooter', ON );
@@ -25,11 +25,11 @@ if ( plugin_config_get( 'ShowMenu' ) != $ShowMenu )
 	plugin_config_set( 'ShowMenu', $ShowMenu );
 }
 
-$SpecificationManagementAccessLevel = gpc_get_int( 'SpecificationManagementAccessLevel' );
+$SpecManagementAccessLevel = gpc_get_int( 'SpecManagementAccessLevel' );
 
-if ( plugin_config_get( 'SpecificationManagementAccessLevel' ) != $SpecificationManagementAccessLevel )
+if ( plugin_config_get( 'SpecManagementAccessLevel' ) != $SpecManagementAccessLevel )
 {
-	plugin_config_set( 'SpecificationManagementAccessLevel', $SpecificationManagementAccessLevel );
+	plugin_config_set( 'SpecManagementAccessLevel', $SpecManagementAccessLevel );
 }
 
 form_security_purge( 'plugin_SpecificationManagement_config_update' );

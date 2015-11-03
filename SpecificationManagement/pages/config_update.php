@@ -1,35 +1,43 @@
 <?php
+auth_reauthenticate();
+access_ensure_global_level( config_get( 'AccessLevel' ) );
+
 form_security_validate( 'plugin_SpecificationManagement_config_update' );
 
-access_ensure_global_level( config_get( 'SpecManagementAccessLevel' ) );
-auth_reauthenticate();
+require_once( SPECIFICATIONMANAGEMENT_CORE_URI . 'constant_api.php' );
+include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
+include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecConfig_api.php';
 
-$ShowInFooter = gpc_get_int( 'ShowInFooter', ON );
+$db_api = new SpecDatabase_api();
+$sc_api = new SpecConfig_api();
 
-if ( plugin_config_get( 'ShowInFooter' ) != $ShowInFooter )
+$option_addtype = gpc_get_bool( 'addtype', false );
+$option_change = gpc_get_bool( 'change', false );
+$option_delete = gpc_get_bool( 'deletetype', false );
+
+if ( $option_change )
 {
-	plugin_config_set( 'ShowInFooter', $ShowInFooter );
+   $sc_api->updateValue( 'AccessLevel', ADMINISTRATOR );
+
+   $sc_api->updateButton( 'ShowInFooter' );
+   $sc_api->updateButton( 'ShowFields' );
+   $sc_api->updateButton( 'ShowMenu' );
 }
 
-$ShowFields = gpc_get_int( 'ShowFields', ON );
-
-if ( plugin_config_get( 'ShowFields' ) != $ShowFields )
+if ( $option_addtype )
 {
-	plugin_config_set( 'ShowFields', $ShowFields );
+   if ( !empty( $_POST['type'] ) )
+   {
+      $db_api->addType( $_POST['type'] );
+   }
 }
 
-$ShowMenu = gpc_get_int( 'ShowMenu', ON );
-
-if ( plugin_config_get( 'ShowMenu' ) != $ShowMenu )
+if ( $option_delete )
 {
-	plugin_config_set( 'ShowMenu', $ShowMenu );
-}
-
-$SpecManagementAccessLevel = gpc_get_int( 'SpecManagementAccessLevel' );
-
-if ( plugin_config_get( 'SpecManagementAccessLevel' ) != $SpecManagementAccessLevel )
-{
-	plugin_config_set( 'SpecManagementAccessLevel', $SpecManagementAccessLevel );
+   if ( !empty( $_POST['types'] ) )
+   {
+      $db_api->deleteType( $_POST['types'] );
+   }
 }
 
 form_security_purge( 'plugin_SpecificationManagement_config_update' );

@@ -31,11 +31,33 @@ else
 $sc_api->printFormTitle( 3, 'config_caption' );
 $sc_api->printTableRow();
 echo '<td class="category" width="30%">';
-echo '<span class="required">*</span>' . plugin_lang_get( 'accesslevel' );
+echo '<span class="required">*</span>' . plugin_lang_get( 'config_accesslevel' );
 echo '</td>';
 echo '<td width="200px">';
 echo '<select name="AccessLevel">';
 print_enum_string_option_list( 'access_levels', plugin_config_get( 'AccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
+echo '</select>';
+echo '</td>';
+echo '</tr>';
+
+$sc_api->printTableRow();
+echo '<td class="category" width="30%">';
+echo '<span class="required">*</span>' . plugin_lang_get( 'config_readlevel' );
+echo '</td>';
+echo '<td width="200px">';
+echo '<select name="ReadAccessLevel">';
+print_enum_string_option_list( 'access_levels', plugin_config_get( 'ReadAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
+echo '</select>';
+echo '</td>';
+echo '</tr>';
+
+$sc_api->printTableRow();
+echo '<td class="category" width="30%">';
+echo '<span class="required">*</span>' . plugin_lang_get( 'config_writelevel' );
+echo '</td>';
+echo '<td width="200px">';
+echo '<select name="WriteAccessLevel">';
+print_enum_string_option_list( 'access_levels', plugin_config_get( 'WriteAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
 echo '</select>';
 echo '</td>';
 echo '</tr>';

@@ -18,6 +18,11 @@ class SpecDatabase_api
       $this->mysqli = new mysqli( $this->dbPath, $this->dbUser, $this->dbPass, $this->dbName );
    }
 
+   public function getMantisVersion()
+   {
+      return substr( MANTIS_VERSION, 0, 4 );
+   }
+
    /**
     * Reset all plugin-related data
     *
@@ -46,38 +51,25 @@ class SpecDatabase_api
    }
 
    /**
-    * Get string-related type id
-    *
-    * @param $type_string
-    * @return mixed
-    */
-   public function getContentType( $type_string )
-   {
-      $plugin_type_table = db_get_table( 'mantis_plugin_specificationmanagement_type_table' );
-
-      $query = 'SELECT id FROM ' . $plugin_type_table . '
-         WHERE type = \'' . $type_string . '\'';
-
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
-
-      $type = $result[0];
-
-      return $type;
-   }
-
-   /**
     * Get id-related type string
     *
     * @param $type_id
     * @return string
     */
-   public function getContentString( $type_id )
+   public function getTypeString( $type_id )
    {
       $string = '';
 
       if ( $type_id != null )
       {
-         $plugin_type_table = db_get_table( 'mantis_plugin_specificationmanagement_type_table' );
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_type_table = plugin_table( 'type' );
+         }
+         else
+         {
+            $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+         }
 
          $query = 'SELECT type FROM ' . $plugin_type_table . '
             WHERE id = ' . $type_id;
@@ -98,16 +90,23 @@ class SpecDatabase_api
     */
    public function getReqId( $bug_id )
    {
-      $plugin_requirement_table = db_get_table( 'mantis_plugin_specificationmanagement_requirement_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_requirement_table = plugin_table( 'requirement' );
+      }
+      else
+      {
+         $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+      }
 
       $query = 'SELECT id FROM ' . $plugin_requirement_table . '
          WHERE bug_id = ' . $bug_id;
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
-      $id = $result[0];
+      $requirement_id = $result[0];
 
-      return $id;
+      return $requirement_id;
    }
 
    /**
@@ -118,14 +117,21 @@ class SpecDatabase_api
     */
    public function getReqRow( $bug_id )
    {
-      $plugin_requirement_table = db_get_table( 'mantis_plugin_specificationmanagement_requirement_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_requirement_table = plugin_table( 'requirement' );
+      }
+      else
+      {
+         $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+      }
 
       $query = 'SELECT * FROM ' . $plugin_requirement_table . '
          WHERE bug_id = ' . $bug_id;
 
-      $reqRow = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $requirement_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
-      return $reqRow;
+      return $requirement_row;
    }
 
    /**
@@ -136,14 +142,48 @@ class SpecDatabase_api
     */
    public function getSourceRow( $bug_id )
    {
-      $plugin_source_table = db_get_table( 'mantis_plugin_specificationmanagement_source_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_source_table = plugin_table( 'source' );
+      }
+      else
+      {
+         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+      }
 
       $query = 'SELECT * FROM ' . $plugin_source_table . '
          WHERE bug_id = ' . $bug_id;
 
-      $sourceRow = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $source_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
-      return $sourceRow;
+      return $source_row;
+   }
+
+   /**
+    * Get version of source entry
+    *
+    * @param $source_vesion
+    * @return array|null
+    */
+   public function getSourceVersion( $source_vesion )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_source_table = plugin_table( 'source' );
+      }
+      else
+      {
+         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+      }
+
+      $query = "SELECT DISTINCT s.version FROM $plugin_source_table s
+         WHERE s.version = '" . $source_vesion . "'";
+
+      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+
+      $source_version = $result[0];
+
+      return $source_version;
    }
 
    /**
@@ -154,7 +194,14 @@ class SpecDatabase_api
     */
    public function insertReqRow( $bug_id, $requirement_type )
    {
-      $plugin_requirement_table = db_get_table( 'mantis_plugin_specificationmanagement_requirement_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_requirement_table = plugin_table( 'requirement' );
+      }
+      else
+      {
+         $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+      }
 
       $query = 'INSERT INTO ' . $plugin_requirement_table . '( id, bug_id, type )
          SELECT null, ' . $bug_id . ',' . $requirement_type . '
@@ -175,7 +222,14 @@ class SpecDatabase_api
     */
    public function insertSourceRow( $bug_id, $requirement_id, $requirement_type, $version )
    {
-      $plugin_source_table = db_get_table( 'mantis_plugin_specificationmanagement_source_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_source_table = plugin_table( 'source' );
+      }
+      else
+      {
+         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+      }
 
       $query = 'INSERT INTO ' . $plugin_source_table . '( id, bug_id, requirement_id, version, type )
          SELECT null, ' . $bug_id . ',' . $requirement_id . ',\'' . $version . '\',' . $requirement_type . '
@@ -194,7 +248,14 @@ class SpecDatabase_api
     */
    public function updateReqRow( $bug_id, $requirement_type )
    {
-      $plugin_requirement_table = db_get_table( 'mantis_plugin_specificationmanagement_requirement_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_requirement_table = plugin_table( 'requirement' );
+      }
+      else
+      {
+         $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+      }
 
       $query = 'SET SQL_SAFE_UPDATES = 0';
       $this->mysqli->query( $query );
@@ -218,7 +279,14 @@ class SpecDatabase_api
     */
    public function updateSourceRow( $bug_id, $requirement_type, $version )
    {
-      $plugin_source_table = db_get_table( 'mantis_plugin_specificationmanagement_source_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_source_table = plugin_table( 'source' );
+      }
+      else
+      {
+         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+      }
 
       $query = 'SET SQL_SAFE_UPDATES = 0';
       $this->mysqli->query( $query );
@@ -234,13 +302,46 @@ class SpecDatabase_api
    }
 
    /**
+    * Get the first element of type
+    *
+    * @return mixed
+    */
+   public function getFirstType()
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+      }
+
+      $query = "SELECT t.id FROM $plugin_type_table t
+          ORDER BY t.id ASC LIMIT 1";
+
+      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+
+      $first_type = $result[0];
+
+      return $first_type;
+   }
+
+   /**
     * Add a specific type
     *
     * @param $string
     */
    public function addType( $string )
    {
-      $plugin_type_table = db_get_table( 'mantis_plugin_specificationmanagement_type_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+      }
 
       $query = 'INSERT INTO ' . $plugin_type_table . '( id, type )
          SELECT null, \'' . $string . '\'
@@ -258,11 +359,19 @@ class SpecDatabase_api
     */
    public function deleteType( $string )
    {
-      $plugin_type_table = db_get_table( 'mantis_plugin_specificationmanagement_type_table' );
-      $primaryKey = $this->getTypePrimareyKey( $string );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+      }
+
+      $primary_key = $this->getTypeId( $string );
 
       $query = "DELETE FROM $plugin_type_table
-         WHERE id = " . $primaryKey;
+         WHERE id = " . $primary_key;
 
       $this->mysqli->query( $query );
    }
@@ -273,18 +382,25 @@ class SpecDatabase_api
     * @param $string
     * @return mixed
     */
-   private function getTypePrimareyKey( $string )
+   public function getTypeId( $string )
    {
-      $plugin_type_table = db_get_table( 'mantis_plugin_specificationmanagement_type_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+      }
 
       $query = 'SELECT id
          FROM ' . $plugin_type_table . '
          WHERE type = \'' . $string . '\'';
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
-      $primaryKey = $result[0];
+      $primary_key = $result[0];
 
-      return $primaryKey;
+      return $primary_key;
    }
 
    /**
@@ -294,19 +410,75 @@ class SpecDatabase_api
     */
    public function getTypes()
    {
-      $plugin_type_table = db_get_table( 'mantis_plugin_specificationmanagement_type_table' );
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+      }
 
       $query = "SELECT type
          FROM $plugin_type_table";
 
       $result = $this->mysqli->query( $query );
-
       $types = array();
-      while ( $row = $result->fetch_row() )
+
+      if ( $result != null )
       {
-         $types[] = $row[0];
+         while ( $row = $result->fetch_row() )
+         {
+            $types[] = $row[0];
+         }
       }
 
       return $types;
+   }
+
+   /**
+    * Get available sources (versions) for a specific requirement (type)
+    *
+    * @param $type
+    * @param $project_id
+    * @return array
+    */
+   public function getSources( $type, $project_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_source_table = plugin_table( 'source' );
+      }
+      else
+      {
+         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+      }
+
+      $bug_table = db_get_table( 'mantis_bug_table' );
+
+      $query = "SELECT DISTINCT s.version FROM $plugin_source_table s, $bug_table b
+          WHERE s.type = " . $type;
+      if ( $project_id != 0 )
+      {
+         $query .= " AND b.id = s.bug_id
+             AND b.project_id = " . $project_id;
+      }
+
+      $result = $this->mysqli->query( $query );
+
+      $oldTmp = null;
+      $sources = array();
+      while ( $row = $result->fetch_row() )
+      {
+         $tmp = explode( ';', $row[0] );
+
+         if ( $tmp[0] != $oldTmp )
+         {
+            $sources[] = $tmp[0];
+         }
+         $oldTmp = $tmp[0];
+      }
+
+      return $sources;
    }
 }

@@ -37,7 +37,6 @@ class SpecPrint_api
       foreach ( $types as $type )
       {
          echo '<option value="' . $type . '"';
-         check_selected( $types, $type );
          echo '>' . string_html_specialchars( $type ) . '</option>';
       }
       echo '</select>';
@@ -69,6 +68,7 @@ class SpecPrint_api
    {
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {
+         /* TODO: 1.2 Content */
       }
       else
       {
@@ -94,6 +94,49 @@ class SpecPrint_api
          echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</div>';
+      }
+   }
+
+   public function print_chapter_title( $chapter_index, $chapter_title )
+   {
+      echo '<tr>';
+      echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
+      echo '<td class="form-title" colspan="2">' . $chapter_title . '</td>';
+      echo '</tr>';
+   }
+
+   public function print_bugs( $chapter_index, $sub_chapter_index, $bug_id )
+   {
+      echo '<tr>';
+      echo '<td colspan="1">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
+      echo '<td colspan="2">' . bug_get_field( $bug_id, 'summary' ) . ' (' . bug_format_id( $bug_id ) . ')</td>';
+      echo '</tr>';
+
+      echo '<tr>';
+      echo '<td colspan="1" />';
+      echo '<td colspan="2">' . bug_get_text_field( $bug_id, 'description' ) . '</td>';
+      echo '</tr>';
+   }
+
+   public function print_bugnotes( $bugnotes )
+   {
+      if ( $bugnotes != null )
+      {
+         echo '<tr>';
+         echo '<td colspan="1" />';
+         echo '<td colspan="2">Notizen</td>';
+         echo '</tr>';
+         $bugnote_index = 1;
+         foreach ( $bugnotes as $bugnote )
+         {
+            echo '<tr>';
+            echo '<td colspan="1" />';
+            echo '<td colspan="1">' . $bugnote_index . '</td>';
+            echo '<td colspan="1">' . $bugnote->note . '</td>';
+            echo '</tr>';
+
+            $bugnote_index++;
+         }
       }
    }
 }

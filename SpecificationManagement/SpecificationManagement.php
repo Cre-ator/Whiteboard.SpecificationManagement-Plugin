@@ -8,7 +8,7 @@ class SpecificationManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specifications to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.2';
+      $this->version = '1.0.3';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.1',
@@ -26,13 +26,13 @@ class SpecificationManagementPlugin extends MantisPlugin
       (
          'EVENT_LAYOUT_PAGE_FOOTER' => 'footer',
 
-         'EVENT_REPORT_BUG_FORM' => 'bugviewFields',
-         'EVENT_REPORT_BUG' => 'bugupdateData',
+         'EVENT_REPORT_BUG_FORM' => 'bugViewFields',
+         'EVENT_REPORT_BUG' => 'bugUpdateData',
 
-         'EVENT_UPDATE_BUG_FORM' => 'bugviewFields',
-         'EVENT_UPDATE_BUG' => 'bugupdateData',
+         'EVENT_UPDATE_BUG_FORM' => 'bugViewFields',
+         'EVENT_UPDATE_BUG' => 'bugUpdateData',
 
-         'EVENT_VIEW_BUG_DETAILS' => 'bugviewFields',
+         'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
       );
       return $hooks;
    }
@@ -94,9 +94,10 @@ class SpecificationManagementPlugin extends MantisPlugin
    function uninstall()
    {
       include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecDatabase_api.php';
-      $db_api = new SpecDatabase_api();
 
-      $db_api->config_resetPlugin();
+      $sd_api = new SpecDatabase_api();
+      $sd_api->config_resetPlugin();
+//      print_successful_redirect( plugin_page( 'DeinstallRequest', true ) );
    }
 
    /**
@@ -106,10 +107,26 @@ class SpecificationManagementPlugin extends MantisPlugin
     */
    function getUserHasLevel()
    {
-      $projectId = helper_get_current_project();
-      $userId = auth_get_current_user_id();
+      $project_id = helper_get_current_project();
+      $user_id = auth_get_current_user_id();
 
-      return user_get_access_level( $userId, $projectId ) >= plugin_config_get( 'AccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT );
+      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'AccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT );
+   }
+
+   function getReadLevel()
+   {
+      $project_id = helper_get_current_project();
+      $user_id = auth_get_current_user_id();
+
+      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'ReadAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_READ_LEVEL_DEFAULT );
+   }
+
+   function getWriteLevel()
+   {
+      $project_id = helper_get_current_project();
+      $user_id = auth_get_current_user_id();
+
+      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'WriteAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_WRITE_LEVEL_DEFAULT );
    }
 
    /**
@@ -132,7 +149,7 @@ class SpecificationManagementPlugin extends MantisPlugin
     * @param $event
     * @return null
     */
-   function bugviewFields( $event )
+   function bugViewFields( $event )
    {
       include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecPrint_api.php';
       include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecDatabase_api.php';
@@ -140,8 +157,8 @@ class SpecificationManagementPlugin extends MantisPlugin
       $db_api = new SpecDatabase_api();
 
       $bug_id = null;
-      $source = null;
-      $requirement = null;
+      $version = null;
+      $requirement_type = null;
 
       switch ( $event )
       {
@@ -157,27 +174,33 @@ class SpecificationManagementPlugin extends MantisPlugin
       {
          $requirement_obj = $db_api->getReqRow( $bug_id );
          $source_obj = $db_api->getSourceRow( $bug_id );
-         $requirement = $db_api->getContentString( $requirement_obj[2] );
-         $source = $source_obj[3];
+         $requirement_type = $db_api->getTypeString( $requirement_obj[2] );
+         $version = $source_obj[3];
       }
 
       $types = $db_api->getTypes();
 
-      if ( plugin_config_get( 'ShowFields' ) && $this->getUserHasLevel() )
+      if ( plugin_config_get( 'ShowFields' ) )
       {
          switch ( $event )
          {
             case 'EVENT_UPDATE_BUG_FORM':
-               $sm_api->printBugUpdateFields( $types, $source );
+               if ( $this->getWriteLevel() )
+               {
+                  $sm_api->printBugUpdateFields( $types, $version );
+               }
                break;
             case 'EVENT_VIEW_BUG_DETAILS':
-               $sm_api->printBugViewFields( $requirement, $source );
+               if ( $this->getReadLevel() || $this->getWriteLevel() )
+               {
+                  $sm_api->printBugViewFields( $requirement_type, $version );
+               }
                break;
             case 'EVENT_REPORT_BUG_FORM':
-               $source = gpc_get_string( 'source', '' );
-               if ( plugin_config_get( 'ShowFields' ) && $this->getUserHasLevel() )
+               if ( $this->getWriteLevel() )
                {
-                  $sm_api->printBugReportFields( $types, $source );
+                  $version = gpc_get_string( 'source', '' );
+                  $sm_api->printBugReportFields( $types, $version );
                }
                break;
          }
@@ -191,26 +214,28 @@ class SpecificationManagementPlugin extends MantisPlugin
     * @param $event
     * @param BugData $bug
     */
-   function bugupdateData( $event, BugData $bug )
+   function bugUpdateData( $event, BugData $bug )
    {
       include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecDatabase_api.php';
       $db_api = new SpecDatabase_api();
 
       $bug_id = $bug->id;
-      $requirement = gpc_get_string( 'types', $db_api->getContentString( $db_api->getReqRow( $bug_id )[2] ) );
-      $version = gpc_get_string( 'source', $db_api->getSourceRow( $bug_id )[3] );
-      $requirement_type = $db_api->getContentType( $requirement );
+      $requirement_obj = $db_api->getReqRow( $bug_id );
+      $source_obj = $db_api->getSourceRow( $bug_id );
+      $requirement_type = gpc_get_string( 'types', $db_api->getTypeString( $requirement_obj[2] ) );
+      $version = gpc_get_string( 'source', $source_obj[3] );
+      $requirement_type_id = $db_api->getTypeId( $requirement_type );
 
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
-            $db_api->insertReqRow( $bug_id, $requirement_type );
+            $db_api->insertReqRow( $bug_id, $requirement_type_id );
             $requirement_id = $db_api->getReqId( $bug_id );
-            $db_api->insertSourceRow( $bug_id, $requirement_id, $requirement_type, $version );
+            $db_api->insertSourceRow( $bug_id, $requirement_id, $requirement_type_id, $version );
             break;
          case 'EVENT_UPDATE_BUG':
-            $db_api->updateReqRow( $bug_id, $requirement_type );
-            $db_api->updateSourceRow( $bug_id, $requirement_type, $version );
+            $db_api->updateReqRow( $bug_id, $requirement_type_id );
+            $db_api->updateSourceRow( $bug_id, $requirement_type_id, $version );
             break;
       }
    }

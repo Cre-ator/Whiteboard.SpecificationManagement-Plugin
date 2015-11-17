@@ -2,11 +2,11 @@
 
 class SpecConfig_api
 {
-   public function printFormTitle( $colspan, $langString )
+   public function printFormTitle( $colspan, $lang_string )
    {
       echo '<tr>';
       echo '<td class="form-title" colspan="' . $colspan . '">';
-      echo plugin_lang_get( $langString );
+      echo plugin_lang_get( $lang_string );
       echo '</td>';
       echo '</tr>';
    }
@@ -23,10 +23,10 @@ class SpecConfig_api
       }
    }
 
-   public function printCategoryField( $colspan, $rowspan, $langString )
+   public function printCategoryField( $colspan, $rowspan, $lang_string )
    {
       echo '<td class="category" colspan="' . $colspan . '" rowspan="' . $rowspan . '">';
-      echo plugin_lang_get( $langString );
+      echo plugin_lang_get( $lang_string );
       echo '</td>';
    }
 
@@ -36,12 +36,12 @@ class SpecConfig_api
       echo '<label>';
       echo '<input type="radio" name="' . $name . '" value="1"';
       echo ( ON == plugin_config_get( $name ) ) ? 'checked="checked"' : '';
-      echo '/>' . plugin_lang_get( 'config_y' );
+      echo '/>' . lang_get( 'yes' );
       echo '</label>';
       echo '<label>';
       echo '<input type="radio" name="' . $name . '" value="0"';
       echo ( OFF == plugin_config_get( $name ) ) ? 'checked="checked"' : '';
-      echo '/>' . plugin_lang_get( 'config_n' );
+      echo '/>' . lang_get( 'no' );
       echo '</label>';
       echo '</td>';
    }
@@ -55,21 +55,21 @@ class SpecConfig_api
 
    public function updateValue( $value, $constant )
    {
-      $actValue = null;
+      $act_value = null;
 
       if ( is_int( $value ) )
       {
-         $actValue = gpc_get_int( $value, $constant );
+         $act_value = gpc_get_int( $value, $constant );
       }
 
       if ( is_string( $value ) )
       {
-         $actValue = gpc_get_string( $value, $constant );
+         $act_value = gpc_get_string( $value, $constant );
       }
 
-      if ( plugin_config_get( $value ) != $actValue )
+      if ( plugin_config_get( $value ) != $act_value )
       {
-         plugin_config_set( $value, $actValue );
+         plugin_config_set( $value, $act_value );
       }
    }
 

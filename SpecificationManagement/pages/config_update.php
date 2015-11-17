@@ -18,6 +18,8 @@ $option_delete = gpc_get_bool( 'deletetype', false );
 if ( $option_change )
 {
    $sc_api->updateValue( 'AccessLevel', ADMINISTRATOR );
+   $sc_api->updateValue( 'ReadAccessLevel', REPORTER );
+   $sc_api->updateValue( 'WriteAccessLevel', DEVELOPER );
 
    $sc_api->updateButton( 'ShowInFooter' );
    $sc_api->updateButton( 'ShowFields' );

@@ -3,6 +3,9 @@
 
 $s_plugin_SpecificationManagement_bug_add_form_specification_req = 'Anforderungsnummer';
 $s_plugin_SpecificationManagement_bug_add_form_specification_src = 'Ursprung der Anforderung';
+$s_plugin_SpecificationManagement_bug_add_form_planned_time = 'Geplante Dauer';
+$s_plugin_SpecificationManagement_bug_add_form_ptime_expl = ' (Stunden)';
+$s_plugin_SpecificationManagement_ptime = 'Dauer';
 
 $s_plugin_SpecificationManagement_footer = 'Plugin Info in Footer anzeigen?';
 $s_plugin_SpecificationManagement_fields = 'Felder in Eintragsfenstern anzeigen?';
@@ -41,8 +44,10 @@ $s_plugin_SpecificationManagement_config_typeadd = 'Dokumenttyp hinzufügen';
 $s_plugin_SpecificationManagement_config_add = 'Hinzufügen';
 $s_plugin_SpecificationManagement_config_types = 'Verfügbare Dokumente';
 $s_plugin_SpecificationManagement_config_del = 'Löschen';
+$s_plugin_SpecificationManagement_config_editor = 'Editoreinstellungen';
+$s_plugin_SpecificationManagement_config_show_duration = 'Geplante Dauer im Editor / Dokument anzeigen?';
 
-$s_plugin_SpecificationManagement_menu_title = 'Whiteboard';
+$s_plugin_SpecificationManagement_menu_title = 'Specification';
 $s_plugin_SpecificationManagement_menu_choosedoc = 'Dokument erzeugen';
 $s_plugin_SpecificationManagement_menu_printbutton = 'Drucken';
 $s_plugin_SpecificationManagement_menu_new_chapter = 'Kapitel hinzufügen';
@@ -54,3 +59,15 @@ $s_plugin_SpecificationManagement_select_blankdoc = 'Leeres Dokument';
 
 $s_plugin_SpecificationManagement_editor_addbug = 'Bug hinzufügen';
 $s_plugin_SpecificationManagement_editor_additionalbugs = 'Bugs ohne Arbeitspaket';
+$s_plugin_SpecificationManagement_editor_work_package_duration = 'Geplante Dauer für Fertigstellung';
+$s_plugin_SpecificationManagement_editor_work_package_duration_null = '-nicht spezifiziert-';
+$s_plugin_SpecificationManagement_editor_duration_unit = 'Personentage';
+$s_plugin_SpecificationManagement_editor_bug_attachments = 'Angehängte Dateien';
+$s_plugin_SpecificationManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
+
+/* head area of document */
+$s_plugin_SpecificationManagement_head_title = 'Dokumententitel';
+$s_plugin_SpecificationManagement_head_customer = 'Kunde';
+$s_plugin_SpecificationManagement_head_project = 'Projekt';
+$s_plugin_SpecificationManagement_head_date = 'Datum';
+$s_plugin_SpecificationManagement_head_person_in_charge = 'Verantwortlicher';

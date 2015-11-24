@@ -8,7 +8,7 @@ class SpecificationManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specifications to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.3';
+      $this->version = '1.0.4';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.1',
@@ -33,6 +33,8 @@ class SpecificationManagementPlugin extends MantisPlugin
          'EVENT_UPDATE_BUG' => 'bugUpdateData',
 
          'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
+
+         'EVENT_MENU_MAIN' => 'menu'
       );
       return $hooks;
    }
@@ -55,6 +57,7 @@ class SpecificationManagementPlugin extends MantisPlugin
          'ShowFields' => ON,
          'ShowUserMenu' => ON,
          'ShowMenu' => ON,
+         'ShowDuration' => ON,
          'AccessLevel' => ADMINISTRATOR
       );
    }
@@ -86,6 +89,14 @@ class SpecificationManagementPlugin extends MantisPlugin
             'CreateTableSQL', array( plugin_table( 'type' ), "
             id              I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             type            C(250)  NOTNULL DEFAULT ''
+            " )
+         ),
+         array
+         (
+            'CreateTableSQL', array( plugin_table( 'ptime' ), "
+            id          I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            bug_id      I       NOTNULL UNSIGNED,
+            time        I       NOTNULL UNSIGNED
             " )
          )
       );
@@ -159,6 +170,7 @@ class SpecificationManagementPlugin extends MantisPlugin
       $bug_id = null;
       $version = null;
       $requirement_type = null;
+      $ptime = null;
 
       switch ( $event )
       {
@@ -174,8 +186,10 @@ class SpecificationManagementPlugin extends MantisPlugin
       {
          $requirement_obj = $db_api->getReqRow( $bug_id );
          $source_obj = $db_api->getSourceRow( $bug_id );
+         $ptime_obj = $db_api->getPtimeRow( $bug_id );
          $requirement_type = $db_api->getTypeString( $requirement_obj[2] );
          $version = $source_obj[3];
+         $ptime = $ptime_obj[2];
       }
 
       $types = $db_api->getTypes();
@@ -187,20 +201,20 @@ class SpecificationManagementPlugin extends MantisPlugin
             case 'EVENT_UPDATE_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
-                  $sm_api->printBugUpdateFields( $types, $version );
+                  $sm_api->printBugUpdateFields( $types, $version, $ptime );
                }
                break;
             case 'EVENT_VIEW_BUG_DETAILS':
                if ( $this->getReadLevel() || $this->getWriteLevel() )
                {
-                  $sm_api->printBugViewFields( $requirement_type, $version );
+                  $sm_api->printBugViewFields( $requirement_type, $version, $ptime );
                }
                break;
             case 'EVENT_REPORT_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
                   $version = gpc_get_string( 'source', '' );
-                  $sm_api->printBugReportFields( $types, $version );
+                  $sm_api->printBugReportFields( $types, $version, $ptime );
                }
                break;
          }
@@ -222,9 +236,11 @@ class SpecificationManagementPlugin extends MantisPlugin
       $bug_id = $bug->id;
       $requirement_obj = $db_api->getReqRow( $bug_id );
       $source_obj = $db_api->getSourceRow( $bug_id );
+      $ptime_obj = $db_api->getPtimeRow( $bug_id );
       $requirement_type = gpc_get_string( 'types', $db_api->getTypeString( $requirement_obj[2] ) );
       $version = gpc_get_string( 'source', $source_obj[3] );
       $requirement_type_id = $db_api->getTypeId( $requirement_type );
+      $ptime = gpc_get_string( 'ptime', $ptime_obj[2] );
 
       switch ( $event )
       {
@@ -232,11 +248,24 @@ class SpecificationManagementPlugin extends MantisPlugin
             $db_api->insertReqRow( $bug_id, $requirement_type_id );
             $requirement_id = $db_api->getReqId( $bug_id );
             $db_api->insertSourceRow( $bug_id, $requirement_id, $requirement_type_id, $version );
+            $db_api->insertPtimeRow( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
             $db_api->updateReqRow( $bug_id, $requirement_type_id );
             $db_api->updateSourceRow( $bug_id, $requirement_type_id, $version );
+            $db_api->updatePtimeRow( $bug_id, $ptime );
             break;
       }
+   }
+
+   function menu()
+   {
+      if ( plugin_config_get( 'ShowMenu' )
+         && $this->getUserHasLevel()
+      )
+      {
+         return '<a href="' . plugin_page( 'ChooseDocument' ) . '">' . plugin_lang_get( 'menu_title' ) . '</a>';
+      }
+      return null;
    }
 }

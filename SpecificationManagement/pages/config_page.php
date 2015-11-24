@@ -109,6 +109,14 @@ echo '</tr>';
 
 $sc_api->printSpacer( 3 );
 
+$sc_api->printFormTitle( 3, 'config_editor' );
+$sc_api->printTableRow();
+$sc_api->printCategoryField( 1, 1, 'config_show_duration' );
+$sc_api->printRadioButton( 1, 'ShowDuration' );
+echo '</tr>';
+
+$sc_api->printSpacer( 3 );
+
 echo '<tr>';
 echo '<td class="center" colspan="3">';
 echo '<input type="submit" name="change" class="button" value="' . lang_get( 'change_configuration' ) . '"/>';

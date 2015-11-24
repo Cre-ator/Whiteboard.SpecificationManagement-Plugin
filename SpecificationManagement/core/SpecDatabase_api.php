@@ -82,6 +82,27 @@ class SpecDatabase_api
       return $string;
    }
 
+   public function getTypeBySource( $source )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_source_table = plugin_table( 'source' );
+      }
+      else
+      {
+         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+      }
+
+      $query = "SELECT DISTINCT s.type FROM $plugin_source_table s
+          WHERE s.version LIKE '" . $source . "%'";
+
+      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+
+      $type_id = $result[0];
+
+      return $type_id;
+   }
+
    /**
     * Get bug-related requirement id
     *
@@ -160,30 +181,28 @@ class SpecDatabase_api
    }
 
    /**
-    * Get version of source entry
+    * Get bug-related planned time entry
     *
-    * @param $source_vesion
+    * @param $bug_id
     * @return array|null
     */
-   public function getSourceVersion( $source_vesion )
+   public function getPtimeRow( $bug_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $plugin_ptime_table = plugin_table( 'ptime' );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $plugin_ptime_table = db_get_table( 'plugin_specificationmanagement_ptime' );
       }
 
-      $query = "SELECT DISTINCT s.version FROM $plugin_source_table s
-         WHERE s.version = '" . $source_vesion . "'";
+      $query = 'SELECT * FROM ' . $plugin_ptime_table . '
+         WHERE bug_id = ' . $bug_id;
 
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $ptime_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
-      $source_version = $result[0];
-
-      return $source_version;
+      return $ptime_row;
    }
 
    /**
@@ -241,6 +260,32 @@ class SpecDatabase_api
    }
 
    /**
+    * Create new bug-related time entry
+    *
+    * @param $bug_id
+    * @param $ptime
+    */
+   public function insertPtimeRow( $bug_id, $ptime )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_ptime_table = plugin_table( 'ptime' );
+      }
+      else
+      {
+         $plugin_ptime_table = db_get_table( 'plugin_specificationmanagement_ptime' );
+      }
+
+      $query = 'INSERT INTO ' . $plugin_ptime_table . '( id, bug_id, time)
+         SELECT null, ' . $bug_id . ',' . $ptime . '
+         FROM DUAL WHERE NOT EXISTS (
+         SELECT 1 FROM ' . $plugin_ptime_table . '
+         WHERE bug_id = ' . $bug_id . ' AND time = ' . $ptime . ')';
+
+      $this->mysqli->query( $query );
+   }
+
+   /**
     * Update existing requirement
     *
     * @param $bug_id
@@ -248,26 +293,33 @@ class SpecDatabase_api
     */
    public function updateReqRow( $bug_id, $requirement_type )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
+      if ( $this->getReqRow( $bug_id ) == null )
       {
-         $plugin_requirement_table = plugin_table( 'requirement' );
+         $this->insertReqRow( $bug_id, $requirement_type );
       }
       else
       {
-         $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
-      }
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_requirement_table = plugin_table( 'requirement' );
+         }
+         else
+         {
+            $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+         }
 
-      $query = 'SET SQL_SAFE_UPDATES = 0';
-      $this->mysqli->query( $query );
+         $query = 'SET SQL_SAFE_UPDATES = 0';
+         $this->mysqli->query( $query );
 
-      $query = 'UPDATE ' . $plugin_requirement_table . '
+         $query = 'UPDATE ' . $plugin_requirement_table . '
          SET type = ' . $requirement_type . '
          WHERE bug_id = ' . $bug_id;
 
-      $this->mysqli->query( $query );
+         $this->mysqli->query( $query );
 
-      $query = 'SET SQL_SAFE_UPDATES = 1';
-      $this->mysqli->query( $query );
+         $query = 'SET SQL_SAFE_UPDATES = 1';
+         $this->mysqli->query( $query );
+      }
    }
 
    /**
@@ -279,26 +331,71 @@ class SpecDatabase_api
     */
    public function updateSourceRow( $bug_id, $requirement_type, $version )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
+      if ( $this->getSourceRow( $bug_id ) == null )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $requirement_id = $this->getTypeId( $requirement_type );
+         $this->insertSourceRow( $bug_id, $requirement_id, $requirement_type, $version );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
-      }
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_source_table = plugin_table( 'source' );
+         }
+         else
+         {
+            $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         }
 
-      $query = 'SET SQL_SAFE_UPDATES = 0';
-      $this->mysqli->query( $query );
+         $query = 'SET SQL_SAFE_UPDATES = 0';
+         $this->mysqli->query( $query );
 
-      $query = 'UPDATE ' . $plugin_source_table . '
+         $query = 'UPDATE ' . $plugin_source_table . '
          SET version = \'' . $version . '\', type = ' . $requirement_type . '
          WHERE bug_id = ' . $bug_id;
 
-      $this->mysqli->query( $query );
+         $this->mysqli->query( $query );
 
-      $query = 'SET SQL_SAFE_UPDATES = 1';
-      $this->mysqli->query( $query );
+         $query = 'SET SQL_SAFE_UPDATES = 1';
+         $this->mysqli->query( $query );
+      }
+   }
+
+   /**
+    * Update existing planned time
+    *
+    * @param $bug_id
+    * @param $ptime
+    */
+   public function updatePtimeRow( $bug_id, $ptime )
+   {
+      if ( $this->getPtimeRow( $bug_id ) == null )
+      {
+         $this->insertPtimeRow( $bug_id, $ptime );
+      }
+      else
+      {
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_ptime_table = plugin_table( 'ptime' );
+         }
+         else
+         {
+            $plugin_ptime_table = db_get_table( 'plugin_specificationmanagement_ptime' );
+         }
+
+         $query = 'SET SQL_SAFE_UPDATES = 0';
+         $this->mysqli->query( $query );
+
+         $query = 'UPDATE ' . $plugin_ptime_table . '
+         SET time = ' . $ptime . '
+         WHERE bug_id = ' . $bug_id;
+
+         $this->mysqli->query( $query );
+
+         $query = 'SET SQL_SAFE_UPDATES = 1';
+         $this->mysqli->query( $query );
+      }
    }
 
    /**
@@ -448,13 +545,13 @@ class SpecDatabase_api
       if ( $this->getMantisVersion() == '1.2.' )
       {
          $plugin_source_table = plugin_table( 'source' );
+         $bug_table = db_get_table( 'mantis_bug_table' );
       }
       else
       {
          $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $bug_table = db_get_table( 'bug' );
       }
-
-      $bug_table = db_get_table( 'mantis_bug_table' );
 
       $query = "SELECT DISTINCT s.version FROM $plugin_source_table s, $bug_table b
           WHERE s.type = " . $type;
@@ -480,5 +577,34 @@ class SpecDatabase_api
       }
 
       return $sources;
+   }
+
+   public function getWorkpackageDuration( $work_package )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_source_table = plugin_table( 'source' );
+         $plugin_ptime_table = plugin_table( 'ptime' );
+      }
+      else
+      {
+         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $plugin_ptime_table = db_get_table( 'plugin_specificationmanagement_ptime' );
+      }
+
+      $query = "SELECT SUM( p.time ) FROM $plugin_ptime_table p, $plugin_source_table s
+         WHERE p.bug_id = s.bug_id
+         AND s.version LIKE '%" . $work_package . "'";
+
+      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+
+      $duration = $result[0];
+
+      return $duration;
+   }
+
+   public function getProbablyAssignedBugs( $work_package )
+   {
+
    }
 }

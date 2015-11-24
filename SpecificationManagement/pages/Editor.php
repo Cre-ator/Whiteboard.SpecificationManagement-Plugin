@@ -9,6 +9,7 @@ $sd_api = new SpecDatabase_api();
 $sp_api = new SpecPrint_api();
 $se_api = new SpecEditor_api();
 
+$document_type = null;
 /* initialize source */
 $source = null;
 /* initialize work packages */
@@ -20,14 +21,11 @@ $work_package_bug_ids = array();
 if ( !empty( $_POST['version'] ) )
 {
    $source = $_POST['version'];
+   $document_type = $sd_api->getTypeString( $sd_api->getTypeBySource( $source ) );
 }
-
-var_dump( $source );
 
 /* get work packages from source */
 $work_packages = $se_api->getDocumentSpecWorkPackages( $source );
-
-var_dump( $work_packages );
 
 html_page_top1( plugin_lang_get( 'page_title' ) );
 echo '<link rel="stylesheet" href="' . SPECIFICATIONMANAGEMENT_PLUGIN_URL . 'files/SpecificationManagement.css">';
@@ -36,7 +34,9 @@ html_page_top2();
 $sm_api->printWhiteboardMenu();
 $sm_api->printEditorMenu();
 
-echo '<table>';
+$sp_api->print_document_head( $document_type, $source );
+
+echo '<table class="width100">';
 
 $chapter_index = 1;
 
@@ -45,8 +45,9 @@ if ( $work_packages != null )
    /* for each work package */
    foreach ( $work_packages as $work_package )
    {
+      $duration = $sd_api->getWorkpackageDuration( $work_package );
       /* print work package */
-      $sp_api->print_chapter_title( $chapter_index, $work_package );
+      $sp_api->print_chapter_title( $chapter_index, $work_package, $duration );
       /* get work package assigned bugs */
       $work_package_bug_ids = $se_api->getWorkPackageSpecBugs( $work_package );
 
@@ -58,12 +59,10 @@ if ( $work_packages != null )
          /* ensure that bug exists */
          if ( bug_exists( $bug_id ) )
          {
+            /* planned duration for each bug */
+            $ptime = $sd_api->getPtimeRow( $bug_id )[2];
             /* print bugs */
-            $sp_api->print_bugs( $chapter_index, $sub_chapter_index, $bug_id );
-            /* get bugnotes */
-            $bugnotes = bugnote_get_all_bugnotes( $bug_id );
-            /* print bugnotes */
-            $sp_api->print_bugnotes( $bugnotes );
+            $sp_api->print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $ptime );
             /* increment index */
             $sub_chapter_index += 10;
          }
@@ -104,12 +103,10 @@ if ( !empty( $additional_bugs ) )
       /* ensure that bug exists */
       if ( bug_exists( $add_bug_id ) )
       {
+         /* planned duration for each bug */
+         $ptime = $sd_api->getPtimeRow( $add_bug_id )[2];
          /* print bugs */
-         $sp_api->print_bugs( $chapter_index, $sub_chapter_index, $add_bug_id );
-         /* get bugnotes */
-         $bugnotes = bugnote_get_all_bugnotes( $add_bug_id );
-         /* print bugnotes */
-         $sp_api->print_bugnotes( $bugnotes );
+         $sp_api->print_bugs( $chapter_index, $sub_chapter_index, $add_bug_id, $ptime );
          /* increment index */
          $sub_chapter_index += 10;
       }

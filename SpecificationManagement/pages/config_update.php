@@ -24,6 +24,7 @@ if ( $option_change )
    $sc_api->updateButton( 'ShowInFooter' );
    $sc_api->updateButton( 'ShowFields' );
    $sc_api->updateButton( 'ShowMenu' );
+   $sc_api->updateButton( 'ShowDuration' );
 }
 
 if ( $option_addtype )

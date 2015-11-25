@@ -1,8 +1,8 @@
 <?php
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecMenu_api.php';
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecPrint_api.php';
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecEditor_api.php';
+include SPECMANAGEMENT_CORE_URI . 'SpecMenu_api.php';
+include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
+include SPECMANAGEMENT_CORE_URI . 'SpecPrint_api.php';
+include SPECMANAGEMENT_CORE_URI . 'SpecEditor_api.php';
 
 $sm_api = new SpecMenu_api();
 $sd_api = new SpecDatabase_api();
@@ -28,7 +28,7 @@ if ( !empty( $_POST['version'] ) )
 $work_packages = $se_api->getDocumentSpecWorkPackages( $source );
 
 html_page_top1( plugin_lang_get( 'page_title' ) );
-echo '<link rel="stylesheet" href="' . SPECIFICATIONMANAGEMENT_PLUGIN_URL . 'files/SpecificationManagement.css">';
+echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/SpecManagement.css">';
 html_page_top2();
 
 $sm_api->printWhiteboardMenu();

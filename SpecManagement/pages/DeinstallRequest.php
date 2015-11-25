@@ -1,5 +1,5 @@
 <?php
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
+include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
 
 $sd_api = new SpecDatabase_api();
 

@@ -1,7 +1,7 @@
 <?php
-require_once( SPECIFICATIONMANAGEMENT_CORE_URI . 'constant_api.php' );
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecConfig_api.php';
+require_once( SPECMANAGEMENT_CORE_URI . 'constant_api.php' );
+include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
+include SPECMANAGEMENT_CORE_URI . 'SpecConfig_api.php';
 
 $db_api = new SpecDatabase_api();
 $sc_api = new SpecConfig_api();
@@ -16,7 +16,7 @@ print_manage_menu();
 
 echo '<br/>';
 echo '<form action="' . plugin_page( 'config_update' ) . '" method="post">';
-echo form_security_field( 'plugin_SpecificationManagement_config_update' );
+echo form_security_field( 'plugin_SpecManagement_config_update' );
 
 if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
 {
@@ -35,7 +35,7 @@ echo '<span class="required">*</span>' . plugin_lang_get( 'config_accesslevel' )
 echo '</td>';
 echo '<td width="200px">';
 echo '<select name="AccessLevel">';
-print_enum_string_option_list( 'access_levels', plugin_config_get( 'AccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
+print_enum_string_option_list( 'access_levels', plugin_config_get( 'AccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
 echo '</select>';
 echo '</td>';
 echo '</tr>';
@@ -46,7 +46,7 @@ echo '<span class="required">*</span>' . plugin_lang_get( 'config_readlevel' );
 echo '</td>';
 echo '<td width="200px">';
 echo '<select name="ReadAccessLevel">';
-print_enum_string_option_list( 'access_levels', plugin_config_get( 'ReadAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
+print_enum_string_option_list( 'access_levels', plugin_config_get( 'ReadAccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
 echo '</select>';
 echo '</td>';
 echo '</tr>';
@@ -57,7 +57,7 @@ echo '<span class="required">*</span>' . plugin_lang_get( 'config_writelevel' );
 echo '</td>';
 echo '<td width="200px">';
 echo '<select name="WriteAccessLevel">';
-print_enum_string_option_list( 'access_levels', plugin_config_get( 'WriteAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
+print_enum_string_option_list( 'access_levels', plugin_config_get( 'WriteAccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
 echo '</select>';
 echo '</td>';
 echo '</tr>';

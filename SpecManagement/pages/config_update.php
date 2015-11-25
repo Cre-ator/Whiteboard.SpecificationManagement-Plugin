@@ -2,11 +2,11 @@
 auth_reauthenticate();
 access_ensure_global_level( config_get( 'AccessLevel' ) );
 
-form_security_validate( 'plugin_SpecificationManagement_config_update' );
+form_security_validate( 'plugin_SpecManagement_config_update' );
 
-require_once( SPECIFICATIONMANAGEMENT_CORE_URI . 'constant_api.php' );
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecConfig_api.php';
+require_once( SPECMANAGEMENT_CORE_URI . 'constant_api.php' );
+include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
+include SPECMANAGEMENT_CORE_URI . 'SpecConfig_api.php';
 
 $db_api = new SpecDatabase_api();
 $sc_api = new SpecConfig_api();
@@ -43,6 +43,6 @@ if ( $option_delete )
    }
 }
 
-form_security_purge( 'plugin_SpecificationManagement_config_update' );
+form_security_purge( 'plugin_SpecManagement_config_update' );
 
 print_successful_redirect( plugin_page( 'config_page', true ) );

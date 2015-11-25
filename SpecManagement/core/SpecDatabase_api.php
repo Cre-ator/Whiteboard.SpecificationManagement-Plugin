@@ -37,15 +37,19 @@ class SpecDatabase_api
 
       $this->mysqli->query( $query );
 
-      $query = ' DROP TABLE mantis_plugin_specificationmanagement_requirement_table';
+      $query = ' DROP TABLE mantis_plugin_specmanagement_req_table';
 
       $this->mysqli->query( $query );
 
-      $query = ' DROP TABLE mantis_plugin_specificationmanagement_source_table';
+      $query = ' DROP TABLE mantis_plugin_specmanagement_src_table';
 
       $this->mysqli->query( $query );
 
-      $query = ' DROP TABLE mantis_plugin_specificationmanagement_type_table';
+      $query = ' DROP TABLE mantis_plugin_specmanagement_type_table';
+
+      $this->mysqli->query( $query );
+
+      $query = ' DROP TABLE mantis_plugin_specmanagement_ptime_table';
 
       $this->mysqli->query( $query );
    }
@@ -68,7 +72,7 @@ class SpecDatabase_api
          }
          else
          {
-            $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+            $plugin_type_table = db_get_table( 'plugin_specmanagement_type' );
          }
 
          $query = 'SELECT type FROM ' . $plugin_type_table . '
@@ -82,19 +86,19 @@ class SpecDatabase_api
       return $string;
    }
 
-   public function getTypeBySource( $source )
+   public function getTypeBySource( $src )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $plugin_src_table = plugin_table( 'src' );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      $query = "SELECT DISTINCT s.type FROM $plugin_source_table s
-          WHERE s.version LIKE '" . $source . "%'";
+      $query = "SELECT DISTINCT s.type FROM $plugin_src_table s
+          WHERE s.version LIKE '" . $src . "%'";
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -104,7 +108,7 @@ class SpecDatabase_api
    }
 
    /**
-    * Get bug-related requirement id
+    * Get bug-related req id
     *
     * @param $bug_id
     * @return mixed
@@ -113,25 +117,25 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_requirement_table = plugin_table( 'requirement' );
+         $plugin_req_table = plugin_table( 'req' );
       }
       else
       {
-         $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+         $plugin_req_table = db_get_table( 'plugin_specmanagement_req' );
       }
 
-      $query = 'SELECT id FROM ' . $plugin_requirement_table . '
+      $query = 'SELECT id FROM ' . $plugin_req_table . '
          WHERE bug_id = ' . $bug_id;
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
-      $requirement_id = $result[0];
+      $req_id = $result[0];
 
-      return $requirement_id;
+      return $req_id;
    }
 
    /**
-    * Get bug-related requirement entry
+    * Get bug-related req entry
     *
     * @param $bug_id
     * @return array|null
@@ -140,23 +144,23 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_requirement_table = plugin_table( 'requirement' );
+         $plugin_req_table = plugin_table( 'req' );
       }
       else
       {
-         $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+         $plugin_req_table = db_get_table( 'plugin_specmanagement_req' );
       }
 
-      $query = 'SELECT * FROM ' . $plugin_requirement_table . '
+      $query = 'SELECT * FROM ' . $plugin_req_table . '
          WHERE bug_id = ' . $bug_id;
 
-      $requirement_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $req_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
-      return $requirement_row;
+      return $req_row;
    }
 
    /**
-    * Get bug-related source entry
+    * Get bug-related src entry
     *
     * @param $bug_id
     * @return array|null
@@ -165,19 +169,19 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $plugin_src_table = plugin_table( 'src' );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      $query = 'SELECT * FROM ' . $plugin_source_table . '
+      $query = 'SELECT * FROM ' . $plugin_src_table . '
          WHERE bug_id = ' . $bug_id;
 
-      $source_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $src_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
-      return $source_row;
+      return $src_row;
    }
 
    /**
@@ -194,7 +198,7 @@ class SpecDatabase_api
       }
       else
       {
-         $plugin_ptime_table = db_get_table( 'plugin_specificationmanagement_ptime' );
+         $plugin_ptime_table = db_get_table( 'plugin_specmanagement_ptime' );
       }
 
       $query = 'SELECT * FROM ' . $plugin_ptime_table . '
@@ -206,55 +210,55 @@ class SpecDatabase_api
    }
 
    /**
-    * Create new bug-related requirement entry
+    * Create new bug-related req entry
     *
     * @param $bug_id
-    * @param $requirement_type
+    * @param $req_type
     */
-   public function insertReqRow( $bug_id, $requirement_type )
+   public function insertReqRow( $bug_id, $req_type )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_requirement_table = plugin_table( 'requirement' );
+         $plugin_req_table = plugin_table( 'req' );
       }
       else
       {
-         $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+         $plugin_req_table = db_get_table( 'plugin_specmanagement_req' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_requirement_table . '( id, bug_id, type )
-         SELECT null, ' . $bug_id . ',' . $requirement_type . '
+      $query = 'INSERT INTO ' . $plugin_req_table . '( id, bug_id, type )
+         SELECT null, ' . $bug_id . ',' . $req_type . '
          FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM ' . $plugin_requirement_table . '
+         SELECT 1 FROM ' . $plugin_req_table . '
          WHERE bug_id = ' . $bug_id . ')';
 
       $this->mysqli->query( $query );
    }
 
    /**
-    * Create new bug-related source entry
+    * Create new bug-related src entry
     *
     * @param $bug_id
-    * @param $requirement_id
-    * @param $requirement_type
+    * @param $req_id
+    * @param $req_type
     * @param $version
     */
-   public function insertSourceRow( $bug_id, $requirement_id, $requirement_type, $version )
+   public function insertSourceRow( $bug_id, $req_id, $req_type, $version )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $plugin_src_table = plugin_table( 'src' );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_source_table . '( id, bug_id, requirement_id, version, type )
-         SELECT null, ' . $bug_id . ',' . $requirement_id . ',\'' . $version . '\',' . $requirement_type . '
+      $query = 'INSERT INTO ' . $plugin_src_table . '( id, bug_id, req_id, version, type )
+         SELECT null, ' . $bug_id . ',' . $req_id . ',\'' . $version . '\',' . $req_type . '
          FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM ' . $plugin_source_table . '
-         WHERE bug_id = ' . $bug_id . ' AND version = \'' . $version . '\' AND type = ' . $requirement_type . ')';
+         SELECT 1 FROM ' . $plugin_src_table . '
+         WHERE bug_id = ' . $bug_id . ' AND version = \'' . $version . '\' AND type = ' . $req_type . ')';
 
       $this->mysqli->query( $query );
    }
@@ -273,7 +277,7 @@ class SpecDatabase_api
       }
       else
       {
-         $plugin_ptime_table = db_get_table( 'plugin_specificationmanagement_ptime' );
+         $plugin_ptime_table = db_get_table( 'plugin_specmanagement_ptime' );
       }
 
       $query = 'INSERT INTO ' . $plugin_ptime_table . '( id, bug_id, time)
@@ -286,33 +290,33 @@ class SpecDatabase_api
    }
 
    /**
-    * Update existing requirement
+    * Update existing req
     *
     * @param $bug_id
-    * @param $requirement_type
+    * @param $req_type
     */
-   public function updateReqRow( $bug_id, $requirement_type )
+   public function updateReqRow( $bug_id, $req_type )
    {
       if ( $this->getReqRow( $bug_id ) == null )
       {
-         $this->insertReqRow( $bug_id, $requirement_type );
+         $this->insertReqRow( $bug_id, $req_type );
       }
       else
       {
          if ( $this->getMantisVersion() == '1.2.' )
          {
-            $plugin_requirement_table = plugin_table( 'requirement' );
+            $plugin_req_table = plugin_table( 'req' );
          }
          else
          {
-            $plugin_requirement_table = db_get_table( 'plugin_specificationmanagement_requirement' );
+            $plugin_req_table = db_get_table( 'plugin_specmanagement_req' );
          }
 
          $query = 'SET SQL_SAFE_UPDATES = 0';
          $this->mysqli->query( $query );
 
-         $query = 'UPDATE ' . $plugin_requirement_table . '
-         SET type = ' . $requirement_type . '
+         $query = 'UPDATE ' . $plugin_req_table . '
+         SET type = ' . $req_type . '
          WHERE bug_id = ' . $bug_id;
 
          $this->mysqli->query( $query );
@@ -323,35 +327,35 @@ class SpecDatabase_api
    }
 
    /**
-    * Update existing source
+    * Update existing src
     *
     * @param $bug_id
-    * @param $requirement_type
+    * @param $req_type
     * @param $version
     */
-   public function updateSourceRow( $bug_id, $requirement_type, $version )
+   public function updateSourceRow( $bug_id, $req_type, $version )
    {
       if ( $this->getSourceRow( $bug_id ) == null )
       {
-         $requirement_id = $this->getTypeId( $requirement_type );
-         $this->insertSourceRow( $bug_id, $requirement_id, $requirement_type, $version );
+         $req_id = $this->getTypeId( $req_type );
+         $this->insertSourceRow( $bug_id, $req_id, $req_type, $version );
       }
       else
       {
          if ( $this->getMantisVersion() == '1.2.' )
          {
-            $plugin_source_table = plugin_table( 'source' );
+            $plugin_src_table = plugin_table( 'src' );
          }
          else
          {
-            $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+            $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
          }
 
          $query = 'SET SQL_SAFE_UPDATES = 0';
          $this->mysqli->query( $query );
 
-         $query = 'UPDATE ' . $plugin_source_table . '
-         SET version = \'' . $version . '\', type = ' . $requirement_type . '
+         $query = 'UPDATE ' . $plugin_src_table . '
+         SET version = \'' . $version . '\', type = ' . $req_type . '
          WHERE bug_id = ' . $bug_id;
 
          $this->mysqli->query( $query );
@@ -381,7 +385,7 @@ class SpecDatabase_api
          }
          else
          {
-            $plugin_ptime_table = db_get_table( 'plugin_specificationmanagement_ptime' );
+            $plugin_ptime_table = db_get_table( 'plugin_specmanagement_ptime' );
          }
 
          $query = 'SET SQL_SAFE_UPDATES = 0';
@@ -411,7 +415,7 @@ class SpecDatabase_api
       }
       else
       {
-         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+         $plugin_type_table = db_get_table( 'plugin_specmanagement_type' );
       }
 
       $query = "SELECT t.id FROM $plugin_type_table t
@@ -437,7 +441,7 @@ class SpecDatabase_api
       }
       else
       {
-         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+         $plugin_type_table = db_get_table( 'plugin_specmanagement_type' );
       }
 
       $query = 'INSERT INTO ' . $plugin_type_table . '( id, type )
@@ -462,7 +466,7 @@ class SpecDatabase_api
       }
       else
       {
-         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+         $plugin_type_table = db_get_table( 'plugin_specmanagement_type' );
       }
 
       $primary_key = $this->getTypeId( $string );
@@ -487,7 +491,7 @@ class SpecDatabase_api
       }
       else
       {
-         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+         $plugin_type_table = db_get_table( 'plugin_specmanagement_type' );
       }
 
       $query = 'SELECT id
@@ -513,7 +517,7 @@ class SpecDatabase_api
       }
       else
       {
-         $plugin_type_table = db_get_table( 'plugin_specificationmanagement_type' );
+         $plugin_type_table = db_get_table( 'plugin_specmanagement_type' );
       }
 
       $query = "SELECT type
@@ -534,7 +538,7 @@ class SpecDatabase_api
    }
 
    /**
-    * Get available sources (versions) for a specific requirement (type)
+    * Get available srcs (versions) for a specific req (type)
     *
     * @param $type
     * @param $project_id
@@ -544,16 +548,16 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $plugin_src_table = plugin_table( 'src' );
          $bug_table = db_get_table( 'mantis_bug_table' );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
          $bug_table = db_get_table( 'bug' );
       }
 
-      $query = "SELECT DISTINCT s.version FROM $plugin_source_table s, $bug_table b
+      $query = "SELECT DISTINCT s.version FROM $plugin_src_table s, $bug_table b
           WHERE s.type = " . $type;
       if ( $project_id != 0 )
       {
@@ -564,35 +568,35 @@ class SpecDatabase_api
       $result = $this->mysqli->query( $query );
 
       $oldTmp = null;
-      $sources = array();
+      $srcs = array();
       while ( $row = $result->fetch_row() )
       {
          $tmp = explode( ';', $row[0] );
 
          if ( $tmp[0] != $oldTmp )
          {
-            $sources[] = $tmp[0];
+            $srcs[] = $tmp[0];
          }
          $oldTmp = $tmp[0];
       }
 
-      return $sources;
+      return $srcs;
    }
 
    public function getWorkpackageDuration( $work_package )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $plugin_src_table = plugin_table( 'src' );
          $plugin_ptime_table = plugin_table( 'ptime' );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
-         $plugin_ptime_table = db_get_table( 'plugin_specificationmanagement_ptime' );
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
+         $plugin_ptime_table = db_get_table( 'plugin_specmanagement_ptime' );
       }
 
-      $query = "SELECT SUM( p.time ) FROM $plugin_ptime_table p, $plugin_source_table s
+      $query = "SELECT SUM( p.time ) FROM $plugin_ptime_table p, $plugin_src_table s
          WHERE p.bug_id = s.bug_id
          AND s.version LIKE '%" . $work_package . "'";
 

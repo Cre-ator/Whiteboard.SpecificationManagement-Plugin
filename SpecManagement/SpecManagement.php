@@ -1,18 +1,17 @@
 <?php
 
-class SpecificationManagementPlugin extends MantisPlugin
+class SpecManagementPlugin extends MantisPlugin
 {
    function register()
    {
-      $this->name = 'SpecificationManagement';
-      $this->description = 'Adds fields for management specifications to bug reports.';
+      $this->name = 'SpecManagement';
+      $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
       $this->version = '1.0.4';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.1',
-         'UserProjectView' => '>= 1.2.7'
       );
 
       $this->author = 'Stefan Schwarz';
@@ -68,7 +67,7 @@ class SpecificationManagementPlugin extends MantisPlugin
       (
          array
          (
-            'CreateTableSQL', array( plugin_table( 'requirement' ), "
+            'CreateTableSQL', array( plugin_table( 'req' ), "
             id          I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id      I       NOTNULL UNSIGNED,
             type        I       NOTNULL UNSIGNED
@@ -76,7 +75,7 @@ class SpecificationManagementPlugin extends MantisPlugin
          ),
          array
          (
-            'CreateTableSQL', array( plugin_table( 'source' ), "
+            'CreateTableSQL', array( plugin_table( 'src' ), "
             id              I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id          I       NOTNULL UNSIGNED,
             requirement_id  I       NOTNULL UNSIGNED,
@@ -121,7 +120,7 @@ class SpecificationManagementPlugin extends MantisPlugin
       $project_id = helper_get_current_project();
       $user_id = auth_get_current_user_id();
 
-      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'AccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_THRESHOLD_LEVEL_DEFAULT );
+      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'AccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT );
    }
 
    function getReadLevel()
@@ -129,7 +128,7 @@ class SpecificationManagementPlugin extends MantisPlugin
       $project_id = helper_get_current_project();
       $user_id = auth_get_current_user_id();
 
-      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'ReadAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_READ_LEVEL_DEFAULT );
+      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'ReadAccessLevel', PLUGINS_SPECMANAGEMENT_READ_LEVEL_DEFAULT );
    }
 
    function getWriteLevel()
@@ -137,7 +136,7 @@ class SpecificationManagementPlugin extends MantisPlugin
       $project_id = helper_get_current_project();
       $user_id = auth_get_current_user_id();
 
-      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'WriteAccessLevel', PLUGINS_SPECIFICATIONMANAGEMENT_WRITE_LEVEL_DEFAULT );
+      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'WriteAccessLevel', PLUGINS_SPECMANAGEMENT_WRITE_LEVEL_DEFAULT );
    }
 
    /**

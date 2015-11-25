@@ -1,5 +1,5 @@
 <?php
-include SPECIFICATIONMANAGEMENT_CORE_URI . 'SpecMenu_api.php';
+include SPECMANAGEMENT_CORE_URI . 'SpecMenu_api.php';
 
 $sm_api = new SpecMenu_api();
 

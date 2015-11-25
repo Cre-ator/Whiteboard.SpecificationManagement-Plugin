@@ -23,21 +23,21 @@ class SpecEditor_api
       return substr( MANTIS_VERSION, 0, 4 );
    }
 
-   public function getDocumentSpecWorkPackages( $source )
+   public function getDocumentSpecWorkPackages( $src )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $plugin_src_table = plugin_table( 'src' );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      if ( $source != null )
+      if ( $src != null )
       {
-         $query = "SELECT s.version FROM $plugin_source_table s
-          WHERE s.version LIKE '" . $source . "%'";
+         $query = "SELECT s.version FROM $plugin_src_table s
+          WHERE s.version LIKE '" . $src . "%'";
 
          $result = $this->mysqli->query( $query );
 
@@ -62,14 +62,14 @@ class SpecEditor_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_source_table = plugin_table( 'source' );
+         $plugin_src_table = plugin_table( 'src' );
       }
       else
       {
-         $plugin_source_table = db_get_table( 'plugin_specificationmanagement_source' );
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      $query = "SELECT DISTINCT s.bug_id FROM $plugin_source_table s
+      $query = "SELECT DISTINCT s.bug_id FROM $plugin_src_table s
         WHERE s.version LIKE '%" . $work_package . "%'";
 
       $result = $this->mysqli->query( $query );

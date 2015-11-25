@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.4';
+      $this->version = '1.0.5';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.1',
@@ -232,7 +232,15 @@ class SpecManagementPlugin extends MantisPlugin
       include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecDatabase_api.php';
       $db_api = new SpecDatabase_api();
 
-      $bug_id = $bug->id;
+      if ( !is_null( $bug ) )
+      {
+         $bug_id = $bug->id;
+      }
+      else
+      {
+         $bug_id = gpc_get_int( 'bug_id' );
+      }
+
       $requirement_obj = $db_api->getReqRow( $bug_id );
       $source_obj = $db_api->getSourceRow( $bug_id );
       $ptime_obj = $db_api->getPtimeRow( $bug_id );
@@ -251,7 +259,7 @@ class SpecManagementPlugin extends MantisPlugin
             break;
          case 'EVENT_UPDATE_BUG':
             $db_api->updateReqRow( $bug_id, $requirement_type_id );
-            $db_api->updateSourceRow( $bug_id, $requirement_type_id, $version );
+            $db_api->updateSourceRow( $bug_id, $requirement_type_id ,$requirement_type, $version );
             $db_api->updatePtimeRow( $bug_id, $ptime );
             break;
       }

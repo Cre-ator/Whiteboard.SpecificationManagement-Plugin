@@ -9,9 +9,9 @@ class SpecPrint_api
 
    public function printRow()
    {
-      if ( $this->system_getMantisVersion() == '1.2' )
+      if ( $this->system_getMantisVersion() == '1.2.' )
       {
-         echo '<tr class="row-1">';
+         echo '<tr ' . helper_alternate_class() . '>';
       }
       else
       {
@@ -22,7 +22,7 @@ class SpecPrint_api
    public function printBugUpdateFields( $types, $source, $ptime )
    {
       $this->printRow();
-      echo '<th class="category">';
+      echo '<td class="category">';
       echo '<form name="options" action="" method="get">';
       echo '<label for="option"><span>' . plugin_lang_get( 'bug_add_form_specification_req' ) . '</span></label>';
       echo '</form>';
@@ -44,14 +44,14 @@ class SpecPrint_api
       echo '</tr>';
 
       $this->printRow();
-      echo '<th class="category"><label for="source">' . plugin_lang_get( 'bug_add_form_specification_src' ) . '</label></th>';
+      echo '<td class="category"><label for="source">' . plugin_lang_get( 'bug_add_form_specification_src' ) . '</label></td>';
       echo '<td colspan="5">';
       echo '<input ', helper_get_tab_index(), ' type="text" id="source" name="source" size="105" maxlength="128" value="', $source, '" />';
       echo '</td>';
       echo '</tr>';
 
       $this->printRow();
-      echo '<th class="category"><label for="ptime">' . plugin_lang_get( 'bug_add_form_planned_time' ) . plugin_lang_get( 'bug_add_form_ptime_expl' ) . '</label></th>';
+      echo '<td class="category"><label for="ptime">' . plugin_lang_get( 'bug_add_form_planned_time' ) . plugin_lang_get( 'bug_add_form_ptime_expl' ) . '</label></td>';
       echo '<td colspan="5">';
       echo '<input ', helper_get_tab_index(), ' type="text" id="ptime" name="ptime" size="105" maxlength="128" value="', $ptime, '" />';
       echo '</td>';
@@ -67,7 +67,7 @@ class SpecPrint_api
 
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_add_form_specification_src' ), '</td>';
-      echo '<td colspan="5" id="source">', $requirement . ': ' . $source, '</td>';
+      echo '<td colspan="5" id="source">', $source, '</td>';
       echo '</tr>';
 
       $this->printRow();
@@ -80,7 +80,48 @@ class SpecPrint_api
    {
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {
-         /* TODO: 1.2 Content */
+         $this->printRow();
+         echo '<td class="category">';
+         echo '<form name="options" action="" method="get">';
+         echo '<label for="option"><span>' . plugin_lang_get( 'bug_add_form_specification_req' ) . '</span></label>';
+         echo '</td>';
+         echo '<td>';
+         echo '<span class="select">';
+         echo '<select ' . helper_get_tab_index() . ' id="types" name="types">';
+         foreach ( $types as $type )
+         {
+            echo '<option value="' . $type . '">' . $type . '</option>';
+         }
+         echo '</select>';
+         echo '</span>';
+         echo '<span class="label-style"></span>';
+         echo '</td>';
+         echo '</form>';
+         echo '</tr>';
+
+         $this->printRow();
+         echo '<td class="category">';
+         echo '<label><span>' . plugin_lang_get( 'bug_add_form_specification_src' ) . '</span></label>';
+         echo '</td>';
+         echo '<td>';
+         echo '<span class="input">';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="source" name="source" size="105" maxlength="128" value="' . string_attribute( $source ) . '" />';
+         echo '</span>';
+         echo '<span class="label-style"></span>';
+         echo '</td>';
+         echo '</tr>';
+
+         $this->printRow();
+         echo '<td class="category">';
+         echo '<label><span>' . plugin_lang_get( 'bug_add_form_planned_time' ) . plugin_lang_get( 'bug_add_form_ptime_expl' ) . '</span></label>';
+         echo '</td>';
+         echo '<td>';
+         echo '<span class="input">';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="105" maxlength="128" value="' . string_attribute( $ptime ) . '" />';
+         echo '</span>';
+         echo '<span class="label-style"></span>';
+         echo '</td>';
+         echo '</tr>';
       }
       else
       {

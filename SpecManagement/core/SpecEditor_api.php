@@ -27,7 +27,7 @@ class SpecEditor_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src' );
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
       }
       else
       {
@@ -62,7 +62,7 @@ class SpecEditor_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src' );
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
       }
       else
       {

@@ -68,7 +68,7 @@ class SpecDatabase_api
       {
          if ( $this->getMantisVersion() == '1.2.' )
          {
-            $plugin_type_table = plugin_table( 'type' );
+            $plugin_type_table = plugin_table( 'type', 'specmanagement' );
          }
          else
          {
@@ -90,7 +90,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src' );
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
       }
       else
       {
@@ -117,7 +117,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_req_table = plugin_table( 'req' );
+         $plugin_req_table = plugin_table( 'req', 'specmanagement' );
       }
       else
       {
@@ -144,7 +144,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_req_table = plugin_table( 'req' );
+         $plugin_req_table = plugin_table( 'req', 'specmanagement' );
       }
       else
       {
@@ -169,7 +169,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src' );
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
       }
       else
       {
@@ -194,7 +194,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_ptime_table = plugin_table( 'ptime' );
+         $plugin_ptime_table = plugin_table( 'ptime', 'specmanagement' );
       }
       else
       {
@@ -219,7 +219,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_req_table = plugin_table( 'req' );
+         $plugin_req_table = plugin_table( 'req', 'specmanagement' );
       }
       else
       {
@@ -247,7 +247,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src' );
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
       }
       else
       {
@@ -259,6 +259,8 @@ class SpecDatabase_api
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM ' . $plugin_src_table . '
          WHERE bug_id = ' . $bug_id . ' AND version = \'' . $version . '\' AND type = ' . $req_type . ')';
+
+      var_dump($query);
 
       $this->mysqli->query( $query );
    }
@@ -273,7 +275,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_ptime_table = plugin_table( 'ptime' );
+         $plugin_ptime_table = plugin_table( 'ptime', 'specmanagement' );
       }
       else
       {
@@ -305,7 +307,7 @@ class SpecDatabase_api
       {
          if ( $this->getMantisVersion() == '1.2.' )
          {
-            $plugin_req_table = plugin_table( 'req' );
+            $plugin_req_table = plugin_table( 'req', 'specmanagement' );
          }
          else
          {
@@ -333,18 +335,18 @@ class SpecDatabase_api
     * @param $req_type
     * @param $version
     */
-   public function updateSourceRow( $bug_id, $req_type, $version )
+   public function updateSourceRow( $bug_id, $req_type_id, $req_type, $version )
    {
       if ( $this->getSourceRow( $bug_id ) == null )
       {
          $req_id = $this->getTypeId( $req_type );
-         $this->insertSourceRow( $bug_id, $req_id, $req_type, $version );
+         $this->insertSourceRow( $bug_id, $req_id, $req_type_id, $version );
       }
       else
       {
          if ( $this->getMantisVersion() == '1.2.' )
          {
-            $plugin_src_table = plugin_table( 'src' );
+            $plugin_src_table = plugin_table( 'src', 'specmanagement' );
          }
          else
          {
@@ -381,7 +383,7 @@ class SpecDatabase_api
       {
          if ( $this->getMantisVersion() == '1.2.' )
          {
-            $plugin_ptime_table = plugin_table( 'ptime' );
+            $plugin_ptime_table = plugin_table( 'ptime', 'specmanagement' );
          }
          else
          {
@@ -411,7 +413,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_type_table = plugin_table( 'type' );
+         $plugin_type_table = plugin_table( 'type', 'specmanagement' );
       }
       else
       {
@@ -437,7 +439,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_type_table = plugin_table( 'type' );
+         $plugin_type_table = plugin_table( 'type', 'specmanagement' );
       }
       else
       {
@@ -462,7 +464,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_type_table = plugin_table( 'type' );
+         $plugin_type_table = plugin_table( 'type', 'specmanagement' );
       }
       else
       {
@@ -487,7 +489,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_type_table = plugin_table( 'type' );
+         $plugin_type_table = plugin_table( 'type', 'specmanagement' );
       }
       else
       {
@@ -513,7 +515,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_type_table = plugin_table( 'type' );
+         $plugin_type_table = plugin_table( 'type', 'specmanagement' );
       }
       else
       {
@@ -548,7 +550,7 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src' );
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
          $bug_table = db_get_table( 'mantis_bug_table' );
       }
       else
@@ -587,8 +589,8 @@ class SpecDatabase_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src' );
-         $plugin_ptime_table = plugin_table( 'ptime' );
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
+         $plugin_ptime_table = plugin_table( 'ptime', 'specmanagement' );
       }
       else
       {

@@ -63,17 +63,17 @@ echo '</td>';
 echo '</tr>';
 
 $sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'fields' );
+$sc_api->printCategoryField( 1, 1, 'config_fields' );
 $sc_api->printRadioButton( 1, 'ShowFields' );
 echo '</tr>';
 
 $sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'menu' );
+$sc_api->printCategoryField( 1, 1, 'config_menu' );
 $sc_api->printRadioButton( 1, 'ShowMenu' );
 echo '</tr>';
 
 $sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'footer' );
+$sc_api->printCategoryField( 1, 1, 'config_footer' );
 $sc_api->printRadioButton( 1, 'ShowInFooter' );
 echo '</tr>';
 

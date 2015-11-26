@@ -8,10 +8,10 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.5';
+      $this->version = '1.0.6';
       $this->requires = array
       (
-         'MantisCore' => '1.2.0, <= 1.3.1',
+         'MantisCore' => '1.2.0, <= 1.3.99',
       );
 
       $this->author = 'Stefan Schwarz';
@@ -70,7 +70,7 @@ class SpecManagementPlugin extends MantisPlugin
             'CreateTableSQL', array( plugin_table( 'req' ), "
             id          I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id      I       NOTNULL UNSIGNED,
-            type        I       NOTNULL UNSIGNED
+            type_id     I       NOTNULL UNSIGNED
             " )
          ),
          array
@@ -80,7 +80,7 @@ class SpecManagementPlugin extends MantisPlugin
             bug_id          I       NOTNULL UNSIGNED,
             requirement_id  I       NOTNULL UNSIGNED,
             version         C(250)  DEFAULT '',
-            type            I       NOTNULL UNSIGNED
+            type_id         I       NOTNULL UNSIGNED
             " )
          ),
          array
@@ -244,23 +244,23 @@ class SpecManagementPlugin extends MantisPlugin
       $requirement_obj = $db_api->getReqRow( $bug_id );
       $source_obj = $db_api->getSourceRow( $bug_id );
       $ptime_obj = $db_api->getPtimeRow( $bug_id );
-      $requirement_type = gpc_get_string( 'types', $db_api->getTypeString( $requirement_obj[2] ) );
+      $type = gpc_get_string( 'types', $db_api->getTypeString( $requirement_obj[2] ) );
       $version = gpc_get_string( 'source', $source_obj[3] );
-      $requirement_type_id = $db_api->getTypeId( $requirement_type );
-      $ptime = gpc_get_string( 'ptime', $ptime_obj[2] );
+      $type_id = $db_api->getTypeId( $type );
+      $time = gpc_get_string( 'ptime', $ptime_obj[2] );
 
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
-            $db_api->insertReqRow( $bug_id, $requirement_type_id );
+            $db_api->insertReqRow( $bug_id, $type_id );
             $requirement_id = $db_api->getReqId( $bug_id );
-            $db_api->insertSourceRow( $bug_id, $requirement_id, $requirement_type_id, $version );
-            $db_api->insertPtimeRow( $bug_id, $ptime );
+            $db_api->insertSourceRow( $bug_id, $requirement_id, $version, $type_id );
+            $db_api->insertPtimeRow( $bug_id, $time );
             break;
          case 'EVENT_UPDATE_BUG':
-            $db_api->updateReqRow( $bug_id, $requirement_type_id );
-            $db_api->updateSourceRow( $bug_id, $requirement_type_id ,$requirement_type, $version );
-            $db_api->updatePtimeRow( $bug_id, $ptime );
+            $db_api->updateReqRow( $bug_id, $type_id );
+            $db_api->updateSourceRow( $bug_id, $version, $type_id );
+            $db_api->updatePtimeRow( $bug_id, $time );
             break;
       }
    }

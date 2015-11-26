@@ -23,7 +23,7 @@ class SpecEditor_api
       return substr( MANTIS_VERSION, 0, 4 );
    }
 
-   public function getDocumentSpecWorkPackages( $src )
+   public function getDocumentSpecWorkPackages( $version )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -34,10 +34,10 @@ class SpecEditor_api
          $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      if ( $src != null )
+      if ( $version != null )
       {
          $query = "SELECT s.version FROM $plugin_src_table s
-          WHERE s.version LIKE '" . $src . "%'";
+          WHERE s.version LIKE '" . $version . "%'";
 
          $result = $this->mysqli->query( $query );
 

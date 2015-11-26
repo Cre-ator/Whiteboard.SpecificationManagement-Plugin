@@ -86,7 +86,7 @@ class SpecDatabase_api
       return $string;
    }
 
-   public function getTypeBySource( $src )
+   public function getTypeByVersion( $version )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -97,8 +97,8 @@ class SpecDatabase_api
          $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      $query = "SELECT DISTINCT s.type FROM $plugin_src_table s
-          WHERE s.version LIKE '" . $src . "%'";
+      $query = "SELECT DISTINCT s.type_id FROM $plugin_src_table s
+          WHERE s.version LIKE '" . $version . "%'";
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -213,9 +213,9 @@ class SpecDatabase_api
     * Create new bug-related req entry
     *
     * @param $bug_id
-    * @param $req_type
+    * @param $type_id
     */
-   public function insertReqRow( $bug_id, $req_type )
+   public function insertReqRow( $bug_id, $type_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -226,8 +226,8 @@ class SpecDatabase_api
          $plugin_req_table = db_get_table( 'plugin_specmanagement_req' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_req_table . '( id, bug_id, type )
-         SELECT null, ' . $bug_id . ',' . $req_type . '
+      $query = 'INSERT INTO ' . $plugin_req_table . '( id, bug_id, type_id )
+         SELECT null, ' . $bug_id . ',' . $type_id . '
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM ' . $plugin_req_table . '
          WHERE bug_id = ' . $bug_id . ')';
@@ -239,11 +239,11 @@ class SpecDatabase_api
     * Create new bug-related src entry
     *
     * @param $bug_id
-    * @param $req_id
-    * @param $req_type
+    * @param $requirement_id
+    * @param $type_id
     * @param $version
     */
-   public function insertSourceRow( $bug_id, $req_id, $req_type, $version )
+   public function insertSourceRow( $bug_id, $requirement_id, $version, $type_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -254,13 +254,11 @@ class SpecDatabase_api
          $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_src_table . '( id, bug_id, req_id, version, type )
-         SELECT null, ' . $bug_id . ',' . $req_id . ',\'' . $version . '\',' . $req_type . '
+      $query = 'INSERT INTO ' . $plugin_src_table . '( id, bug_id, requirement_id, version, type_id )
+         SELECT null, ' . $bug_id . ',' . $requirement_id . ',\'' . $version . '\',' . $type_id . '
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM ' . $plugin_src_table . '
-         WHERE bug_id = ' . $bug_id . ' AND version = \'' . $version . '\' AND type = ' . $req_type . ')';
-
-      var_dump($query);
+         WHERE bug_id = ' . $bug_id . ' AND version = \'' . $version . '\' AND type_id = ' . $type_id . ')';
 
       $this->mysqli->query( $query );
    }
@@ -295,13 +293,13 @@ class SpecDatabase_api
     * Update existing req
     *
     * @param $bug_id
-    * @param $req_type
+    * @param $type_id
     */
-   public function updateReqRow( $bug_id, $req_type )
+   public function updateReqRow( $bug_id, $type_id )
    {
       if ( $this->getReqRow( $bug_id ) == null )
       {
-         $this->insertReqRow( $bug_id, $req_type );
+         $this->insertReqRow( $bug_id, $type_id );
       }
       else
       {
@@ -318,7 +316,7 @@ class SpecDatabase_api
          $this->mysqli->query( $query );
 
          $query = 'UPDATE ' . $plugin_req_table . '
-         SET type = ' . $req_type . '
+         SET type_id = ' . $type_id . '
          WHERE bug_id = ' . $bug_id;
 
          $this->mysqli->query( $query );
@@ -332,15 +330,15 @@ class SpecDatabase_api
     * Update existing src
     *
     * @param $bug_id
-    * @param $req_type
+    * @param $type_id
     * @param $version
     */
-   public function updateSourceRow( $bug_id, $req_type_id, $req_type, $version )
+   public function updateSourceRow( $bug_id, $version, $type_id )
    {
       if ( $this->getSourceRow( $bug_id ) == null )
       {
-         $req_id = $this->getTypeId( $req_type );
-         $this->insertSourceRow( $bug_id, $req_id, $req_type_id, $version );
+         $requirement_id = $this->getReqId( $bug_id );
+         $this->insertSourceRow( $bug_id, $requirement_id, $version, $type_id );
       }
       else
       {
@@ -357,7 +355,7 @@ class SpecDatabase_api
          $this->mysqli->query( $query );
 
          $query = 'UPDATE ' . $plugin_src_table . '
-         SET version = \'' . $version . '\', type = ' . $req_type . '
+         SET version = \'' . $version . '\', type_id = ' . $type_id . '
          WHERE bug_id = ' . $bug_id;
 
          $this->mysqli->query( $query );
@@ -542,11 +540,11 @@ class SpecDatabase_api
    /**
     * Get available srcs (versions) for a specific req (type)
     *
-    * @param $type
+    * @param $type_id
     * @param $project_id
     * @return array
     */
-   public function getSources( $type, $project_id )
+   public function getSources( $type_id, $project_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -560,7 +558,7 @@ class SpecDatabase_api
       }
 
       $query = "SELECT DISTINCT s.version FROM $plugin_src_table s, $bug_table b
-          WHERE s.type = " . $type;
+          WHERE s.type_id = " . $type_id;
       if ( $project_id != 0 )
       {
          $query .= " AND b.id = s.bug_id
@@ -607,10 +605,5 @@ class SpecDatabase_api
       $duration = $result[0];
 
       return $duration;
-   }
-
-   public function getProbablyAssignedBugs( $work_package )
-   {
-
    }
 }

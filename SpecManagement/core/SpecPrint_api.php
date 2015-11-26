@@ -2,14 +2,14 @@
 
 class SpecPrint_api
 {
-   public function system_getMantisVersion()
+   public function getMantisVersion()
    {
       return substr( MANTIS_VERSION, 0, 4 );
    }
 
    public function printRow()
    {
-      if ( $this->system_getMantisVersion() == '1.2.' )
+      if ( $this->getMantisVersion() == '1.2.' )
       {
          echo '<tr ' . helper_alternate_class() . '>';
       }
@@ -24,7 +24,7 @@ class SpecPrint_api
       $this->printRow();
       echo '<td class="category">';
       echo '<form name="options" action="" method="get">';
-      echo '<label for="option"><span>' . plugin_lang_get( 'bug_add_form_specification_req' ) . '</span></label>';
+      echo '<label for="option"><span>' . plugin_lang_get( 'bug_view_specification_req' ) . '</span></label>';
       echo '</form>';
       echo '</th>';
       echo '<td colspan="5">';
@@ -44,14 +44,14 @@ class SpecPrint_api
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category"><label for="source">' . plugin_lang_get( 'bug_add_form_specification_src' ) . '</label></td>';
+      echo '<td class="category"><label for="source">' . plugin_lang_get( 'bug_view_specification_src' ) . '</label></td>';
       echo '<td colspan="5">';
       echo '<input ', helper_get_tab_index(), ' type="text" id="source" name="source" size="105" maxlength="128" value="', $source, '" />';
       echo '</td>';
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category"><label for="ptime">' . plugin_lang_get( 'bug_add_form_planned_time' ) . plugin_lang_get( 'bug_add_form_ptime_expl' ) . '</label></td>';
+      echo '<td class="category"><label for="ptime">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</label></td>';
       echo '<td colspan="5">';
       echo '<input ', helper_get_tab_index(), ' type="text" id="ptime" name="ptime" size="105" maxlength="128" value="', $ptime, '" />';
       echo '</td>';
@@ -61,17 +61,17 @@ class SpecPrint_api
    public function printBugViewFields( $requirement, $source, $ptime )
    {
       $this->printRow();
-      echo '<td class="category">', plugin_lang_get( 'bug_add_form_specification_req' ), '</td>';
+      echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
       echo '<td colspan="5" id="types">', $requirement, '</td>';
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category">', plugin_lang_get( 'bug_add_form_specification_src' ), '</td>';
+      echo '<td class="category">', plugin_lang_get( 'bug_view_specification_src' ), '</td>';
       echo '<td colspan="5" id="source">', $source, '</td>';
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category">', plugin_lang_get( 'bug_add_form_planned_time' ), plugin_lang_get( 'bug_add_form_ptime_expl' ), '</td>';
+      echo '<td class="category">', plugin_lang_get( 'bug_view_planned_time' ),  ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' , '</td>';
       echo '<td colspan="5" id="ptime">', $ptime, '</td>';
       echo '</tr>';
    }
@@ -83,7 +83,7 @@ class SpecPrint_api
          $this->printRow();
          echo '<td class="category">';
          echo '<form name="options" action="" method="get">';
-         echo '<label for="option"><span>' . plugin_lang_get( 'bug_add_form_specification_req' ) . '</span></label>';
+         echo '<label for="option"><span>' . plugin_lang_get( 'bug_view_specification_req' ) . '</span></label>';
          echo '</td>';
          echo '<td>';
          echo '<span class="select">';
@@ -101,7 +101,7 @@ class SpecPrint_api
 
          $this->printRow();
          echo '<td class="category">';
-         echo '<label><span>' . plugin_lang_get( 'bug_add_form_specification_src' ) . '</span></label>';
+         echo '<label><span>' . plugin_lang_get( 'bug_view_specification_src' ) . '</span></label>';
          echo '</td>';
          echo '<td>';
          echo '<span class="input">';
@@ -113,7 +113,7 @@ class SpecPrint_api
 
          $this->printRow();
          echo '<td class="category">';
-         echo '<label><span>' . plugin_lang_get( 'bug_add_form_planned_time' ) . plugin_lang_get( 'bug_add_form_ptime_expl' ) . '</span></label>';
+         echo '<label><span>' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</span></label>';
          echo '</td>';
          echo '<td>';
          echo '<span class="input">';
@@ -127,7 +127,7 @@ class SpecPrint_api
       {
          echo '<div class="field-container">';
          echo '<form name="options" action="" method="get">';
-         echo '<label for="option"><span>' . plugin_lang_get( 'bug_add_form_specification_req' ) . '</span></label>';
+         echo '<label for="option"><span>' . plugin_lang_get( 'bug_view_specification_req' ) . '</span></label>';
          echo '<span class="select">';
          echo '<select ' . helper_get_tab_index() . ' id="types" name="types">';
          foreach ( $types as $type )
@@ -141,7 +141,7 @@ class SpecPrint_api
          echo '</div>';
 
          echo '<div class="field-container">';
-         echo '<label><span>' . plugin_lang_get( 'bug_add_form_specification_src' ) . '</span></label>';
+         echo '<label><span>' . plugin_lang_get( 'bug_view_specification_src' ) . '</span></label>';
          echo '<span class="input">';
          echo '<input ' . helper_get_tab_index() . ' type="text" id="source" name="source" size="105" maxlength="128" value="' . string_attribute( $source ) . '" />';
          echo '</span>';
@@ -149,7 +149,7 @@ class SpecPrint_api
          echo '</div>';
 
          echo '<div class="field-container">';
-         echo '<label><span>' . plugin_lang_get( 'bug_add_form_planned_time' ) . plugin_lang_get( 'bug_add_form_ptime_expl' ) . '</span></label>';
+         echo '<label><span>' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</span></label>';
          echo '<span class="input">';
          echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="105" maxlength="128" value="' . string_attribute( $ptime ) . '" />';
          echo '</span>';
@@ -230,7 +230,7 @@ class SpecPrint_api
       echo ')';
       if ( plugin_config_get( 'ShowDuration' ) )
       {
-         echo ', ' . plugin_lang_get( 'ptime' ) . ': ' . $ptime . ' ' . plugin_lang_get( 'editor_duration_unit' );
+         echo ', ' . plugin_lang_get( 'editor_duration' ) . ': ' . $ptime . ' ' . plugin_lang_get( 'editor_duration_unit' );
       }
       echo '</td>';
       echo '</tr>';
@@ -285,13 +285,6 @@ class SpecPrint_api
       echo '<tr>';
       echo '<td colspan="1" />';
       echo '<td class="infohead" colspan="2">' . plugin_lang_get( 'editor_bug_notes_note' ) . ' (' . $bugnote_count . ')</td>';
-      echo '</tr>';
-
-      echo '<tr>';
-      echo '<td colspan="1" />';
-      echo '<td class="infohead" colspan="2">';
-      print_bug_link( $bug_id, true );
-      echo '</td>';
       echo '</tr>';
    }
 }

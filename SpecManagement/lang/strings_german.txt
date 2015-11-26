@@ -1,39 +1,15 @@
 <?php
 /* Configuration page */
 
-$s_plugin_SpecManagement_bug_add_form_specification_req = 'Anforderungsnummer';
-$s_plugin_SpecManagement_bug_add_form_specification_src = 'Ursprung der Anforderung';
-$s_plugin_SpecManagement_bug_add_form_planned_time = 'Geplante Dauer';
-$s_plugin_SpecManagement_bug_add_form_ptime_expl = ' (Stunden)';
-$s_plugin_SpecManagement_ptime = 'Dauer';
-
-$s_plugin_SpecManagement_footer = 'Plugin Info in Footer anzeigen?';
-$s_plugin_SpecManagement_fields = 'Felder in Eintragsfenstern anzeigen?';
-$s_plugin_SpecManagement_menu = 'Plugin Menüeintrag anzeigen?';
-
-
-
-
-
 $s_plugin_SpecManagement_page_title = 'Spezifikationen';
 
-$s_plugin_SpecManagement_table_title = 'Bug Übersicht';
-$s_plugin_SpecManagement_print_button = 'Drucken';
-$s_plugin_SpecManagement_bug_thead = 'Eintrag';
-$s_plugin_SpecManagement_prio_thead = 'P';
-$s_plugin_SpecManagement_category_thead = 'Kategorie';
-$s_plugin_SpecManagement_severity_thead = 'Auswirkung';
-$s_plugin_SpecManagement_status_thead = 'Status';
-$s_plugin_SpecManagement_lupdate_thead = 'Aktualisiert';
-$s_plugin_SpecManagement_sum_thead = 'Zusammenfassung';
-$s_plugin_SpecManagement_requirement_thead = 'Anforderungsnummer';
-$s_plugin_SpecManagement_resource_thead = 'Ursprung der Anforderung';
-$s_plugin_SpecManagement_version_thead = 'Version';
-$s_plugin_SpecManagement_subproject_thead = 'Unterprojekt';
+$s_plugin_SpecManagement_bug_view_specification_req = 'Anforderungsnummer';
+$s_plugin_SpecManagement_bug_view_specification_src = 'Ursprung der Anforderung';
+$s_plugin_SpecManagement_bug_view_planned_time = 'Geplante Dauer';
 
-$s_plugin_SpecManagement_severity_enum_string = '10:Feature-Wunsch,20:Trivial,30:Fehler im Text,40:Unschönheit,50:kleinerer Fehler,60:schwerer Fehler,70:Absturz,80:Blocker';
-$s_plugin_SpecManagement_status_enum_string = '10:neu,20:Rückmeldung,30:anerkannt,40:bestätigt,50:zugewiesen,80:erledigt,90:geschlossen';
-
+$s_plugin_SpecManagement_config_footer = 'Plugin Info in Footer anzeigen?';
+$s_plugin_SpecManagement_config_fields = 'Felder in Eintragsfenstern anzeigen?';
+$s_plugin_SpecManagement_config_menu = 'Plugin Menüeintrag anzeigen?';
 $s_plugin_SpecManagement_config_accesslevel = 'Zugriffslevel für Plugin';
 $s_plugin_SpecManagement_config_readlevel = 'Zugriffslevel für Leserecht';
 $s_plugin_SpecManagement_config_writelevel = 'Zugriffslevel für Schreibrecht';
@@ -61,6 +37,7 @@ $s_plugin_SpecManagement_editor_addbug = 'Bug hinzufügen';
 $s_plugin_SpecManagement_editor_additionalbugs = 'Bugs ohne Arbeitspaket';
 $s_plugin_SpecManagement_editor_work_package_duration = 'Geplante Dauer für Fertigstellung';
 $s_plugin_SpecManagement_editor_work_package_duration_null = '-nicht spezifiziert-';
+$s_plugin_SpecManagement_editor_duration = 'Dauer';
 $s_plugin_SpecManagement_editor_duration_unit = 'Personentage';
 $s_plugin_SpecManagement_editor_bug_attachments = 'Angehängte Dateien';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';

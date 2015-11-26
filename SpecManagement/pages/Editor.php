@@ -11,7 +11,7 @@ $se_api = new SpecEditor_api();
 
 $document_type = null;
 /* initialize source */
-$source = null;
+$version = null;
 /* initialize work packages */
 $work_packages = array();
 /* initialize bug ids assigned to work package */
@@ -20,21 +20,27 @@ $work_package_bug_ids = array();
 /* get source if not empty */
 if ( !empty( $_POST['version'] ) )
 {
-   $source = $_POST['version'];
-   $document_type = $sd_api->getTypeString( $sd_api->getTypeBySource( $source ) );
+   $version = $_POST['version'];
+   $document_type = $sd_api->getTypeString( $sd_api->getTypeByVersion( $version ) );
 }
 
 /* get work packages from source */
-$work_packages = $se_api->getDocumentSpecWorkPackages( $source );
+$work_packages = $se_api->getDocumentSpecWorkPackages( $version );
+
+/* if there is no work package specified, the default work package named with "version" */
+/* will be used */
+if ( empty( $work_packages ) && !is_null( $version ) )
+{
+   array_push( $work_packages, $version );
+}
 
 html_page_top1( plugin_lang_get( 'page_title' ) );
 echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/SpecManagement.css">';
 html_page_top2();
 
-$sm_api->printWhiteboardMenu();
 $sm_api->printEditorMenu();
 
-$sp_api->print_document_head( $document_type, $source );
+$sp_api->print_document_head( $document_type, $version );
 
 echo '<table class="width100">';
 
@@ -72,52 +78,6 @@ if ( $work_packages != null )
    }
 }
 
-if ( !empty( $_SESSION ) )
-{
-   /* get all keys from session */
-   $allSessionKeys = array_keys( $_SESSION );
-
-   /* initialize additional bugs */
-   $additional_bugs = array();
-   /* for each session key */
-   foreach ( $allSessionKeys as $key )
-   {
-      /* ensure that key is bug id */
-      if ( strpos( $key, 'bug_id' ) !== false )
-      {
-         $additional_bugs[] = substr( $key, 6 );
-      }
-   }
-}
-
-if ( !empty( $additional_bugs ) )
-{
-   /* print work package */
-   $sp_api->print_chapter_title( $chapter_index, plugin_lang_get( 'editor_additionalbugs' ) );
-
-   $sub_chapter_index = 10;
-   /* for each additional bug */
-   foreach ( $additional_bugs as $add_bug_id )
-   {
-      /* TODO extract method    */
-      /* ensure that bug exists */
-      if ( bug_exists( $add_bug_id ) )
-      {
-         /* planned duration for each bug */
-         $ptime = $sd_api->getPtimeRow( $add_bug_id )[2];
-         /* print bugs */
-         $sp_api->print_bugs( $chapter_index, $sub_chapter_index, $add_bug_id, $ptime );
-         /* increment index */
-         $sub_chapter_index += 10;
-      }
-   }
-}
-
 echo '</table>';
-
-echo '<form method="post" name="form_set_requirement" action="' . plugin_page( 'Editor_update' ) . '">';
-echo '<input ' . helper_get_tab_index() . ' type="text" id="bug_id" name="bug_id" size="8" minlength="1" maxlength="8" />';
-echo '<input type="submit" name="newbugid" class="button-small" value="' . plugin_lang_get( 'editor_addbug' ) . '" />';
-echo '</form>';
 
 html_page_bottom1();

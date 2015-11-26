@@ -25,7 +25,6 @@ if ( !empty( $_POST['types'] ) )
 html_page_top1( plugin_lang_get( 'page_title' ) );
 html_page_top2();
 
-$sm_api->printWhiteboardMenu();
 $sm_api->printPluginMenu();
 
 echo '<div align="center">';

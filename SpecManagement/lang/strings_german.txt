@@ -3,8 +3,8 @@
 
 $s_plugin_SpecManagement_page_title = 'Spezifikationen';
 
-$s_plugin_SpecManagement_bug_view_specification_req = 'Anforderungsnummer';
-$s_plugin_SpecManagement_bug_view_specification_src = 'Ursprung der Anforderung';
+$s_plugin_SpecManagement_bug_view_specification_req = 'Ursprung der Anforderung';
+$s_plugin_SpecManagement_bug_view_specification_src = 'Anforderungsnummer';
 $s_plugin_SpecManagement_bug_view_planned_time = 'Geplante Dauer';
 
 $s_plugin_SpecManagement_config_footer = 'Plugin Info in Footer anzeigen?';

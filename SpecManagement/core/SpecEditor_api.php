@@ -36,22 +36,20 @@ class SpecEditor_api
 
       if ( $version != null )
       {
-         $query = "SELECT s.version FROM $plugin_src_table s
-          WHERE s.version LIKE '" . $version . "%'";
+         $query = "SELECT s.work_package FROM $plugin_src_table s
+          WHERE s.version = '" . $version . "'";
 
          $result = $this->mysqli->query( $query );
 
-         $oldTmp = null;
+         $tmp_row = null;
          $work_packages = array();
          while ( $row = $result->fetch_row() )
          {
-            $tmp = explode( ';', $row[0] );
-
-            if ( $tmp[1] != $oldTmp )
+            if ( $row[0] != $tmp_row )
             {
-               $work_packages[] = $tmp[1];
+               $work_packages[] = $row[0];
+               $tmp_row = $row[0];
             }
-            $oldTmp = $tmp[1];
          }
 
          return $work_packages;
@@ -70,7 +68,7 @@ class SpecEditor_api
       }
 
       $query = "SELECT DISTINCT s.bug_id FROM $plugin_src_table s
-        WHERE s.version LIKE '%" . $work_package . "%'";
+        WHERE s.work_package = '" . $work_package . "'";
 
       $result = $this->mysqli->query( $query );
 

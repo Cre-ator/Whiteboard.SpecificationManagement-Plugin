@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.6';
+      $this->version = '1.0.7';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -80,6 +80,7 @@ class SpecManagementPlugin extends MantisPlugin
             bug_id          I       NOTNULL UNSIGNED,
             requirement_id  I       NOTNULL UNSIGNED,
             version         C(250)  DEFAULT '',
+            work_package    C(250)  DEFAULT '',
             type_id         I       NOTNULL UNSIGNED
             " )
          ),
@@ -168,7 +169,8 @@ class SpecManagementPlugin extends MantisPlugin
 
       $bug_id = null;
       $version = null;
-      $requirement_type = null;
+      $work_package = null;
+      $type = null;
       $ptime = null;
 
       switch ( $event )
@@ -186,8 +188,10 @@ class SpecManagementPlugin extends MantisPlugin
          $requirement_obj = $db_api->getReqRow( $bug_id );
          $source_obj = $db_api->getSourceRow( $bug_id );
          $ptime_obj = $db_api->getPtimeRow( $bug_id );
-         $requirement_type = $db_api->getTypeString( $requirement_obj[2] );
+
+         $type = $db_api->getTypeString( $requirement_obj[2] );
          $version = $source_obj[3];
+         $work_package = $source_obj[4];
          $ptime = $ptime_obj[2];
       }
 
@@ -197,23 +201,23 @@ class SpecManagementPlugin extends MantisPlugin
       {
          switch ( $event )
          {
-            case 'EVENT_UPDATE_BUG_FORM':
-               if ( $this->getWriteLevel() )
-               {
-                  $sm_api->printBugUpdateFields( $types, $version, $ptime );
-               }
-               break;
             case 'EVENT_VIEW_BUG_DETAILS':
                if ( $this->getReadLevel() || $this->getWriteLevel() )
                {
-                  $sm_api->printBugViewFields( $requirement_type, $version, $ptime );
+                  $sm_api->printBugViewFields( $type, $version, $work_package, $ptime );
                }
                break;
             case 'EVENT_REPORT_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
-                  $version = gpc_get_string( 'source', '' );
-                  $sm_api->printBugReportFields( $types, $version, $ptime );
+                  $version = gpc_get_string( 'version', '' );
+                  $sm_api->printBugReportFields( $types, $version, $work_package, $ptime );
+               }
+               break;
+            case 'EVENT_UPDATE_BUG_FORM':
+               if ( $this->getWriteLevel() )
+               {
+                  $sm_api->printBugUpdateFields( $type, $types, $version, $work_package, $ptime );
                }
                break;
          }
@@ -232,44 +236,44 @@ class SpecManagementPlugin extends MantisPlugin
       include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecDatabase_api.php';
       $db_api = new SpecDatabase_api();
 
-      if ( !is_null( $bug ) )
+      if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {
-         $bug_id = $bug->id;
+         $bug_id = gpc_get_int( 'bug_id' );
       }
       else
       {
-         $bug_id = gpc_get_int( 'bug_id' );
+         $bug_id = $bug->id;
       }
 
       $requirement_obj = $db_api->getReqRow( $bug_id );
       $source_obj = $db_api->getSourceRow( $bug_id );
       $ptime_obj = $db_api->getPtimeRow( $bug_id );
+
       $type = gpc_get_string( 'types', $db_api->getTypeString( $requirement_obj[2] ) );
-      $version = gpc_get_string( 'source', $source_obj[3] );
       $type_id = $db_api->getTypeId( $type );
-      $time = gpc_get_string( 'ptime', $ptime_obj[2] );
+      $version = gpc_get_string( 'doc_version', $source_obj[3] );
+      $work_package = gpc_get_string( 'work_package', $source_obj[4] );
+      $ptime = gpc_get_string( 'ptime', $ptime_obj[2] );
 
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
             $db_api->insertReqRow( $bug_id, $type_id );
             $requirement_id = $db_api->getReqId( $bug_id );
-            $db_api->insertSourceRow( $bug_id, $requirement_id, $version, $type_id );
-            $db_api->insertPtimeRow( $bug_id, $time );
+            $db_api->insertSourceRow( $bug_id, $requirement_id, $version, $work_package, $type_id );
+            $db_api->insertPtimeRow( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
             $db_api->updateReqRow( $bug_id, $type_id );
-            $db_api->updateSourceRow( $bug_id, $version, $type_id );
-            $db_api->updatePtimeRow( $bug_id, $time );
+            $db_api->updateSourceRow( $bug_id, $version, $work_package, $type_id );
+            $db_api->updatePtimeRow( $bug_id, $ptime );
             break;
       }
    }
 
    function menu()
    {
-      if ( plugin_config_get( 'ShowMenu' )
-         && $this->getUserHasLevel()
-      )
+      if ( plugin_config_get( 'ShowMenu' ) && $this->getUserHasLevel() )
       {
          return '<a href="' . plugin_page( 'ChooseDocument' ) . '">' . plugin_lang_get( 'menu_title' ) . '</a>';
       }

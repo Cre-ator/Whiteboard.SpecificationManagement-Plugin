@@ -98,7 +98,7 @@ class SpecDatabase_api
       }
 
       $query = "SELECT DISTINCT s.type_id FROM $plugin_src_table s
-          WHERE s.version LIKE '" . $version . "%'";
+          WHERE s.version = '" . $version . "'";
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -240,10 +240,11 @@ class SpecDatabase_api
     *
     * @param $bug_id
     * @param $requirement_id
-    * @param $type_id
     * @param $version
+    * @param $work_package
+    * @param $type_id
     */
-   public function insertSourceRow( $bug_id, $requirement_id, $version, $type_id )
+   public function insertSourceRow( $bug_id, $requirement_id, $version, $work_package, $type_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -254,11 +255,11 @@ class SpecDatabase_api
          $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_src_table . '( id, bug_id, requirement_id, version, type_id )
-         SELECT null, ' . $bug_id . ',' . $requirement_id . ',\'' . $version . '\',' . $type_id . '
+      $query = 'INSERT INTO ' . $plugin_src_table . '( id, bug_id, requirement_id, version, work_package, type_id )
+         SELECT null, ' . $bug_id . ',' . $requirement_id . ',\'' . $version . '\',\'' . $work_package . '\',' . $type_id . '
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM ' . $plugin_src_table . '
-         WHERE bug_id = ' . $bug_id . ' AND version = \'' . $version . '\' AND type_id = ' . $type_id . ')';
+         WHERE bug_id = ' . $bug_id . ' AND version = \'' . $version . '\' AND work_package = \'' . $work_package . '\' AND type_id = ' . $type_id . ')';
 
       $this->mysqli->query( $query );
    }
@@ -330,15 +331,16 @@ class SpecDatabase_api
     * Update existing src
     *
     * @param $bug_id
-    * @param $type_id
     * @param $version
+    * @param $work_package
+    * @param $type_id
     */
-   public function updateSourceRow( $bug_id, $version, $type_id )
+   public function updateSourceRow( $bug_id, $version, $work_package, $type_id )
    {
       if ( $this->getSourceRow( $bug_id ) == null )
       {
          $requirement_id = $this->getReqId( $bug_id );
-         $this->insertSourceRow( $bug_id, $requirement_id, $version, $type_id );
+         $this->insertSourceRow( $bug_id, $requirement_id, $version, $work_package, $type_id );
       }
       else
       {
@@ -355,7 +357,7 @@ class SpecDatabase_api
          $this->mysqli->query( $query );
 
          $query = 'UPDATE ' . $plugin_src_table . '
-         SET version = \'' . $version . '\', type_id = ' . $type_id . '
+         SET version = \'' . $version . '\', work_package = \'' . $work_package . '\', type_id = ' . $type_id . '
          WHERE bug_id = ' . $bug_id;
 
          $this->mysqli->query( $query );
@@ -598,12 +600,44 @@ class SpecDatabase_api
 
       $query = "SELECT SUM( p.time ) FROM $plugin_ptime_table p, $plugin_src_table s
          WHERE p.bug_id = s.bug_id
-         AND s.version LIKE '%" . $work_package . "'";
+         AND s.work_package LIKE '" . $work_package . "'";
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
       $duration = $result[0];
 
       return $duration;
+   }
+
+   public function getMainProjectByHierarchy( $project_id )
+   {
+      if ($project_id != 0)
+      {
+         $parent_project = project_hierarchy_get_parent( $project_id, false );
+         if ( project_hierarchy_is_toplevel( $project_id ) )
+         {
+            $parent_project_id = $project_id;
+         }
+         else
+         {
+            // selected project is subproject
+            while ( project_hierarchy_is_toplevel( $parent_project, false ) == false )
+            {
+               $parent_project = project_hierarchy_get_parent( $parent_project, false );
+
+               if ( project_hierarchy_is_toplevel( $parent_project ) )
+               {
+                  break;
+               }
+            }
+            $parent_project_id = $parent_project;
+         }
+
+         return $parent_project_id;
+      }
+      else
+      {
+         return 0;
+      }
    }
 }

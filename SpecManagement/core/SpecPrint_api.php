@@ -19,7 +19,7 @@ class SpecPrint_api
       }
    }
 
-   public function printBugUpdateFields( $types, $source, $ptime )
+   public function printBugUpdateFields( $type, $types, $version, $work_package, $ptime )
    {
       $this->printRow();
       echo '<td class="category">';
@@ -28,37 +28,39 @@ class SpecPrint_api
       echo '</form>';
       echo '</th>';
       echo '<td colspan="5">';
-      /* resort the list into ascending order */
-      /* Referenz: print_api.php -> Zeile 996 */
-      ksort( $types );
-      reset( $types );
-      /* TODO check_selected arbeitet noch nicht richtig */
-      echo '<select ' . helper_get_tab_index() . 'id="types" name="types">';
-      foreach ( $types as $type )
+      echo '<select ' . helper_get_tab_index() . ' name="types">';
+      foreach ( $types as $act_type )
       {
-         echo '<option value="' . $type . '"';
-         echo '>' . string_html_specialchars( $type ) . '</option>';
+         echo '<option value="' . $act_type . '"';
+         check_selected( string_attribute( $type ), $act_type );
+         echo '>' . string_html_specialchars( $act_type );
+         echo '</option>';
       }
       echo '</select>';
       echo '</td>';
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category"><label for="source">' . plugin_lang_get( 'bug_view_specification_src' ) . '</label></td>';
+      echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_src' ) . '</td>';
       echo '<td colspan="5">';
-      echo '<input ', helper_get_tab_index(), ' type="text" id="source" name="source" size="105" maxlength="128" value="', $source, '" />';
+
+      echo '<select ' . helper_get_tab_index() . ' name="doc_version">';
+      print_version_option_list( $version );
+      echo '</select>';
+
+      echo '<input ', helper_get_tab_index(), ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="', $work_package, '" />';
       echo '</td>';
       echo '</tr>';
 
       $this->printRow();
       echo '<td class="category"><label for="ptime">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</label></td>';
       echo '<td colspan="5">';
-      echo '<input ', helper_get_tab_index(), ' type="text" id="ptime" name="ptime" size="105" maxlength="128" value="', $ptime, '" />';
+      echo '<input ', helper_get_tab_index(), ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="', $ptime, '" />';
       echo '</td>';
       echo '</tr>';
    }
 
-   public function printBugViewFields( $requirement, $source, $ptime )
+   public function printBugViewFields( $requirement, $version, $work_package, $ptime )
    {
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
@@ -67,16 +69,16 @@ class SpecPrint_api
 
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_src' ), '</td>';
-      echo '<td colspan="5" id="source">', $source, '</td>';
+      echo '<td colspan="5" id="doc_version">', $version . ' ' . $work_package, '</td>';
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category">', plugin_lang_get( 'bug_view_planned_time' ),  ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' , '</td>';
+      echo '<td class="category">', plugin_lang_get( 'bug_view_planned_time' ), ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')', '</td>';
       echo '<td colspan="5" id="ptime">', $ptime, '</td>';
       echo '</tr>';
    }
 
-   public function printBugReportFields( $types, $source, $ptime )
+   public function printBugReportFields( $types, $version, $work_package, $ptime )
    {
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {
@@ -86,14 +88,11 @@ class SpecPrint_api
          echo '<label for="option"><span>' . plugin_lang_get( 'bug_view_specification_req' ) . '</span></label>';
          echo '</td>';
          echo '<td>';
-         echo '<span class="select">';
-         echo '<select ' . helper_get_tab_index() . ' id="types" name="types">';
+         echo '<select ' . helper_get_tab_index() . ' name="types">';
          foreach ( $types as $type )
          {
             echo '<option value="' . $type . '">' . $type . '</option>';
          }
-         echo '</select>';
-         echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</td>';
          echo '</form>';
@@ -104,9 +103,15 @@ class SpecPrint_api
          echo '<label><span>' . plugin_lang_get( 'bug_view_specification_src' ) . '</span></label>';
          echo '</td>';
          echo '<td>';
+
+         echo '<select ' . helper_get_tab_index() . ' name="doc_version">';
+         print_version_option_list( $version );
+         echo '</select>';
+
          echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="source" name="source" size="105" maxlength="128" value="' . string_attribute( $source ) . '" />';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="workpackage" name="workpackage" size="50" maxlength="50" value="' . string_attribute( $work_package ) . '" />';
          echo '</span>';
+
          echo '<span class="label-style"></span>';
          echo '</td>';
          echo '</tr>';
@@ -117,7 +122,7 @@ class SpecPrint_api
          echo '</td>';
          echo '<td>';
          echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="105" maxlength="128" value="' . string_attribute( $ptime ) . '" />';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="' . string_attribute( $ptime ) . '" />';
          echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</td>';
@@ -141,17 +146,24 @@ class SpecPrint_api
          echo '</div>';
 
          echo '<div class="field-container">';
-         echo '<label><span>' . plugin_lang_get( 'bug_view_specification_src' ) . '</span></label>';
-         echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="source" name="source" size="105" maxlength="128" value="' . string_attribute( $source ) . '" />';
+         echo '<label for="doc_version"><span>' . plugin_lang_get( 'bug_view_specification_src' ) . '</span></label>';
+         echo '<span class="select">';
+         echo '<select ' . helper_get_tab_index() . ' name="doc_version">';
+         print_version_option_list( $version );
+         echo '</select>';
          echo '</span>';
+
+         echo '<span class="input">';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="' . string_attribute( $work_package ) . '" />';
+         echo '</span>';
+
          echo '<span class="label-style"></span>';
          echo '</div>';
 
          echo '<div class="field-container">';
          echo '<label><span>' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</span></label>';
          echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="105" maxlength="128" value="' . string_attribute( $ptime ) . '" />';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="' . string_attribute( $ptime ) . '" />';
          echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</div>';
@@ -176,18 +188,18 @@ class SpecPrint_api
       echo '</tr>';
    }
 
-   public function print_document_head( $document_type, $source )
+   public function print_document_head( $document_type, $version, $parent_project )
    {
       echo '<table class="width100">';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_title' ) . '</td>';
-      echo '<td class="form-title">' . $document_type . ' - ' . $source . '</td>';
+      echo '<td class="form-title">' . $document_type . ' - ' . $version . '</td>';
       echo '</tr>';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_customer' ) . '</td>';
-      echo '<td class="form-title">' . project_get_name( helper_get_current_project() ) . '</td>';
+      echo '<td class="form-title">' . project_get_name( $parent_project ) . '</td>';
       echo '</tr>';
 
       echo '<tr>';

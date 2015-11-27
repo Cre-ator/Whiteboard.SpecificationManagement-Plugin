@@ -16,6 +16,8 @@ $version = null;
 $work_packages = array();
 /* initialize bug ids assigned to work package */
 $work_package_bug_ids = array();
+/* initialize parent project */
+$parent_project_id = $sd_api->getMainProjectByHierarchy( helper_get_current_project() );
 
 /* get source if not empty */
 if ( !empty( $_POST['version'] ) )
@@ -40,7 +42,7 @@ html_page_top2();
 
 $sm_api->printEditorMenu();
 
-$sp_api->print_document_head( $document_type, $version );
+$sp_api->print_document_head( $document_type, $version, $parent_project_id );
 
 echo '<table class="width100">';
 

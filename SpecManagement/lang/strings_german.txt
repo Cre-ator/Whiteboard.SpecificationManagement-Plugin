@@ -5,6 +5,7 @@ $s_plugin_SpecManagement_page_title = 'Spezifikationen';
 
 $s_plugin_SpecManagement_bug_view_specification_req = 'Ursprung der Anforderung';
 $s_plugin_SpecManagement_bug_view_specification_src = 'Anforderungsnummer';
+$s_plugin_SpecManagement_bug_view_specification_wpg = 'Arbeitspaket';
 $s_plugin_SpecManagement_bug_view_planned_time = 'Geplante Dauer';
 
 $s_plugin_SpecManagement_config_footer = 'Plugin Info in Footer anzeigen?';
@@ -13,8 +14,8 @@ $s_plugin_SpecManagement_config_menu = 'Plugin Menüeintrag anzeigen?';
 $s_plugin_SpecManagement_config_accesslevel = 'Zugriffslevel für Plugin';
 $s_plugin_SpecManagement_config_readlevel = 'Zugriffslevel für Leserecht';
 $s_plugin_SpecManagement_config_writelevel = 'Zugriffslevel für Schreibrecht';
-$s_plugin_SpecManagement_config_title = 'SpecManagement - Konfiguration';
-$s_plugin_SpecManagement_config_caption = 'Allgemeine Konfiguration';
+$s_plugin_SpecManagement_config_title = 'SpecManagement - Einstellungen';
+$s_plugin_SpecManagement_config_caption = 'Allgemeine Einstellungen';
 $s_plugin_SpecManagement_config_document = 'Dokumentverwaltung';
 $s_plugin_SpecManagement_config_typeadd = 'Dokumenttyp hinzufügen';
 $s_plugin_SpecManagement_config_add = 'Hinzufügen';
@@ -22,6 +23,11 @@ $s_plugin_SpecManagement_config_types = 'Verfügbare Dokumente';
 $s_plugin_SpecManagement_config_del = 'Löschen';
 $s_plugin_SpecManagement_config_editor = 'Editoreinstellungen';
 $s_plugin_SpecManagement_config_show_duration = 'Geplante Dauer im Editor / Dokument anzeigen?';
+$s_plugin_SpecManagement_config_reset_title = 'Alle Plugin Daten entfernen';
+$s_plugin_SpecManagement_config_reset_expl = 'Achtung, wenn Sie fortfahren werden alle im Plugin hinterlegten Daten unwiderruflich gelöscht. Fortfahren?';
+$s_plugin_SpecManagement_config_reset_conf = 'Fortfahren';
+$s_plugin_SpecManagement_config_reset_dont = 'Abbrechen';
+
 
 $s_plugin_SpecManagement_menu_title = 'Spezifikationen';
 $s_plugin_SpecManagement_menu_choosedoc = 'Dokument erzeugen';

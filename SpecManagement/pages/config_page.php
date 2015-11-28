@@ -119,7 +119,8 @@ $sc_api->printSpacer( 3 );
 
 echo '<tr>';
 echo '<td class="center" colspan="3">';
-echo '<input type="submit" name="change" class="button" value="' . lang_get( 'change_configuration' ) . '"/>';
+echo '<input type="submit" name="change" class="button" value="' . lang_get( 'update_prefs_button' ) . '"/>';
+echo '<input type="submit" name="reset" class="button" value="' . lang_get( 'reset_prefs_button' ) . '"/>';
 echo '</td>';
 echo '</tr>';
 

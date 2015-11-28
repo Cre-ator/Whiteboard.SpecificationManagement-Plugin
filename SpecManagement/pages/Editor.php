@@ -27,7 +27,12 @@ if ( !empty( $_POST['version'] ) )
 }
 
 /* get work packages from source */
-$work_packages = $se_api->getDocumentSpecWorkPackages( $version );
+$work_packages = $sd_api->getDocumentSpecWorkPackages( $version );
+
+/* get all bug ids from an array of work packages */
+$allRelevantBugs = $sd_api->getAllBugsFromWorkpackages( $work_packages, $version );
+
+var_dump($allRelevantBugs);
 
 /* if there is no work package specified, the default work package named with "version" */
 /* will be used */
@@ -44,6 +49,8 @@ $sm_api->printEditorMenu();
 
 $sp_api->print_document_head( $document_type, $version, $parent_project_id );
 
+$sp_api->print_document_progress( $allRelevantBugs );
+
 echo '<table class="width100">';
 
 $chapter_index = 1;
@@ -53,17 +60,16 @@ if ( $work_packages != null )
    /* for each work package */
    foreach ( $work_packages as $work_package )
    {
-      $duration = $sd_api->getWorkpackageDuration( $work_package );
+      $duration = $sd_api->getWorkpackageDuration( $version, $work_package );
       /* print work package */
       $sp_api->print_chapter_title( $chapter_index, $work_package, $duration );
       /* get work package assigned bugs */
-      $work_package_bug_ids = $se_api->getWorkPackageSpecBugs( $work_package );
+      $work_package_bug_ids = $sd_api->getWorkPackageSpecBugs( $version, $work_package );
 
       $sub_chapter_index = 10;
       /* for each bug in selected work package */
       foreach ( $work_package_bug_ids as $bug_id )
       {
-         /* TODO extract method    */
          /* ensure that bug exists */
          if ( bug_exists( $bug_id ) )
          {

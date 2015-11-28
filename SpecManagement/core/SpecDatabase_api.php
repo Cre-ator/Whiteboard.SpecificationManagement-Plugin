@@ -29,29 +29,30 @@ class SpecDatabase_api
     * - config entries
     * - database entities
     */
-   public function config_resetPlugin()
+   public function resetPlugin()
    {
-      $query = ' DELETE FROM mantis_config_table' .
-         ' WHERE config_id' .
-         ' LIKE \'plugin_SpecificationManagement_%\' ';
+      $query = 'DROP TABLE mantis_plugin_specmanagement_req_table';
 
       $this->mysqli->query( $query );
 
-      $query = ' DROP TABLE mantis_plugin_specmanagement_req_table';
+      $query = 'DROP TABLE mantis_plugin_specmanagement_src_table';
 
       $this->mysqli->query( $query );
 
-      $query = ' DROP TABLE mantis_plugin_specmanagement_src_table';
+      $query = 'DROP TABLE mantis_plugin_specmanagement_type_table';
 
       $this->mysqli->query( $query );
 
-      $query = ' DROP TABLE mantis_plugin_specmanagement_type_table';
+      $query = 'DROP TABLE mantis_plugin_specmanagement_ptime_table';
 
       $this->mysqli->query( $query );
 
-      $query = ' DROP TABLE mantis_plugin_specmanagement_ptime_table';
+      $query = "DELETE FROM mantis_config_table
+          WHERE config_id LIKE 'plugin_SpecManagement%'";
 
       $this->mysqli->query( $query );
+
+      print_successful_redirect( 'manage_plugin_page.php' );
    }
 
    /**
@@ -260,6 +261,9 @@ class SpecDatabase_api
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM ' . $plugin_src_table . '
          WHERE bug_id = ' . $bug_id . ' AND version = \'' . $version . '\' AND work_package = \'' . $work_package . '\' AND type_id = ' . $type_id . ')';
+
+
+      var_dump( $query );
 
       $this->mysqli->query( $query );
    }
@@ -564,43 +568,131 @@ class SpecDatabase_api
       if ( $project_id != 0 )
       {
          $query .= " AND b.id = s.bug_id
-             AND b.project_id = " . $project_id;
+            AND b.project_id = " . $project_id;
       }
 
       $result = $this->mysqli->query( $query );
 
-      $oldTmp = null;
+      $tmp_row = null;
       $srcs = array();
       while ( $row = $result->fetch_row() )
       {
-         $tmp = explode( ';', $row[0] );
-
-         if ( $tmp[0] != $oldTmp )
+         if ( $row[0] != $tmp_row )
          {
-            $srcs[] = $tmp[0];
+            $srcs[] = $row[0];
+            $tmp_row = $row[0];
          }
-         $oldTmp = $tmp[0];
       }
 
       return $srcs;
    }
 
-   public function getWorkpackageDuration( $work_package )
+   /**
+    * Get all work packages assigned to a version of a document
+    *
+    * @param $version
+    * @return array
+    */
+   public function getDocumentSpecWorkPackages( $version )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
+      }
+
+      if ( $version != null )
+      {
+         $query = "SELECT s.work_package FROM $plugin_src_table s
+          WHERE s.version = '" . $version . "'";
+
+         $result = $this->mysqli->query( $query );
+
+         $tmp_row = null;
+         $work_packages = array();
+         while ( $row = $result->fetch_row() )
+         {
+            if ( $row[0] != $tmp_row )
+            {
+               $work_packages[] = $row[0];
+               $tmp_row = $row[0];
+            }
+         }
+
+         return $work_packages;
+      }
+
+      return null;
+   }
+
+   /**
+    * Get all bugs of a specific work package and the version
+    *
+    * @param $version
+    * @param $work_package
+    * @return array
+    */
+   public function getWorkPackageSpecBugs( $version, $work_package )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'specmanagement' );
+         $bug_table = db_get_table( 'mantis_bug_table' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
+         $bug_table = db_get_table( 'bug' );
+      }
+
+      $query = "SELECT DISTINCT s.bug_id FROM $plugin_src_table s, $bug_table b
+         WHERE s.version = '" . $version . "'
+         AND s.work_package = '" . $work_package . "'
+         AND s.bug_id = b.id
+         AND NOT b.resolution = 90";
+
+      $result = $this->mysqli->query( $query );
+
+      $bugs = array();
+      while ( $row = $result->fetch_row() )
+      {
+         $bugs[] = $row[0];
+      }
+
+      return $bugs;
+   }
+
+   /**
+    * Get the duration of all bugs in a specific work package and the version
+    *
+    * @param $version
+    * @param $work_package
+    * @return mixed
+    */
+   public function getWorkpackageDuration( $version, $work_package )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
          $plugin_src_table = plugin_table( 'src', 'specmanagement' );
          $plugin_ptime_table = plugin_table( 'ptime', 'specmanagement' );
+         $bug_table = db_get_table( 'mantis_bug_table' );
       }
       else
       {
          $plugin_src_table = db_get_table( 'plugin_specmanagement_src' );
          $plugin_ptime_table = db_get_table( 'plugin_specmanagement_ptime' );
+         $bug_table = db_get_table( 'bug' );
       }
 
-      $query = "SELECT SUM( p.time ) FROM $plugin_ptime_table p, $plugin_src_table s
+      $query = "SELECT SUM( p.time ) FROM $plugin_ptime_table p, $plugin_src_table s, $bug_table b
          WHERE p.bug_id = s.bug_id
-         AND s.work_package LIKE '" . $work_package . "'";
+         AND s.version = '" . $version . "'
+         AND s.work_package = '" . $work_package . "'
+         AND s.bug_id = b.id
+         AND NOT b.resolution = 90";
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -609,9 +701,40 @@ class SpecDatabase_api
       return $duration;
    }
 
+
+   /**
+    * Get all bug ids from an array of work packages
+    *
+    * @param $work_packages
+    * @param $version
+    * @return array
+    */
+   public function getAllBugsFromWorkpackages( $work_packages, $version )
+   {
+      $allBugs = array();
+
+      foreach ( $work_packages as $work_package )
+      {
+         $work_package_bug_ids = $this->getWorkPackageSpecBugs( $version, $work_package );
+
+         foreach ( $work_package_bug_ids as $bug_id )
+         {
+            $allBugs[] = $bug_id;
+         }
+      }
+
+      return $allBugs;
+   }
+
+   /**
+    * Get the overall parent project by a given project/subproject
+    *
+    * @param $project_id
+    * @return int
+    */
    public function getMainProjectByHierarchy( $project_id )
    {
-      if ($project_id != 0)
+      if ( $project_id != 0 )
       {
          $parent_project = project_hierarchy_get_parent( $project_id, false );
          if ( project_hierarchy_is_toplevel( $project_id ) )

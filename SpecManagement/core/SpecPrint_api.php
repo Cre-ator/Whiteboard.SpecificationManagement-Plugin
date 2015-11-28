@@ -42,12 +42,13 @@ class SpecPrint_api
 
       $this->printRow();
       echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_src' ) . '</td>';
-      echo '<td colspan="5">';
-
+      echo '<td>';
       echo '<select ' . helper_get_tab_index() . ' name="doc_version">';
       print_version_option_list( $version );
       echo '</select>';
-
+      echo '</td>';
+      echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</td>';
+      echo '<td colspan="3">';
       echo '<input ', helper_get_tab_index(), ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="', $work_package, '" />';
       echo '</td>';
       echo '</tr>';
@@ -69,7 +70,9 @@ class SpecPrint_api
 
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_src' ), '</td>';
-      echo '<td colspan="5" id="doc_version">', $version . ' ' . $work_package, '</td>';
+      echo '<td id="doc_version">', $version, '</td>';
+      echo '<td class="category">', plugin_lang_get( 'bug_view_specification_wpg' ), '</td>';
+      echo '<td colspan="3" id="work_package">', $work_package, '</td>';
       echo '</tr>';
 
       $this->printRow();
@@ -103,15 +106,21 @@ class SpecPrint_api
          echo '<label><span>' . plugin_lang_get( 'bug_view_specification_src' ) . '</span></label>';
          echo '</td>';
          echo '<td>';
-
          echo '<select ' . helper_get_tab_index() . ' name="doc_version">';
          print_version_option_list( $version );
          echo '</select>';
+         echo '<span class="label-style"></span>';
+         echo '</td>';
+         echo '</tr>';
 
+         $this->printRow();
+         echo '<td class="category">';
+         echo '<label><span>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</span></label>';
+         echo '</td>';
+         echo '<td>';
          echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="workpackage" name="workpackage" size="50" maxlength="50" value="' . string_attribute( $work_package ) . '" />';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="' . string_attribute( $work_package ) . '" />';
          echo '</span>';
-
          echo '<span class="label-style"></span>';
          echo '</td>';
          echo '</tr>';
@@ -152,11 +161,14 @@ class SpecPrint_api
          print_version_option_list( $version );
          echo '</select>';
          echo '</span>';
+         echo '<span class="label-style"></span>';
+         echo '</div>';
 
+         echo '<div class="field-container">';
+         echo '<label><span>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</span></label>';
          echo '<span class="input">';
          echo '<input ' . helper_get_tab_index() . ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="' . string_attribute( $work_package ) . '" />';
          echo '</span>';
-
          echo '<span class="label-style"></span>';
          echo '</div>';
 
@@ -298,5 +310,19 @@ class SpecPrint_api
       echo '<td colspan="1" />';
       echo '<td class="infohead" colspan="2">' . plugin_lang_get( 'editor_bug_notes_note' ) . ' (' . $bugnote_count . ')</td>';
       echo '</tr>';
+   }
+
+   public function print_document_progress( $allRelevantBugs )
+   {
+      $segments = count( $allRelevantBugs );
+
+      for ( $segment = 0; $segment < $segments; $segment++ )
+      {
+         $bug_id = $allRelevantBugs[$segment];
+
+         $bug_resolution = bug_get_field( $bug_id, 'resolution' );
+
+         var_dump($bug_resolution);
+      }
    }
 }

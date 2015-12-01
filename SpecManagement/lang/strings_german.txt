@@ -54,3 +54,5 @@ $s_plugin_SpecManagement_head_customer = 'Kunde';
 $s_plugin_SpecManagement_head_project = 'Projekt';
 $s_plugin_SpecManagement_head_date = 'Datum';
 $s_plugin_SpecManagement_head_person_in_charge = 'Verantwortlicher';
+$s_plugin_SpecManagement_head_process = 'Fortschritt';
+

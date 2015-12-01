@@ -1,13 +1,9 @@
 <?php
-include SPECMANAGEMENT_CORE_URI . 'SpecMenu_api.php';
 include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
 include SPECMANAGEMENT_CORE_URI . 'SpecPrint_api.php';
-include SPECMANAGEMENT_CORE_URI . 'SpecEditor_api.php';
 
-$sm_api = new SpecMenu_api();
 $sd_api = new SpecDatabase_api();
 $sp_api = new SpecPrint_api();
-$se_api = new SpecEditor_api();
 
 $document_type = null;
 /* initialize source */
@@ -32,8 +28,6 @@ $work_packages = $sd_api->getDocumentSpecWorkPackages( $version );
 /* get all bug ids from an array of work packages */
 $allRelevantBugs = $sd_api->getAllBugsFromWorkpackages( $work_packages, $version );
 
-var_dump($allRelevantBugs);
-
 /* if there is no work package specified, the default work package named with "version" */
 /* will be used */
 if ( empty( $work_packages ) && !is_null( $version ) )
@@ -45,11 +39,8 @@ html_page_top1( plugin_lang_get( 'page_title' ) );
 echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/SpecManagement.css">';
 html_page_top2();
 
-$sm_api->printEditorMenu();
-
-$sp_api->print_document_head( $document_type, $version, $parent_project_id );
-
-$sp_api->print_document_progress( $allRelevantBugs );
+$sp_api->print_editor_menu();
+$sp_api->print_document_head( $document_type, $version, $parent_project_id, $allRelevantBugs );
 
 echo '<table class="width100">';
 

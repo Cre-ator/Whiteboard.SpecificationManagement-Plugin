@@ -1,9 +1,7 @@
 <?php
-include SPECMANAGEMENT_CORE_URI . 'SpecMenu_api.php';
 include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
 include SPECMANAGEMENT_CORE_URI . 'SpecPrint_api.php';
 
-$sm_api = new SpecMenu_api();
 $sd_api = new SpecDatabase_api();
 $sp_api = new SpecPrint_api();
 
@@ -25,7 +23,7 @@ if ( !empty( $_POST['types'] ) )
 html_page_top1( plugin_lang_get( 'page_title' ) );
 html_page_top2();
 
-$sm_api->printPluginMenu();
+$sp_api->print_plugin_menu();
 
 echo '<div align="center">';
 echo '<hr size="1" width="50%" />';

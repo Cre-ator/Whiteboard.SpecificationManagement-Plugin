@@ -19,6 +19,43 @@ class SpecPrint_api
       }
    }
 
+   public function print_plugin_menu()
+   {
+      echo '<table align="center">';
+      echo '<tr">';
+
+      echo '<td>';
+      echo '[ <a href="' . plugin_page( 'ChooseDocument' ) . '">';
+      echo plugin_lang_get( 'menu_choosedoc' );
+      echo '</a> ]';
+      echo '</td>';
+
+      echo '</tr>';
+      echo '</table>';
+   }
+
+   public function print_editor_menu()
+   {
+      echo '<table align="center">';
+      echo '<tr">';
+      /* General */
+
+      echo '<td>';
+      echo '[ <a href="' . plugin_page( 'ChooseDocument' ) . '">';
+      echo plugin_lang_get( 'menu_choosedoc' );
+      echo '</a> ]';
+      echo '</td>';
+
+      echo '<td>';
+      echo '[ <a href="' . plugin_page( 'Specification_Print' ) . '">';
+      echo plugin_lang_get( 'menu_printbutton' );
+      echo '</a> ]';
+      echo '</td>';
+
+      echo '</tr>';
+      echo '</table>';
+   }
+
    public function printBugUpdateFields( $type, $types, $version, $work_package, $ptime )
    {
       $this->printRow();
@@ -200,7 +237,7 @@ class SpecPrint_api
       echo '</tr>';
    }
 
-   public function print_document_head( $document_type, $version, $parent_project )
+   public function print_document_head( $document_type, $version, $parent_project, $allRelevantBugs )
    {
       echo '<table class="width100">';
 
@@ -226,7 +263,14 @@ class SpecPrint_api
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_person_in_charge' ) . '</td>';
-      echo '<td class="form-title">' . user_get_name( auth_get_current_user_id() ) . '</td>';
+      echo '<td class="form-title">' . user_get_realname( auth_get_current_user_id() ) . '</td>';
+      echo '</tr>';
+
+      echo '<tr>';
+      echo '<td class="field-container">' . plugin_lang_get( 'head_process' ) . '</td>';
+      echo '<td class="form-title">';
+      $this->print_document_progress( $allRelevantBugs );
+      echo '</td>';
       echo '</tr>';
 
       echo '</table>';
@@ -298,7 +342,7 @@ class SpecPrint_api
       echo '<tr id="attachments">';
       echo '<td colspan="1" />';
       echo '<td class="bug-attachments" colspan="2">';
-      print_bug_attachments_list( $bug_id );
+      $this->print_bug_attachments_list( $bug_id );
       echo '</td>';
       echo '</tr>';
    }
@@ -312,9 +356,11 @@ class SpecPrint_api
       echo '</tr>';
    }
 
-   public function print_document_progress( $allRelevantBugs )
+   public function calculate_document_progress( $allRelevantBugs )
    {
       $segments = count( $allRelevantBugs );
+      $segment_process = 0;
+      $bug_spec_progress = 0;
 
       for ( $segment = 0; $segment < $segments; $segment++ )
       {
@@ -322,7 +368,197 @@ class SpecPrint_api
 
          $bug_resolution = bug_get_field( $bug_id, 'resolution' );
 
-         var_dump($bug_resolution);
+         /* TODO spezifiziere prozentualen Fortschritt
+          * 10:offen,
+          * 20:erledigt,
+          * 30:wiedereröffnet,
+          * 40:nicht reproduzierbar,
+          * 50:unlösbar,
+          * 60:doppelt,
+          * 70:keine Änderung notwendig,
+          * 80:aufgeschoben,
+          * 90:wird nicht behoben
+          */
+         switch ( $bug_resolution )
+         {
+            case 10:
+               $bug_spec_progress = 0;
+               break;
+            case 20:
+               $bug_spec_progress = 100;
+               break;
+            case 30:
+               $bug_spec_progress = 0;
+               break;
+            case 40:
+               $bug_spec_progress = 100;
+               break;
+            case 50:
+               $bug_spec_progress = 100;
+               break;
+            case 60:
+               $bug_spec_progress = 100;
+               break;
+            case 70:
+               $bug_spec_progress = 100;
+               break;
+            case 80:
+               $bug_spec_progress = 0;
+               break;
+         }
+
+         $segment_process += $bug_spec_progress;
+      }
+
+      $document_process = $segment_process / $segments;
+
+      return $document_process;
+   }
+
+   public function print_document_progress( $allRelevantBugs )
+   {
+      $document_process = $this->calculate_document_progress( $allRelevantBugs );
+
+      echo '<div class="progress400">';
+      echo '<span class="bar" style="width: ' . $document_process . '%;">' . $document_process . '%</span>';
+      echo '</div>';
+   }
+
+   # List the attachments belonging to the specified bug.  This is used from within
+   # bug_view_inc.php
+   function print_bug_attachments_list( $p_bug_id )
+   {
+      $t_attachments = file_get_visible_attachments( $p_bug_id );
+      $t_attachments_count = count( $t_attachments );
+
+      $i = 0;
+      $image_previewed = false;
+
+      foreach ( $t_attachments as $t_attachment )
+      {
+         $t_file_display_name = string_display_line( $t_attachment['display_name'] );
+         $t_date_added = date( config_get( 'normal_date_format' ), $t_attachment['date_added'] );
+
+         if ( $image_previewed )
+         {
+            $image_previewed = false;
+            echo '<br />';
+         }
+
+         if ( $t_attachment['can_download'] )
+         {
+            $t_href_start = '<a href="' . string_attribute( $t_attachment['download_url'] ) . '">';
+            $t_href_end = '</a>';
+         }
+         else
+         {
+            $t_href_start = '';
+            $t_href_end = '';
+         }
+
+         if ( !$t_attachment['exists'] )
+         {
+            print_file_icon( $t_file_display_name );
+            echo '&#160;<span class="strike">' . $t_file_display_name . '</span>' . lang_get( 'word_separator' ) . '(' . lang_get( 'attachment_missing' ) . ')';
+         }
+         else
+         {
+            echo $t_href_start;
+            print_file_icon( $t_file_display_name );
+            echo $t_href_end . '&#160;' . $t_href_start . $t_file_display_name . $t_href_end . ' <span class="italic">(' . $t_date_added . ')</span>';
+         }
+
+         if ( $t_attachment['exists'] )
+         {
+            if ( ( FTP == config_get( 'file_upload_method' ) ) && $t_attachment['exists'] )
+            {
+               echo ' (' . lang_get( 'cached' ) . ')';
+            }
+
+            if ( $t_attachment['preview'] && ( $t_attachment['type'] == 'text' ) )
+            {
+               $c_id = db_prepare_int( $t_attachment['id'] );
+               $t_bug_file_table = db_get_table( 'mantis_bug_file_table' );
+
+               echo "<script type=\"text/javascript\" language=\"JavaScript\">
+<!--
+function swap_content( span ) {
+displayType = ( document.getElementById( span ).style.display == 'none' ) ? '' : 'none';
+document.getElementById( span ).style.display = displayType;
+}
+
+ -->
+ </script>";
+               echo " <span id=\"hideSection_$c_id\">[<a class=\"small\" href='#' id='attmlink_" . $c_id . "' onclick='swap_content(\"hideSection_" . $c_id . "\");swap_content(\"showSection_" . $c_id . "\");return false;'>" . lang_get( 'show_content' ) . "</a>]</span>";
+               echo " <span style='display:none' id=\"showSection_$c_id\">[<a class=\"small\" href='#' id='attmlink_" . $c_id . "' onclick='swap_content(\"hideSection_" . $c_id . "\");swap_content(\"showSection_" . $c_id . "\");return false;'>" . lang_get( 'hide_content' ) . "</a>]";
+
+               echo "<pre>";
+
+               /** @todo Refactor into a method that gets contents for download / preview. */
+               switch ( config_get( 'file_upload_method' ) )
+               {
+                  case DISK:
+                     if ( $t_attachment['exists'] )
+                     {
+                        $v_content = file_get_contents( $t_attachment['diskfile'] );
+                     }
+                     break;
+                  case FTP:
+                     if ( file_exists( $t_attachment['exists'] ) )
+                     {
+                        file_get_contents( $t_attachment['diskfile'] );
+                     }
+                     else
+                     {
+                        $ftp = file_ftp_connect();
+                        file_ftp_get( $ftp, $t_attachment['diskfile'], $t_attachment['diskfile'] );
+                        file_ftp_disconnect( $ftp );
+                        $v_content = file_get_contents( $t_attachment['diskfile'] );
+                     }
+                     break;
+                  default:
+                     $query = "SELECT *
+	                  					FROM $t_bug_file_table
+				            			WHERE id=" . db_param();
+                     $result = db_query_bound( $query, Array( $c_id ) );
+                     $row = db_fetch_array( $result );
+                     $v_content = $row['content'];
+               }
+
+               echo htmlspecialchars( $v_content );
+               echo "</pre></span>\n";
+            }
+
+            if ( $t_attachment['can_download'] && $t_attachment['preview'] && $t_attachment['type'] == 'image' )
+            {
+               $t_preview_style = 'border: 0;';
+               $t_max_width = config_get( 'preview_max_width' );
+               if ( $t_max_width > 0 )
+               {
+                  $t_preview_style .= ' max-width:' . $t_max_width . 'px;';
+               }
+
+               $t_max_height = config_get( 'preview_max_height' );
+               if ( $t_max_height > 0 )
+               {
+                  $t_preview_style .= ' max-height:' . $t_max_height . 'px;';
+               }
+
+               $t_preview_style = 'style="' . $t_preview_style . '"';
+               $t_title = file_get_field( $t_attachment['id'], 'title' );
+
+               $t_image_url = $t_attachment['download_url'] . '&amp;show_inline=1' . form_security_param( 'file_show_inline' );
+
+               echo "\n<br />$t_href_start<img alt=\"$t_title\" $t_preview_style src=\"$t_image_url\" />$t_href_end";
+               $image_previewed = true;
+            }
+         }
+
+         if ( $i != ( $t_attachments_count - 1 ) )
+         {
+            echo "<br />\n";
+            $i++;
+         }
       }
    }
 }

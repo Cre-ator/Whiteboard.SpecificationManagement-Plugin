@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.8';
+      $this->version = '1.0.9';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -228,15 +228,7 @@ class SpecManagementPlugin extends MantisPlugin
       include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecDatabase_api.php';
       $db_api = new SpecDatabase_api();
 
-      /* mantis 1.2.19 is using BugData object like mantis 1.3.0. */
-//      if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
-//      {
-//         $bug_id = gpc_get_int( 'bug_id' );
-//      }
-//      else
-//      {
       $bug_id = $bug->id;
-//      }
 
       $requirement_obj = $db_api->getReqRow( $bug_id );
       $source_obj = $db_api->getSourceRow( $bug_id );

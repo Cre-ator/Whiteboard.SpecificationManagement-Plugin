@@ -1,13 +1,13 @@
 <?php
-include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
-include SPECMANAGEMENT_CORE_URI . 'SpecPrint_api.php';
+include SPECMANAGEMENT_CORE_URI . 'database_api.php';
+include SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
-$sd_api = new SpecDatabase_api();
-$sp_api = new SpecPrint_api();
+$database_api = new database_api();
+$print_api = new print_api();
 
 $t_project_id = gpc_get_int( 'project_id', helper_get_current_project() );
-$types = $sd_api->getTypes();
-$document_type = $sd_api->getFirstType();
+$types = $database_api->getTypes();
+$document_type = $database_api->getFirstType();
 $sources = array();
 
 /**
@@ -23,7 +23,7 @@ if ( !empty( $_POST['types'] ) )
 html_page_top1( plugin_lang_get( 'select_doc_title' ) );
 html_page_top2();
 
-$sp_api->print_plugin_menu();
+$print_api->print_plugin_menu();
 
 echo '<div align="center">';
 echo '<hr size="1" width="50%" />';
@@ -33,7 +33,7 @@ echo '<tr class="row-category">';
 echo '<th>' . plugin_lang_get( 'select_doc' ) . '</th>';
 echo '</tr>';
 
-$sp_api->printRow();
+$print_api->printRow();
 echo '<td class="center">';
 
 echo '<form method="post" name="form_set_requirement" action="' . plugin_page( 'ChooseDocument' ) . '">';
@@ -58,14 +58,14 @@ echo '<input type="submit" class="button-small" value="' . lang_get( 'switch' ) 
 
 if ( $post )
 {
-   $document_type = $sd_api->getTypeId( $_POST['types'] );
+   $document_type = $database_api->getTypeId( $_POST['types'] );
 }
 
 echo '</form>';
 echo '<form method="post" name="form_set_source" action="' . plugin_page( 'Editor' ) . '">';
 if ( $document_type != null || $_POST['types'] != 'blank' )
 {
-   $source_ids = $sd_api->getSources( $document_type, $t_project_id );
+   $source_ids = $database_api->getSources( $document_type, $t_project_id );
 
    echo '<select name="version">';
    foreach ( $source_ids as $source )
@@ -83,7 +83,7 @@ if ( $document_type != null || $_POST['types'] != 'blank' )
 echo '</td>';
 echo '</tr>';
 
-$sp_api->printRow();
+$print_api->printRow();
 echo '<td class="center">';
 
 ?>

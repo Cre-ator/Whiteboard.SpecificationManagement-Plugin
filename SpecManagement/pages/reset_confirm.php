@@ -1,12 +1,12 @@
 <?php
 require_once( SPECMANAGEMENT_CORE_URI . 'constant_api.php' );
-include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
+include SPECMANAGEMENT_CORE_URI . 'database_api.php';
 
-$db_api = new SpecDatabase_api();
+$database_api = new database_api();
 
 if ( !empty( $_POST['con_reset'] ) )
 {
-   $db_api->resetPlugin();
+   $database_api->resetPlugin();
 }
 else
 {

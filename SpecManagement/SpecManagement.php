@@ -8,7 +8,7 @@ class specmanagementplugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.9';
+      $this->version = '1.0.10';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -154,10 +154,10 @@ class specmanagementplugin extends MantisPlugin
     */
    function bugViewFields( $event )
    {
-      include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecPrint_api.php';
-      include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecDatabase_api.php';
-      $sm_api = new SpecPrint_api();
-      $db_api = new SpecDatabase_api();
+      include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'database_api.php';
+      include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'print_api.php';
+      $database_api = new database_api();
+      $print_api = new print_api();
 
       $bug_id = null;
       $version = null;
@@ -177,17 +177,17 @@ class specmanagementplugin extends MantisPlugin
 
       if ( $bug_id != null )
       {
-         $requirement_obj = $db_api->getReqRow( $bug_id );
-         $source_obj = $db_api->getSourceRow( $bug_id );
-         $ptime_obj = $db_api->getPtimeRow( $bug_id );
+         $requirement_obj = $database_api->getReqRow( $bug_id );
+         $source_obj = $database_api->getSourceRow( $bug_id );
+         $ptime_obj = $database_api->getPtimeRow( $bug_id );
 
-         $type = $db_api->getTypeString( $requirement_obj[2] );
+         $type = $database_api->getTypeString( $requirement_obj[2] );
          $version = $source_obj[3];
          $work_package = $source_obj[4];
          $ptime = $ptime_obj[2];
       }
 
-      $types = $db_api->getTypes();
+      $types = $database_api->getTypes();
 
       if ( plugin_config_get( 'ShowFields' ) )
       {
@@ -196,20 +196,20 @@ class specmanagementplugin extends MantisPlugin
             case 'EVENT_VIEW_BUG_DETAILS':
                if ( $this->getReadLevel() || $this->getWriteLevel() )
                {
-                  $sm_api->printBugViewFields( $type, $version, $work_package, $ptime );
+                  $print_api->printBugViewFields( $type, $version, $work_package, $ptime );
                }
                break;
             case 'EVENT_REPORT_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
                   $version = gpc_get_string( 'version', '' );
-                  $sm_api->printBugReportFields( $types, $version, $work_package, $ptime );
+                  $print_api->printBugReportFields( $types, $version, $work_package, $ptime );
                }
                break;
             case 'EVENT_UPDATE_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
-                  $sm_api->printBugUpdateFields( $type, $types, $version, $work_package, $ptime );
+                  $print_api->printBugUpdateFields( $type, $types, $version, $work_package, $ptime );
                }
                break;
          }
@@ -225,17 +225,17 @@ class specmanagementplugin extends MantisPlugin
     */
    function bugUpdateData( $event, BugData $bug )
    {
-      include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'SpecDatabase_api.php';
-      $db_api = new SpecDatabase_api();
+      include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'database_api.php';
+      $database_api = new database_api();
 
       $bug_id = $bug->id;
 
-      $requirement_obj = $db_api->getReqRow( $bug_id );
-      $source_obj = $db_api->getSourceRow( $bug_id );
-      $ptime_obj = $db_api->getPtimeRow( $bug_id );
+      $requirement_obj = $database_api->getReqRow( $bug_id );
+      $source_obj = $database_api->getSourceRow( $bug_id );
+      $ptime_obj = $database_api->getPtimeRow( $bug_id );
 
-      $type = gpc_get_string( 'types', $db_api->getTypeString( $requirement_obj[2] ) );
-      $type_id = $db_api->getTypeId( $type );
+      $type = gpc_get_string( 'types', $database_api->getTypeString( $requirement_obj[2] ) );
+      $type_id = $database_api->getTypeId( $type );
       $version = gpc_get_string( 'doc_version', $source_obj[3] );
       $work_package = gpc_get_string( 'work_package', $source_obj[4] );
       $ptime = gpc_get_string( 'ptime', $ptime_obj[2] );
@@ -243,15 +243,15 @@ class specmanagementplugin extends MantisPlugin
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
-            $db_api->insertReqRow( $bug_id, $type_id );
-            $requirement_id = $db_api->getReqId( $bug_id );
-            $db_api->insertSourceRow( $bug_id, $requirement_id, $version, $work_package, $type_id );
-            $db_api->insertPtimeRow( $bug_id, $ptime );
+            $database_api->insertReqRow( $bug_id, $type_id );
+            $requirement_id = $database_api->getReqId( $bug_id );
+            $database_api->insertSourceRow( $bug_id, $requirement_id, $version, $work_package, $type_id );
+            $database_api->insertPtimeRow( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
-            $db_api->updateReqRow( $bug_id, $type_id );
-            $db_api->updateSourceRow( $bug_id, $version, $work_package, $type_id );
-            $db_api->updatePtimeRow( $bug_id, $ptime );
+            $database_api->updateReqRow( $bug_id, $type_id );
+            $database_api->updateSourceRow( $bug_id, $version, $work_package, $type_id );
+            $database_api->updatePtimeRow( $bug_id, $ptime );
             break;
       }
    }
@@ -260,7 +260,7 @@ class specmanagementplugin extends MantisPlugin
    {
       if ( plugin_config_get( 'ShowMenu' ) && $this->getUserHasLevel() )
       {
-         return '<a href="' . plugin_page( 'ChooseDocument' ) . '">' . plugin_lang_get( 'menu_title' ) . '</a>';
+         return '<a href="' . plugin_page( 'choose_document' ) . '">' . plugin_lang_get( 'menu_title' ) . '</a>';
       }
       return null;
    }

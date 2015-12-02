@@ -1,10 +1,10 @@
 <?php
 require_once( SPECMANAGEMENT_CORE_URI . 'constant_api.php' );
-include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
-include SPECMANAGEMENT_CORE_URI . 'SpecConfig_api.php';
+include SPECMANAGEMENT_CORE_URI . 'database_api.php';
+include SPECMANAGEMENT_CORE_URI . 'config_api.php';
 
-$db_api = new SpecDatabase_api();
-$sc_api = new SpecConfig_api();
+$database_api = new database_api();
+$config_api = new config_api();
 
 auth_reauthenticate();
 access_ensure_global_level( plugin_config_get( 'AccessLevel' ) );
@@ -28,8 +28,8 @@ else
    echo '<table>';
 }
 
-$sc_api->printFormTitle( 3, 'config_caption' );
-$sc_api->printTableRow();
+$config_api->printFormTitle( 3, 'config_caption' );
+$config_api->printTableRow();
 echo '<td class="category" width="30%">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_accesslevel' );
 echo '</td>';
@@ -40,7 +40,7 @@ echo '</select>';
 echo '</td>';
 echo '</tr>';
 
-$sc_api->printTableRow();
+$config_api->printTableRow();
 echo '<td class="category" width="30%">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_readlevel' );
 echo '</td>';
@@ -51,7 +51,7 @@ echo '</select>';
 echo '</td>';
 echo '</tr>';
 
-$sc_api->printTableRow();
+$config_api->printTableRow();
 echo '<td class="category" width="30%">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_writelevel' );
 echo '</td>';
@@ -62,26 +62,26 @@ echo '</select>';
 echo '</td>';
 echo '</tr>';
 
-$sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'config_fields' );
-$sc_api->printRadioButton( 1, 'ShowFields' );
+$config_api->printTableRow();
+$config_api->printCategoryField( 1, 1, 'config_fields' );
+$config_api->printRadioButton( 1, 'ShowFields' );
 echo '</tr>';
 
-$sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'config_menu' );
-$sc_api->printRadioButton( 1, 'ShowMenu' );
+$config_api->printTableRow();
+$config_api->printCategoryField( 1, 1, 'config_menu' );
+$config_api->printRadioButton( 1, 'ShowMenu' );
 echo '</tr>';
 
-$sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'config_footer' );
-$sc_api->printRadioButton( 1, 'ShowInFooter' );
+$config_api->printTableRow();
+$config_api->printCategoryField( 1, 1, 'config_footer' );
+$config_api->printRadioButton( 1, 'ShowInFooter' );
 echo '</tr>';
 
-$sc_api->printSpacer( 3 );
+$config_api->printSpacer( 3 );
 
-$sc_api->printFormTitle( 3, 'config_document' );
-$sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'config_typeadd' );
+$config_api->printFormTitle( 3, 'config_document' );
+$config_api->printTableRow();
+$config_api->printCategoryField( 1, 1, 'config_typeadd' );
 $type = gpc_get_string( 'type', '' );
 echo '<td>';
 echo '<input type="text" id="type" name="type" size="30" maxlength="128" value="', $type, '">';
@@ -89,11 +89,11 @@ echo '<input type="submit" name="addtype" class="button" value="' . plugin_lang_
 echo '</td>';
 echo '</tr>';
 
-$sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'config_types' );
+$config_api->printTableRow();
+$config_api->printCategoryField( 1, 1, 'config_types' );
 echo '<td>';
 
-$types = $db_api->getTypes();
+$types = $database_api->getTypes();
 
 echo '<span class="select">';
 echo '<select ' . helper_get_tab_index() . ' id="types" name="types">';
@@ -107,15 +107,15 @@ echo '<input type="submit" name="deletetype" class="button" value="' . plugin_la
 echo '</td>';
 echo '</tr>';
 
-$sc_api->printSpacer( 3 );
+$config_api->printSpacer( 3 );
 
-$sc_api->printFormTitle( 3, 'config_editor' );
-$sc_api->printTableRow();
-$sc_api->printCategoryField( 1, 1, 'config_show_duration' );
-$sc_api->printRadioButton( 1, 'ShowDuration' );
+$config_api->printFormTitle( 3, 'config_editor' );
+$config_api->printTableRow();
+$config_api->printCategoryField( 1, 1, 'config_show_duration' );
+$config_api->printRadioButton( 1, 'ShowDuration' );
 echo '</tr>';
 
-$sc_api->printSpacer( 3 );
+$config_api->printSpacer( 3 );
 
 echo '<tr>';
 echo '<td class="center" colspan="3">';

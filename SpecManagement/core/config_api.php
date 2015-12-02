@@ -1,6 +1,6 @@
 <?php
 
-class SpecConfig_api
+class config_api
 {
    public function printFormTitle( $colspan, $lang_string )
    {

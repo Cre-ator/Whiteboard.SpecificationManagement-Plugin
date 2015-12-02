@@ -1,6 +1,6 @@
 <?php
 
-class SpecPrint_api
+class print_api
 {
    public function getMantisVersion()
    {

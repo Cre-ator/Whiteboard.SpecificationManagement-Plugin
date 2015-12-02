@@ -1,9 +1,9 @@
 <?php
-include SPECMANAGEMENT_CORE_URI . 'SpecDatabase_api.php';
-include SPECMANAGEMENT_CORE_URI . 'SpecPrint_api.php';
+include SPECMANAGEMENT_CORE_URI . 'database_api.php';
+include SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
-$sd_api = new SpecDatabase_api();
-$sp_api = new SpecPrint_api();
+$database_api = new database_api();
+$print_api = new print_api();
 
 $document_type = null;
 /* initialize source */
@@ -13,20 +13,20 @@ $work_packages = array();
 /* initialize bug ids assigned to work package */
 $work_package_bug_ids = array();
 /* initialize parent project */
-$parent_project_id = $sd_api->getMainProjectByHierarchy( helper_get_current_project() );
+$parent_project_id = $database_api->getMainProjectByHierarchy( helper_get_current_project() );
 
 /* get source if not empty */
 if ( !empty( $_POST['version'] ) )
 {
    $version = $_POST['version'];
-   $document_type = $sd_api->getTypeString( $sd_api->getTypeByVersion( $version ) );
+   $document_type = $database_api->getTypeString( $database_api->getTypeByVersion( $version ) );
 }
 
 /* get work packages from source */
-$work_packages = $sd_api->getDocumentSpecWorkPackages( $version );
+$work_packages = $database_api->getDocumentSpecWorkPackages( $version );
 
 /* get all bug ids from an array of work packages */
-$allRelevantBugs = $sd_api->getAllBugsFromWorkpackages( $work_packages, $version );
+$allRelevantBugs = $database_api->getAllBugsFromWorkpackages( $work_packages, $version );
 
 /* if there is no work package specified, the default work package named with "version" */
 /* will be used */
@@ -39,8 +39,8 @@ html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $document_type . ' - 
 echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/SpecManagement.css">';
 html_page_top2();
 
-$sp_api->print_editor_menu();
-$sp_api->print_document_head( $document_type, $version, $parent_project_id, $allRelevantBugs );
+$print_api->print_editor_menu();
+$print_api->print_document_head( $document_type, $version, $parent_project_id, $allRelevantBugs );
 
 echo '<table class="width100">';
 
@@ -51,11 +51,11 @@ if ( $work_packages != null )
    /* for each work package */
    foreach ( $work_packages as $work_package )
    {
-      $duration = $sd_api->getWorkpackageDuration( $version, $work_package );
+      $duration = $database_api->getWorkpackageDuration( $version, $work_package );
       /* print work package */
-      $sp_api->print_chapter_title( $chapter_index, $work_package, $duration );
+      $print_api->print_chapter_title( $chapter_index, $work_package, $duration );
       /* get work package assigned bugs */
-      $work_package_bug_ids = $sd_api->getWorkPackageSpecBugs( $version, $work_package );
+      $work_package_bug_ids = $database_api->getWorkPackageSpecBugs( $version, $work_package );
 
       $sub_chapter_index = 10;
       /* for each bug in selected work package */
@@ -65,9 +65,9 @@ if ( $work_packages != null )
          if ( bug_exists( $bug_id ) )
          {
             /* planned duration for each bug */
-            $ptime = $sd_api->getPtimeRow( $bug_id )[2];
+            $ptime = $database_api->getPtimeRow( $bug_id )[2];
             /* print bugs */
-            $sp_api->print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $ptime );
+            $print_api->print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $ptime );
             /* increment index */
             $sub_chapter_index += 10;
          }

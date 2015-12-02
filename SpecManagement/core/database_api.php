@@ -1,6 +1,6 @@
 <?php
 
-class SpecDatabase_api
+class database_api
 {
    private $mysqli;
    private $dbPath;

@@ -20,7 +20,7 @@ if ( !empty( $_POST['types'] ) )
    $post = true;
 }
 
-html_page_top1( plugin_lang_get( 'page_title' ) );
+html_page_top1( plugin_lang_get( 'select_doc_title' ) );
 html_page_top2();
 
 $sp_api->print_plugin_menu();

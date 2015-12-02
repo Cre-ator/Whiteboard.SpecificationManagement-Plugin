@@ -298,7 +298,7 @@ class SpecPrint_api
       echo ')';
       if ( plugin_config_get( 'ShowDuration' ) )
       {
-         echo ', ' . plugin_lang_get( 'editor_duration' ) . ': ' . $ptime . ' ' . plugin_lang_get( 'editor_duration_unit' );
+         echo ', ' . plugin_lang_get( 'editor_bug_duration' ) . ': ' . $ptime . ' ' . plugin_lang_get( 'editor_duration_unit' );
       }
       echo '</td>';
       echo '</tr>';
@@ -377,7 +377,7 @@ class SpecPrint_api
           * 60:doppelt,
           * 70:keine Änderung notwendig,
           * 80:aufgeschoben,
-          * 90:wird nicht behoben
+          * 90:wird nicht behoben ---
           */
          switch ( $bug_resolution )
          {

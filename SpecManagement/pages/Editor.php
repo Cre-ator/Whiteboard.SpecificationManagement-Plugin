@@ -35,7 +35,7 @@ if ( empty( $work_packages ) && !is_null( $version ) )
    array_push( $work_packages, $version );
 }
 
-html_page_top1( plugin_lang_get( 'page_title' ) );
+html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $document_type . ' - ' . $version );
 echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/SpecManagement.css">';
 html_page_top2();
 

@@ -18,7 +18,7 @@ echo '<br/>';
 echo '<form action="' . plugin_page( 'config_update' ) . '" method="post">';
 echo form_security_field( 'plugin_SpecManagement_config_update' );
 
-if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
 {
    echo '<table align="center" class="width75" cellspacing="1">';
 }

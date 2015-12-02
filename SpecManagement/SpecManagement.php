@@ -1,10 +1,10 @@
 <?php
 
-class SpecManagementPlugin extends MantisPlugin
+class specmanagementplugin extends MantisPlugin
 {
    function register()
    {
-      $this->name = 'SpecManagement';
+      $this->name = 'specmanagement';
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 

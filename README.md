@@ -4,7 +4,7 @@ Plugin for MantisBT to add Specification - Requirement and Specification - Sourc
 
 Requirements
 
-+ MantisBT 1.2.x | MantisBT 1.3.0
++ MantisBT 1.2.x | MantisBT 1.3.x
 
 Installation
 

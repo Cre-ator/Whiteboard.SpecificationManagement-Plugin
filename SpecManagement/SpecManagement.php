@@ -4,7 +4,7 @@ class specmanagementplugin extends MantisPlugin
 {
    function register()
    {
-      $this->name = 'specmanagement';
+      $this->name = 'Specification Management';
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
@@ -258,7 +258,7 @@ class specmanagementplugin extends MantisPlugin
 
    function menu()
    {
-      if ( plugin_config_get( 'ShowMenu' ) && $this->getUserHasLevel() )
+      if ( !plugin_is_installed('WhiteboardMenu') && plugin_config_get( 'ShowMenu' ) && $this->getUserHasLevel() )
       {
          return '<a href="' . plugin_page( 'choose_document' ) . '">' . plugin_lang_get( 'menu_title' ) . '</a>';
       }

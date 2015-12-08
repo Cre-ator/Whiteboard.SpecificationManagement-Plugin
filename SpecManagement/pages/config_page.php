@@ -1,10 +1,10 @@
 <?php
 require_once( SPECMANAGEMENT_CORE_URI . 'constant_api.php' );
 include SPECMANAGEMENT_CORE_URI . 'database_api.php';
-include SPECMANAGEMENT_CORE_URI . 'config_api.php';
+include SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
 $database_api = new database_api();
-$config_api = new config_api();
+$print_api = new print_api();
 
 auth_reauthenticate();
 access_ensure_global_level( plugin_config_get( 'AccessLevel' ) );
@@ -18,7 +18,7 @@ echo '<br/>';
 echo '<form action="' . plugin_page( 'config_update' ) . '" method="post">';
 echo form_security_field( 'plugin_SpecManagement_config_update' );
 
-if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
+if ( $print_api->getMantisVersion() == '1.2.' )
 {
    echo '<table align="center" class="width75" cellspacing="1">';
 }
@@ -28,8 +28,8 @@ else
    echo '<table>';
 }
 
-$config_api->printFormTitle( 3, 'config_caption' );
-$config_api->printTableRow();
+$print_api->printFormTitle( 3, 'config_caption' );
+$print_api->printRow();
 echo '<td class="category" width="30%">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_accesslevel' );
 echo '</td>';
@@ -40,7 +40,7 @@ echo '</select>';
 echo '</td>';
 echo '</tr>';
 
-$config_api->printTableRow();
+$print_api->printRow();
 echo '<td class="category" width="30%">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_readlevel' );
 echo '</td>';
@@ -51,7 +51,7 @@ echo '</select>';
 echo '</td>';
 echo '</tr>';
 
-$config_api->printTableRow();
+$print_api->printRow();
 echo '<td class="category" width="30%">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_writelevel' );
 echo '</td>';
@@ -62,26 +62,26 @@ echo '</select>';
 echo '</td>';
 echo '</tr>';
 
-$config_api->printTableRow();
-$config_api->printCategoryField( 1, 1, 'config_fields' );
-$config_api->printRadioButton( 1, 'ShowFields' );
+$print_api->printRow();
+$print_api->printCategoryField( 1, 1, 'config_fields' );
+$print_api->printRadioButton( 1, 'ShowFields' );
 echo '</tr>';
 
-$config_api->printTableRow();
-$config_api->printCategoryField( 1, 1, 'config_menu' );
-$config_api->printRadioButton( 1, 'ShowMenu' );
+$print_api->printRow();
+$print_api->printCategoryField( 1, 1, 'config_menu' );
+$print_api->printRadioButton( 1, 'ShowMenu' );
 echo '</tr>';
 
-$config_api->printTableRow();
-$config_api->printCategoryField( 1, 1, 'config_footer' );
-$config_api->printRadioButton( 1, 'ShowInFooter' );
+$print_api->printRow();
+$print_api->printCategoryField( 1, 1, 'config_footer' );
+$print_api->printRadioButton( 1, 'ShowInFooter' );
 echo '</tr>';
 
-$config_api->printSpacer( 3 );
+$print_api->printSpacer( 3 );
 
-$config_api->printFormTitle( 3, 'config_document' );
-$config_api->printTableRow();
-$config_api->printCategoryField( 1, 1, 'config_typeadd' );
+$print_api->printFormTitle( 3, 'config_document' );
+$print_api->printRow();
+$print_api->printCategoryField( 1, 1, 'config_typeadd' );
 $type = gpc_get_string( 'type', '' );
 echo '<td>';
 echo '<input type="text" id="type" name="type" size="30" maxlength="128" value="', $type, '">';
@@ -89,8 +89,8 @@ echo '<input type="submit" name="addtype" class="button" value="' . plugin_lang_
 echo '</td>';
 echo '</tr>';
 
-$config_api->printTableRow();
-$config_api->printCategoryField( 1, 1, 'config_types' );
+$print_api->printRow();
+$print_api->printCategoryField( 1, 1, 'config_types' );
 echo '<td>';
 
 $types = $database_api->getTypes();
@@ -107,15 +107,13 @@ echo '<input type="submit" name="deletetype" class="button" value="' . plugin_la
 echo '</td>';
 echo '</tr>';
 
-$config_api->printSpacer( 3 );
+$print_api->printSpacer( 3 );
 
-$config_api->printFormTitle( 3, 'config_editor' );
-$config_api->printTableRow();
-$config_api->printCategoryField( 1, 1, 'config_show_duration' );
-$config_api->printRadioButton( 1, 'ShowDuration' );
+$print_api->printFormTitle( 3, 'config_editor' );
+$print_api->printRow();
 echo '</tr>';
 
-$config_api->printSpacer( 3 );
+$print_api->printSpacer( 3 );
 
 echo '<tr>';
 echo '<td class="center" colspan="3">';
@@ -126,7 +124,7 @@ echo '</tr>';
 
 echo '</table>';
 
-if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+if ( $print_api->getMantisVersion() != '1.2.' )
 {
    echo '</div>';
 }

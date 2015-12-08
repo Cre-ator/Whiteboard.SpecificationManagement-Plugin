@@ -25,7 +25,6 @@ $s_plugin_SpecManagement_config_types = 'Verfügbare Dokumenttypen';
 $s_plugin_SpecManagement_config_del = 'Löschen';
 /* --------------- */
 $s_plugin_SpecManagement_config_editor = 'Editoreinstellungen';
-$s_plugin_SpecManagement_config_show_duration = 'Geplante Dauer im Editor / Dokument anzeigen?';
 /* --------------- */
 $s_plugin_SpecManagement_config_reset_title = 'SpecManagement - Alle Plugin Daten entfernen';
 $s_plugin_SpecManagement_config_reset_expl = 'Achtung, wenn Sie fortfahren werden alle im Plugin hinterlegten Daten unwiderruflich gelöscht. Fortfahren?';
@@ -35,7 +34,9 @@ $s_plugin_SpecManagement_config_reset_dont = 'Abbrechen';
 /* Choose Doc Page */
 $s_plugin_SpecManagement_select_doc_title = 'SpecManagement - Dokument erzeugen';
 $s_plugin_SpecManagement_select_doc = 'Dokumentauswahl';
-$s_plugin_SpecManagement_select_blankdoc = 'Leeres Dokument';
+$s_plugin_SpecManagement_select_type = 'Dokumenttyp:';
+$s_plugin_SpecManagement_select_version = 'Dokumentversion:';
+$s_plugin_SpecManagement_select_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
 $s_plugin_SpecManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 
 /* Menu Area */
@@ -59,4 +60,3 @@ $s_plugin_SpecManagement_head_project = 'Projekt';
 $s_plugin_SpecManagement_head_date = 'Datum';
 $s_plugin_SpecManagement_head_person_in_charge = 'Verantwortlicher';
 $s_plugin_SpecManagement_head_process = 'Fortschritt';
-

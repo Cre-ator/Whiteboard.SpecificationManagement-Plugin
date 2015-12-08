@@ -7,6 +7,15 @@ class print_api
       return substr( MANTIS_VERSION, 0, 4 );
    }
 
+   public function printFormTitle( $colspan, $lang_string )
+   {
+      echo '<tr>';
+      echo '<td class="form-title" colspan="' . $colspan . '">';
+      echo plugin_lang_get( $lang_string );
+      echo '</td>';
+      echo '</tr>';
+   }
+
    public function printRow()
    {
       if ( $this->getMantisVersion() == '1.2.' )
@@ -19,13 +28,43 @@ class print_api
       }
    }
 
+   public function printCategoryField( $colspan, $rowspan, $lang_string )
+   {
+      echo '<td class="category" colspan="' . $colspan . '" rowspan="' . $rowspan . '">';
+      echo plugin_lang_get( $lang_string );
+      echo '</td>';
+   }
+
+   public function printRadioButton( $colspan, $name )
+   {
+      echo '<td width="100px" colspan="' . $colspan . '">';
+      echo '<label>';
+      echo '<input type="radio" name="' . $name . '" value="1"';
+      echo ( ON == plugin_config_get( $name ) ) ? 'checked="checked"' : '';
+      echo '/>' . lang_get( 'yes' );
+      echo '</label>';
+      echo '<label>';
+      echo '<input type="radio" name="' . $name . '" value="0"';
+      echo ( OFF == plugin_config_get( $name ) ) ? 'checked="checked"' : '';
+      echo '/>' . lang_get( 'no' );
+      echo '</label>';
+      echo '</td>';
+   }
+
+   public function printSpacer( $colspan )
+   {
+      echo '<tr>';
+      echo '<td class="spacer" colspan="' . $colspan . '">&nbsp;</td>';
+      echo '</tr>';
+   }
+
    public function print_plugin_menu()
    {
       echo '<table align="center">';
       echo '<tr">';
 
       echo '<td>';
-      echo '[ <a href="' . plugin_page( 'ChooseDocument' ) . '">';
+      echo '[ <a href="' . plugin_page( 'choose_document' ) . '">';
       echo plugin_lang_get( 'menu_choosedoc' );
       echo '</a> ]';
       echo '</td>';
@@ -41,13 +80,13 @@ class print_api
       /* General */
 
       echo '<td>';
-      echo '[ <a href="' . plugin_page( 'ChooseDocument' ) . '">';
+      echo '[ <a href="' . plugin_page( 'choose_document' ) . '">';
       echo plugin_lang_get( 'menu_choosedoc' );
       echo '</a> ]';
       echo '</td>';
 
       echo '<td>';
-      echo '[ <a href="' . plugin_page( 'Specification_Print' ) . '">';
+      echo '[ <a href="' . plugin_page( 'document_print' ) . '">';
       echo plugin_lang_get( 'menu_printbutton' );
       echo '</a> ]';
       echo '</td>';
@@ -219,7 +258,7 @@ class print_api
       }
    }
 
-   public function print_chapter_title( $chapter_index, $chapter_title, $duration )
+   public function print_chapter_title( $chapter_index, $chapter_title, $print_duration, $duration )
    {
       if ( is_null( $duration ) )
       {
@@ -229,7 +268,7 @@ class print_api
       echo '<tr>';
       echo '<td class="workpackagehead" colspan="1">' . $chapter_index . '</td>';
       echo '<td class="workpackagehead" colspan="2">' . $chapter_title;
-      if ( plugin_config_get( 'ShowDuration' ) )
+      if ( !is_null( $print_duration ) )
       {
          echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
       }
@@ -278,7 +317,7 @@ class print_api
       echo '<br />';
    }
 
-   public function print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $ptime )
+   public function print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $print_duration, $ptime )
    {
       $bug_description = bug_get_text_field( $bug_id, 'description' );
       $bug_streproduce = bug_get_text_field( $bug_id, 'steps_to_reproduce' );
@@ -296,7 +335,7 @@ class print_api
       echo '<td colspan="2">' . bug_get_field( $bug_id, 'summary' ) . ' (';
       print_bug_link( $bug_id, true );
       echo ')';
-      if ( plugin_config_get( 'ShowDuration' ) )
+      if ( !is_null( $print_duration ) )
       {
          echo ', ' . plugin_lang_get( 'editor_bug_duration' ) . ': ' . $ptime . ' ' . plugin_lang_get( 'editor_duration_unit' );
       }
@@ -356,9 +395,13 @@ class print_api
       echo '</tr>';
    }
 
-   public function calculate_document_progress( $allRelevantBugs )
+   private function calculate_document_progress( $allRelevantBugs )
    {
       $segments = count( $allRelevantBugs );
+      if ( $segments == 0 )
+      {
+         $segments++;
+      }
       $segment_process = 0;
       $bug_spec_progress = 0;
 
@@ -417,7 +460,11 @@ class print_api
 
    public function print_document_progress( $allRelevantBugs )
    {
-      $document_process = $this->calculate_document_progress( $allRelevantBugs );
+      $document_process = 0;
+      if ( !empty( $allRelevantBugs ) )
+      {
+         $document_process = $this->calculate_document_progress( $allRelevantBugs );
+      }
 
       echo '<div class="progress400">';
       echo '<span class="bar" style="width: ' . $document_process . '%;">' . $document_process . '%</span>';

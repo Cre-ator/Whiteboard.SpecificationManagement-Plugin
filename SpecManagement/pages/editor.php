@@ -6,7 +6,10 @@ $database_api = new database_api();
 $print_api = new print_api();
 
 $document_type = null;
-/* initialize source */
+
+/* initialize print_duration */
+$print_duration = null;
+/* initialize version */
 $version = null;
 /* initialize work packages */
 $work_packages = array();
@@ -15,7 +18,13 @@ $work_package_bug_ids = array();
 /* initialize parent project */
 $parent_project_id = $database_api->getMainProjectByHierarchy( helper_get_current_project() );
 
-/* get source if not empty */
+/* get print_duration option if not empty */
+if ( !empty( $_POST['print_duration'] ) )
+{
+   $print_duration = $_POST['print_duration'];
+}
+
+/* get version if not empty */
 if ( !empty( $_POST['version'] ) )
 {
    $version = $_POST['version'];
@@ -53,7 +62,7 @@ if ( $work_packages != null )
    {
       $duration = $database_api->getWorkpackageDuration( $version, $work_package );
       /* print work package */
-      $print_api->print_chapter_title( $chapter_index, $work_package, $duration );
+      $print_api->print_chapter_title( $chapter_index, $work_package, $print_duration, $duration );
       /* get work package assigned bugs */
       $work_package_bug_ids = $database_api->getWorkPackageSpecBugs( $version, $work_package );
 
@@ -67,7 +76,7 @@ if ( $work_packages != null )
             /* planned duration for each bug */
             $ptime = $database_api->getPtimeRow( $bug_id )[2];
             /* print bugs */
-            $print_api->print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $ptime );
+            $print_api->print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $print_duration, $ptime );
             /* increment index */
             $sub_chapter_index += 10;
          }

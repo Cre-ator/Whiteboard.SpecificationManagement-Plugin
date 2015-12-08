@@ -25,7 +25,6 @@ if ( $option_change )
    $config_api->updateButton( 'ShowInFooter' );
    $config_api->updateButton( 'ShowFields' );
    $config_api->updateButton( 'ShowMenu' );
-   $config_api->updateButton( 'ShowDuration' );
 }
 
 if ( $option_reset )

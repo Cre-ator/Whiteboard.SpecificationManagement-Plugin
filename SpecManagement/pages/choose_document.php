@@ -10,10 +10,6 @@ $types = $database_api->getTypes();
 $document_type = $database_api->getFirstType();
 $sources = array();
 
-/**
- * false if no data was sent
- * true if type was specified and sent
- */
 $post = false;
 if ( !empty( $_POST['types'] ) )
 {
@@ -27,15 +23,11 @@ $print_api->print_plugin_menu();
 
 echo '<div align="center">';
 echo '<hr size="1" width="50%" />';
-
 echo '<table class="width50" cellspacing="1">';
-echo '<tr class="row-category">';
-echo '<th>' . plugin_lang_get( 'select_doc' ) . '</th>';
-echo '</tr>';
+$print_api->printFormTitle( 2, 'select_doc' );
 
-$print_api->printRow();
-echo '<td class="center">';
-
+$print_api->printCategoryField( 1, 1, 'select_type' );
+echo '<td>';
 echo '<form method="post" name="form_set_requirement" action="' . plugin_page( 'choose_document' ) . '">';
 echo '<select name="types">';
 foreach ( $types as $type )
@@ -47,14 +39,14 @@ foreach ( $types as $type )
    }
    echo '>' . string_html_specialchars( $type ) . '</option>';
 }
-echo '<option value="blank"';
-if ( $post && $_POST['types'] == 'blank' )
-{
-   echo ' selected="selected"';
-}
-echo '>' . plugin_lang_get( 'select_blankdoc' ) . '</option>';
 echo '</select>';
 echo '<input type="submit" class="button-small" value="' . lang_get( 'switch' ) . '" />';
+echo '</td>';
+echo '</tr>';
+
+$print_api->printRow();
+$print_api->printCategoryField( 1, 1, 'select_version' );
+echo '<td>';
 
 if ( $post )
 {
@@ -79,13 +71,18 @@ if ( $document_type != null || $_POST['types'] != 'blank' )
    }
    echo '</select>';
 }
-
 echo '</td>';
 echo '</tr>';
 
 $print_api->printRow();
-echo '<td class="center">';
+$print_api->printCategoryField( 1, 1, 'select_print_duration' );
+echo '<td>';
+echo '<input type="checkbox" name="print_duration" value="true" />';
+echo '</td>';
+echo '</tr>';
 
+$print_api->printRow();
+echo '<td class="center" colspan="2">';
 ?>
    <input type="submit" name="formSubmit" class="button"
           value="<?php echo plugin_lang_get( 'select_confirm' ); ?>"/>

@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.11';
+      $this->version = '1.0.12';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -160,9 +160,10 @@ class SpecManagementPlugin extends MantisPlugin
       $print_api = new print_api();
 
       $bug_id = null;
+      $type = null;
+      $types = null;
       $version = null;
       $work_package = null;
-      $type = null;
       $ptime = null;
 
       switch ( $event )
@@ -209,6 +210,10 @@ class SpecManagementPlugin extends MantisPlugin
             case 'EVENT_UPDATE_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
+                  if ( is_null( $version ) )
+                  {
+                     $version = gpc_get_string( 'version', '' );
+                  }
                   $print_api->printBugUpdateFields( $type, $types, $version, $work_package, $ptime );
                }
                break;
@@ -258,7 +263,7 @@ class SpecManagementPlugin extends MantisPlugin
 
    function menu()
    {
-      if ( !plugin_is_installed('WhiteboardMenu') && plugin_config_get( 'ShowMenu' ) && $this->getUserHasLevel() )
+      if ( !plugin_is_installed( 'WhiteboardMenu' ) && plugin_config_get( 'ShowMenu' ) && $this->getUserHasLevel() )
       {
          return '<a href="' . plugin_page( 'choose_document' ) . '">' . plugin_lang_get( 'menu_title' ) . '</a>';
       }

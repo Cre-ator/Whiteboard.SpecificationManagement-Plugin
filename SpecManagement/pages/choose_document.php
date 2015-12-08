@@ -36,7 +36,7 @@ echo '</tr>';
 $print_api->printRow();
 echo '<td class="center">';
 
-echo '<form method="post" name="form_set_requirement" action="' . plugin_page( 'ChooseDocument' ) . '">';
+echo '<form method="post" name="form_set_requirement" action="' . plugin_page( 'choose_document' ) . '">';
 echo '<select name="types">';
 foreach ( $types as $type )
 {
@@ -62,7 +62,7 @@ if ( $post )
 }
 
 echo '</form>';
-echo '<form method="post" name="form_set_source" action="' . plugin_page( 'Editor' ) . '">';
+echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
 if ( $document_type != null || $_POST['types'] != 'blank' )
 {
    $source_ids = $database_api->getSources( $document_type, $t_project_id );

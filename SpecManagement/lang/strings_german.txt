@@ -55,6 +55,7 @@ $s_plugin_SpecManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Dokumententitel';
+$s_plugin_SpecManagement_head_version = 'Version';
 $s_plugin_SpecManagement_head_customer = 'Kunde';
 $s_plugin_SpecManagement_head_project = 'Projekt';
 $s_plugin_SpecManagement_head_date = 'Datum';

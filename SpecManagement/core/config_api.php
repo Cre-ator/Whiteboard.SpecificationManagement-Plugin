@@ -2,6 +2,12 @@
 
 class config_api
 {
+   /**
+    * Updates a value in the plugin configuration
+    *
+    * @param $value
+    * @param $constant
+    */
    public function updateValue( $value, $constant )
    {
       $act_value = null;
@@ -22,6 +28,11 @@ class config_api
       }
    }
 
+   /**
+    * Updates a button in the plugin configuration
+    *
+    * @param $config
+    */
    public function updateButton( $config )
    {
       $button = gpc_get_int( $config );

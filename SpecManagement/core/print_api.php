@@ -2,11 +2,22 @@
 
 class print_api
 {
+   /**
+    * Get suffix of mantis version
+    *
+    * @return string
+    */
    public function getMantisVersion()
    {
       return substr( MANTIS_VERSION, 0, 4 );
    }
 
+   /**
+    * Prints a header row in a table
+    *
+    * @param $colspan
+    * @param $lang_string
+    */
    public function printFormTitle( $colspan, $lang_string )
    {
       echo '<tr>';
@@ -16,6 +27,9 @@ class print_api
       echo '</tr>';
    }
 
+   /**
+    * Starts a new row in a table
+    */
    public function printRow()
    {
       if ( $this->getMantisVersion() == '1.2.' )
@@ -28,6 +42,13 @@ class print_api
       }
    }
 
+   /**
+    * Creates a new category-column
+    *
+    * @param $colspan
+    * @param $rowspan
+    * @param $lang_string
+    */
    public function printCategoryField( $colspan, $rowspan, $lang_string )
    {
       echo '<td class="category" colspan="' . $colspan . '" rowspan="' . $rowspan . '">';
@@ -35,6 +56,12 @@ class print_api
       echo '</td>';
    }
 
+   /**
+    * Prints a radio button in a table
+    *
+    * @param $colspan
+    * @param $name
+    */
    public function printRadioButton( $colspan, $name )
    {
       echo '<td width="100px" colspan="' . $colspan . '">';
@@ -51,6 +78,11 @@ class print_api
       echo '</td>';
    }
 
+   /**
+    * Prints a space-element in a table
+    *
+    * @param $colspan
+    */
    public function printSpacer( $colspan )
    {
       echo '<tr>';
@@ -58,6 +90,9 @@ class print_api
       echo '</tr>';
    }
 
+   /**
+    * Prints the plugin specific menu
+    */
    public function print_plugin_menu()
    {
       echo '<table align="center">';
@@ -73,6 +108,9 @@ class print_api
       echo '</table>';
    }
 
+   /**
+    * Prints the editor specific menu
+    */
    public function print_editor_menu()
    {
       echo '<table align="center">';
@@ -95,6 +133,15 @@ class print_api
       echo '</table>';
    }
 
+   /**
+    * Prints the specific plugin fields in the bug-update user interface
+    *
+    * @param $type
+    * @param $types
+    * @param $version
+    * @param $work_package
+    * @param $ptime
+    */
    public function printBugUpdateFields( $type, $types, $version, $work_package, $ptime )
    {
       $this->printRow();
@@ -105,6 +152,7 @@ class print_api
       echo '</th>';
       echo '<td colspan="5">';
       echo '<select ' . helper_get_tab_index() . ' name="types">';
+      echo '<option value=""></option>';
       foreach ( $types as $act_type )
       {
          echo '<option value="' . $act_type . '"';
@@ -137,6 +185,14 @@ class print_api
       echo '</tr>';
    }
 
+   /**
+    * Prints the specific plugin fields in the bug-view user interface
+    *
+    * @param $requirement
+    * @param $version
+    * @param $work_package
+    * @param $ptime
+    */
    public function printBugViewFields( $requirement, $version, $work_package, $ptime )
    {
       $this->printRow();
@@ -157,6 +213,14 @@ class print_api
       echo '</tr>';
    }
 
+   /**
+    * Prints the specific plugin fields in the bug-report user interface
+    *
+    * @param $types
+    * @param $version
+    * @param $work_package
+    * @param $ptime
+    */
    public function printBugReportFields( $types, $version, $work_package, $ptime )
    {
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
@@ -168,6 +232,7 @@ class print_api
          echo '</td>';
          echo '<td>';
          echo '<select ' . helper_get_tab_index() . ' name="types">';
+         echo '<option value=""></option>';
          foreach ( $types as $type )
          {
             echo '<option value="' . $type . '">' . $type . '</option>';
@@ -258,6 +323,14 @@ class print_api
       }
    }
 
+   /**
+    * Prints a new chapter title element in a document
+    *
+    * @param $chapter_index
+    * @param $chapter_title
+    * @param $print_duration
+    * @param $duration
+    */
    public function print_chapter_title( $chapter_index, $chapter_title, $print_duration, $duration )
    {
       if ( is_null( $duration ) )
@@ -266,8 +339,8 @@ class print_api
       }
 
       echo '<tr>';
-      echo '<td class="workpackagehead" colspan="1">' . $chapter_index . '</td>';
-      echo '<td class="workpackagehead" colspan="2">' . $chapter_title;
+      echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
+      echo '<td class="form-title" colspan="2">' . $chapter_title;
       if ( !is_null( $print_duration ) )
       {
          echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
@@ -276,13 +349,27 @@ class print_api
       echo '</tr>';
    }
 
+
+   /**
+    * Prints the header element of a document
+    *
+    * @param $document_type
+    * @param $version
+    * @param $parent_project
+    * @param $allRelevantBugs
+    */
    public function print_document_head( $document_type, $version, $parent_project, $allRelevantBugs )
    {
-      echo '<table class="width100">';
+      echo '<table class="width60">';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_title' ) . '</td>';
       echo '<td class="form-title">' . $document_type . ' - ' . $version . '</td>';
+      echo '</tr>';
+
+      echo '<tr>';
+      echo '<td class="field-container">' . plugin_lang_get( 'head_version' ) . '</td>';
+      echo '<td class="form-title">' . $version . '</td>';
       echo '</tr>';
 
       echo '<tr>';
@@ -317,6 +404,15 @@ class print_api
       echo '<br />';
    }
 
+   /**
+    * Prints a detailed view of a bug in a document
+    *
+    * @param $chapter_index
+    * @param $sub_chapter_index
+    * @param $bug_id
+    * @param $print_duration
+    * @param $ptime
+    */
    public function print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $print_duration, $ptime )
    {
       $bug_description = bug_get_text_field( $bug_id, 'description' );
@@ -331,8 +427,8 @@ class print_api
       }
 
       echo '<tr>';
-      echo '<td colspan="1">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
-      echo '<td colspan="2">' . bug_get_field( $bug_id, 'summary' ) . ' (';
+      echo '<td class="form-title" colspan="1">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
+      echo '<td class="form-title" colspan="2">' . bug_get_field( $bug_id, 'summary' ) . ' (';
       print_bug_link( $bug_id, true );
       echo ')';
       if ( !is_null( $print_duration ) )
@@ -356,6 +452,8 @@ class print_api
    }
 
    /**
+    * Prints a specific information of a bug
+    *
     * @param $info
     * @internal param $bug_description
     */
@@ -370,6 +468,11 @@ class print_api
       }
    }
 
+   /**
+    * Prints bug-specific attachments
+    *
+    * @param $bug_id
+    */
    public function print_bug_attachments( $bug_id )
    {
       $attachment_count = file_bug_attachment_count( $bug_id );
@@ -386,6 +489,11 @@ class print_api
       echo '</tr>';
    }
 
+   /**
+    * Prints the information that there are notes
+    *
+    * @param $bug_id
+    */
    public function print_bugnote_note( $bug_id )
    {
       $bugnote_count = count( bugnote_get_all_bugnotes( $bug_id ) );
@@ -395,6 +503,12 @@ class print_api
       echo '</tr>';
    }
 
+   /**
+    * Calculates the process of a document
+    *
+    * @param $allRelevantBugs
+    * @return float
+    */
    private function calculate_document_progress( $allRelevantBugs )
    {
       $segments = count( $allRelevantBugs );
@@ -409,43 +523,36 @@ class print_api
       {
          $bug_id = $allRelevantBugs[$segment];
 
+         /**
+          * TODO spezifiziere prozentualen Fortschritt
+          */
+         $bug_status = bug_get_field( $bug_id, 'status' );
          $bug_resolution = bug_get_field( $bug_id, 'resolution' );
 
-         /* TODO spezifiziere prozentualen Fortschritt
-          * 10:offen,
-          * 20:erledigt,
-          * 30:wiedereröffnet,
-          * 40:nicht reproduzierbar,
-          * 50:unlösbar,
-          * 60:doppelt,
-          * 70:keine Änderung notwendig,
-          * 80:aufgeschoben,
-          * 90:wird nicht behoben ---
-          */
          switch ( $bug_resolution )
          {
-            case 10:
+            case PLUGINS_SPECMANAGEMENT_RES_OPEN:
                $bug_spec_progress = 0;
                break;
-            case 20:
+            case PLUGINS_SPECMANAGEMENT_RES_FIXED:
                $bug_spec_progress = 100;
                break;
-            case 30:
+            case PLUGINS_SPECMANAGEMENT_RES_REOPENED:
                $bug_spec_progress = 0;
                break;
-            case 40:
+            case PLUGINS_SPECMANAGEMENT_RES_UNABLETOREPRODUCE:
                $bug_spec_progress = 100;
                break;
-            case 50:
+            case PLUGINS_SPECMANAGEMENT_RES_NOTFIXABLE:
                $bug_spec_progress = 100;
                break;
-            case 60:
+            case PLUGINS_SPECMANAGEMENT_RES_DUPLICATE:
                $bug_spec_progress = 100;
                break;
-            case 70:
+            case PLUGINS_SPECMANAGEMENT_RES_NOCHANGEREQUIRED:
                $bug_spec_progress = 100;
                break;
-            case 80:
+            case PLUGINS_SPECMANAGEMENT_RES_SUSPENDED:
                $bug_spec_progress = 0;
                break;
          }
@@ -458,6 +565,11 @@ class print_api
       return $document_process;
    }
 
+   /**
+    * Prints the process of a document
+    *
+    * @param $allRelevantBugs
+    */
    public function print_document_progress( $allRelevantBugs )
    {
       $document_process = 0;

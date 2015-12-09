@@ -45,13 +45,12 @@ if ( empty( $work_packages ) && !is_null( $version ) )
 }
 
 html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $document_type . ' - ' . $version );
-echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/SpecManagement.css">';
 html_page_top2();
 
 $print_api->print_editor_menu();
 $print_api->print_document_head( $document_type, $version, $parent_project_id, $allRelevantBugs );
 
-echo '<table class="width100">';
+echo '<table class="width60">';
 
 $chapter_index = 1;
 

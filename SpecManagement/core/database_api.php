@@ -18,6 +18,11 @@ class database_api
       $this->mysqli = new mysqli( $this->dbPath, $this->dbUser, $this->dbPass, $this->dbName );
    }
 
+   /**
+    * Get suffix of mantis version
+    *
+    * @return string
+    */
    public function getMantisVersion()
    {
       return substr( MANTIS_VERSION, 0, 4 );
@@ -87,6 +92,12 @@ class database_api
       return $string;
    }
 
+   /**
+    * Get version-related type id
+    *
+    * @param $version
+    * @return mixed
+    */
    public function getTypeByVersion( $version )
    {
       if ( $this->getMantisVersion() == '1.2.' )
@@ -606,7 +617,7 @@ class database_api
 
       if ( $version != null )
       {
-         $query = "SELECT s.work_package FROM $plugin_src_table s
+         $query = "SELECT DISTINCT s.work_package FROM $plugin_src_table s
           WHERE s.version = '" . $version . "'";
 
          $result = $this->mysqli->query( $query );

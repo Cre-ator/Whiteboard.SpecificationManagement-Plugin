@@ -142,7 +142,7 @@ class print_api
     * @param $work_package
     * @param $ptime
     */
-   public function printBugUpdateFields( $type, $types, $version, $work_package, $ptime )
+   public function printBugUpdateFields( $type, $types, $work_package, $ptime )
    {
       $this->printRow();
       echo '<td class="category">';
@@ -165,14 +165,8 @@ class print_api
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_src' ) . '</td>';
-      echo '<td>';
-      echo '<select ' . helper_get_tab_index() . ' name="doc_version">';
-      print_version_option_list( $version );
-      echo '</select>';
-      echo '</td>';
       echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</td>';
-      echo '<td colspan="3">';
+      echo '<td colspan="5">';
       echo '<input ', helper_get_tab_index(), ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="', $work_package, '" />';
       echo '</td>';
       echo '</tr>';
@@ -193,7 +187,7 @@ class print_api
     * @param $work_package
     * @param $ptime
     */
-   public function printBugViewFields( $requirement, $version, $work_package, $ptime )
+   public function printBugViewFields( $requirement, $work_package, $ptime )
    {
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
@@ -201,10 +195,8 @@ class print_api
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category">', plugin_lang_get( 'bug_view_specification_src' ), '</td>';
-      echo '<td id="doc_version">', $version, '</td>';
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_wpg' ), '</td>';
-      echo '<td colspan="3" id="work_package">', $work_package, '</td>';
+      echo '<td colspan="5" id="work_package">', $work_package, '</td>';
       echo '</tr>';
 
       $this->printRow();
@@ -221,7 +213,7 @@ class print_api
     * @param $work_package
     * @param $ptime
     */
-   public function printBugReportFields( $types, $version, $work_package, $ptime )
+   public function printBugReportFields( $types, $work_package, $ptime )
    {
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {
@@ -240,18 +232,6 @@ class print_api
          echo '<span class="label-style"></span>';
          echo '</td>';
          echo '</form>';
-         echo '</tr>';
-
-         $this->printRow();
-         echo '<td class="category">';
-         echo '<label><span>' . plugin_lang_get( 'bug_view_specification_src' ) . '</span></label>';
-         echo '</td>';
-         echo '<td>';
-         echo '<select ' . helper_get_tab_index() . ' name="doc_version">';
-         print_version_option_list( $version );
-         echo '</select>';
-         echo '<span class="label-style"></span>';
-         echo '</td>';
          echo '</tr>';
 
          $this->printRow();
@@ -293,16 +273,6 @@ class print_api
          echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</form>';
-         echo '</div>';
-
-         echo '<div class="field-container">';
-         echo '<label for="doc_version"><span>' . plugin_lang_get( 'bug_view_specification_src' ) . '</span></label>';
-         echo '<span class="select">';
-         echo '<select ' . helper_get_tab_index() . ' name="doc_version">';
-         print_version_option_list( $version );
-         echo '</select>';
-         echo '</span>';
-         echo '<span class="label-style"></span>';
          echo '</div>';
 
          echo '<div class="field-container">';

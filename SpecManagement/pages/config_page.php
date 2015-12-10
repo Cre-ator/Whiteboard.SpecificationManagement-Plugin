@@ -84,7 +84,7 @@ $print_api->printRow();
 $print_api->printCategoryField( 1, 1, 'config_typeadd' );
 $type = gpc_get_string( 'type', '' );
 echo '<td>';
-echo '<input type="text" id="type" name="type" size="30" maxlength="128" value="', $type, '">';
+echo '<input type="text" id="type" name="type" size="15" maxlength="128" value="', $type, '">&nbsp';
 echo '<input type="submit" name="addtype" class="button" value="' . plugin_lang_get( 'config_add' ) . '">';
 echo '</td>';
 echo '</tr>';
@@ -101,8 +101,11 @@ foreach ( $types as $type )
 {
    echo '<option value="' . $type . '">' . $type . '</option>';
 }
-echo '</select>';
-echo '<input type="submit" name="deletetype" class="button" value="' . plugin_lang_get( 'config_del' ) . '">';
+echo '</select>&nbsp';
+$new_type = gpc_get_string( 'newtype', '' );
+echo '<input type="submit" name="deletetype" class="button" value="' . plugin_lang_get( 'config_del' ) . '">&nbsp';
+echo '<input type="text" id="newtype" name="newtype" size="15" maxlength="128" value="', $new_type, '">&nbsp';
+echo '<input type="submit" name="changetype" class="button" value="' . plugin_lang_get( 'config_change' ) . '">';
 
 echo '</td>';
 echo '</tr>';
@@ -117,7 +120,7 @@ $print_api->printSpacer( 3 );
 
 echo '<tr>';
 echo '<td class="center" colspan="3">';
-echo '<input type="submit" name="change" class="button" value="' . lang_get( 'update_prefs_button' ) . '"/>';
+echo '<input type="submit" name="change" class="button" value="' . lang_get( 'update_prefs_button' ) . '"/>&nbsp';
 echo '<input type="submit" name="reset" class="button" value="' . lang_get( 'reset_prefs_button' ) . '"/>';
 echo '</td>';
 echo '</tr>';

@@ -19,6 +19,13 @@ if ( !empty( $_POST['types'] ) )
 html_page_top1( plugin_lang_get( 'select_doc_title' ) );
 html_page_top2();
 
+/**
+ * TODO WhiteboardMenu mit anzeigen
+ * (dafür muss zunächst die print_api von WhiteboardMenu umbenannt werden.)
+ */
+if ( plugin_is_installed( 'WhiteboardMenu' ) )
+{
+}
 $print_api->print_plugin_menu();
 
 echo '<div align="center">';

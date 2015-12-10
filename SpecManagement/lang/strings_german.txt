@@ -23,6 +23,7 @@ $s_plugin_SpecManagement_config_typeadd = 'Dokumenttyp hinzufügen';
 $s_plugin_SpecManagement_config_add = 'Hinzufügen';
 $s_plugin_SpecManagement_config_types = 'Verfügbare Dokumenttypen';
 $s_plugin_SpecManagement_config_del = 'Löschen';
+$s_plugin_SpecManagement_config_change = 'Ändern';
 /* --------------- */
 $s_plugin_SpecManagement_config_editor = 'Editoreinstellungen';
 /* --------------- */

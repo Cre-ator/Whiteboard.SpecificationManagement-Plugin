@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.0.14';
+      $this->version = '1.1.0';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -57,7 +57,6 @@ class SpecManagementPlugin extends MantisPlugin
          'ShowUserMenu' => ON,
          'ShowMenu' => ON,
          'ShowDuration' => ON,
-         'DeinstallFull' => OFF,
          'AccessLevel' => ADMINISTRATOR
       );
    }
@@ -68,19 +67,10 @@ class SpecManagementPlugin extends MantisPlugin
       (
          array
          (
-            'CreateTableSQL', array( plugin_table( 'req' ), "
-            id          I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
-            bug_id      I       NOTNULL UNSIGNED,
-            type_id     I       NOTNULL UNSIGNED
-            " )
-         ),
-         array
-         (
             'CreateTableSQL', array( plugin_table( 'src' ), "
             id              I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id          I       NOTNULL UNSIGNED,
-            requirement_id  I       NOTNULL UNSIGNED,
-            version         C(250)  DEFAULT '',
+            version_id      I       NOTNULL UNSIGNED,
             work_package    C(250)  DEFAULT '',
             type_id         I       NOTNULL UNSIGNED
             " )
@@ -162,7 +152,6 @@ class SpecManagementPlugin extends MantisPlugin
       $bug_id = null;
       $type = null;
       $types = null;
-      $version = null;
       $work_package = null;
       $ptime = null;
 
@@ -178,13 +167,11 @@ class SpecManagementPlugin extends MantisPlugin
 
       if ( $bug_id != null )
       {
-         $requirement_obj = $database_api->getReqRow( $bug_id );
          $source_obj = $database_api->getSourceRow( $bug_id );
          $ptime_obj = $database_api->getPtimeRow( $bug_id );
 
-         $type = $database_api->getTypeString( $requirement_obj[2] );
-         $version = $source_obj[3];
-         $work_package = $source_obj[4];
+         $type = $database_api->getTypeString( $source_obj[4] );
+         $work_package = $source_obj[3];
          $ptime = $ptime_obj[2];
       }
 
@@ -197,24 +184,19 @@ class SpecManagementPlugin extends MantisPlugin
             case 'EVENT_VIEW_BUG_DETAILS':
                if ( $this->getReadLevel() || $this->getWriteLevel() )
                {
-                  $print_api->printBugViewFields( $type, $version, $work_package, $ptime );
+                  $print_api->printBugViewFields( $type, $work_package, $ptime );
                }
                break;
             case 'EVENT_REPORT_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
-                  $version = gpc_get_string( 'version', '' );
-                  $print_api->printBugReportFields( $types, $version, $work_package, $ptime );
+                  $print_api->printBugReportFields( $types, $work_package, $ptime );
                }
                break;
             case 'EVENT_UPDATE_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
-                  if ( is_null( $version ) )
-                  {
-                     $version = gpc_get_string( 'version', '' );
-                  }
-                  $print_api->printBugUpdateFields( $type, $types, $version, $work_package, $ptime );
+                  $print_api->printBugUpdateFields( $type, $types, $work_package, $ptime );
                }
                break;
          }
@@ -235,27 +217,25 @@ class SpecManagementPlugin extends MantisPlugin
 
       $bug_id = $bug->id;
 
-      $requirement_obj = $database_api->getReqRow( $bug_id );
       $source_obj = $database_api->getSourceRow( $bug_id );
       $ptime_obj = $database_api->getPtimeRow( $bug_id );
 
-      $type = gpc_get_string( 'types', $database_api->getTypeString( $requirement_obj[2] ) );
+      $version = gpc_get_string( 'target_version', '' );
+      $version_id = version_get_id( $version );
+
+      $work_package = gpc_get_string( 'work_package', $source_obj[3] );
+      $type = gpc_get_string( 'types', $database_api->getTypeString( $source_obj[4] ) );
       $type_id = $database_api->getTypeId( $type );
-      $version = gpc_get_string( 'doc_version', $source_obj[3] );
-      $work_package = gpc_get_string( 'work_package', $source_obj[4] );
       $ptime = gpc_get_string( 'ptime', $ptime_obj[2] );
 
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
-            $database_api->insertReqRow( $bug_id, $type_id );
-            $requirement_id = $database_api->getReqId( $bug_id );
-            $database_api->insertSourceRow( $bug_id, $requirement_id, $version, $work_package, $type_id );
+            $database_api->insertSourceRow( $bug_id, $version_id, $work_package, $type_id );
             $database_api->insertPtimeRow( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
-            $database_api->updateReqRow( $bug_id, $type_id );
-            $database_api->updateSourceRow( $bug_id, $version, $work_package, $type_id );
+            $database_api->updateSourceRow( $bug_id, $version_id, $work_package, $type_id );
             $database_api->updatePtimeRow( $bug_id, $ptime );
             break;
       }

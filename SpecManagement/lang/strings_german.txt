@@ -43,6 +43,7 @@ $s_plugin_SpecManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 /* Menu Area */
 $s_plugin_SpecManagement_menu_title = 'Spezifikationen';
 $s_plugin_SpecManagement_menu_choosedoc = 'Dokument erzeugen';
+$s_plugin_SpecManagement_menu_manversions = 'Dokumentversionen verwalten';
 $s_plugin_SpecManagement_menu_printbutton = 'Drucken';
 
 /* Editor Area */
@@ -53,6 +54,13 @@ $s_plugin_SpecManagement_editor_duration_unit = 'Personentage';
 $s_plugin_SpecManagement_editor_bug_duration = 'Dauer';
 $s_plugin_SpecManagement_editor_bug_attachments = 'Angehängte Dateien';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
+
+/* Version Manager Area */
+$s_plugin_SpecManagement_manversions_title = 'Dokument-Versionsverwaltung';
+$s_plugin_SpecManagement_manversions_thead = 'Versionsverwaltung';
+$s_plugin_SpecManagement_manversions_thdoctype = 'Dokumenttyp';
+$s_plugin_SpecManagement_manversions_thaddchangetype = 'Weise Dokumenttyp zu';
+$s_plugin_SpecManagement_manversions_assigntype = 'Zuweisen';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Dokumententitel';

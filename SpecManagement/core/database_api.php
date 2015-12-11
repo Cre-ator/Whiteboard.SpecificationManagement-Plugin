@@ -48,6 +48,10 @@ class database_api
 
       $this->mysqli->query( $query );
 
+      $query = 'DROP TABLE mantis_plugin_SpecManagement_vers_table';
+
+      $this->mysqli->query( $query );
+
       $query = "DELETE FROM mantis_config_table
           WHERE config_id LIKE 'plugin_SpecManagement%'";
 
@@ -98,15 +102,15 @@ class database_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
       }
       else
       {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
       }
 
-      $query = "SELECT DISTINCT s.type_id FROM $plugin_src_table s
-          WHERE s.version_id = " . $version_id;
+      $query = "SELECT DISTINCT v.type_id FROM $plugin_vers_table v
+          WHERE v.version_id = " . $version_id;
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -169,11 +173,11 @@ class database_api
     * Create new bug-related src entry
     *
     * @param $bug_id
-    * @param $version_id
+    * @param $p_version_id
     * @param $work_package
     * @param $type_id
     */
-   public function insertSourceRow( $bug_id, $version_id, $work_package, $type_id )
+   public function insertSourceRow( $bug_id, $p_version_id, $work_package )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -184,11 +188,11 @@ class database_api
          $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_src_table . '( id, bug_id, version_id, work_package, type_id )
-         SELECT null, ' . $bug_id . ',' . $version_id . ',\'' . $work_package . '\',' . $type_id . '
+      $query = 'INSERT INTO ' . $plugin_src_table . '( id, bug_id, p_version_id, work_package )
+         SELECT null, ' . $bug_id . ',' . $p_version_id . ',\'' . $work_package . '\'
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM ' . $plugin_src_table . '
-         WHERE bug_id = ' . $bug_id . ' AND version_id = ' . $version_id . ' AND work_package = \'' . $work_package . '\' AND type_id = ' . $type_id . ')';
+         WHERE bug_id = ' . $bug_id . ' AND version_id = ' . $p_version_id . ' AND work_package = \'' . $work_package . '\')';
 
       $this->mysqli->query( $query );
    }
@@ -223,15 +227,15 @@ class database_api
     * Update existing src
     *
     * @param $bug_id
-    * @param $version_id
+    * @param $p_version_id
     * @param $work_package
     * @param $type_id
     */
-   public function updateSourceRow( $bug_id, $version_id, $work_package, $type_id )
+   public function updateSourceRow( $bug_id, $p_version_id, $work_package )
    {
       if ( $this->getSourceRow( $bug_id ) == null )
       {
-         $this->insertSourceRow( $bug_id, $version_id, $work_package, $type_id );
+         $this->insertSourceRow( $bug_id, $p_version_id, $work_package );
       }
       else
       {
@@ -248,7 +252,7 @@ class database_api
          $this->mysqli->query( $query );
 
          $query = 'UPDATE ' . $plugin_src_table . '
-         SET version_id = ' . $version_id . ', work_package = \'' . $work_package . '\', type_id = ' . $type_id . '
+         SET version_id = ' . $p_version_id . ', work_package = \'' . $work_package . '\'
          WHERE bug_id = ' . $bug_id;
 
          $this->mysqli->query( $query );
@@ -432,12 +436,13 @@ class database_api
 
    /**
     * Get available srcs (versions) for a specific req (type)
+    * TODO type_id nicht mehr vorhanden!!!!
     *
     * @param $type_id
     * @param $project_id
     * @return array
     */
-   public function getSources( $type_id, $project_id )
+   public function getVersionIDs( $type_id, $project_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -450,7 +455,7 @@ class database_api
          $bug_table = db_get_table( 'bug' );
       }
 
-      $query = "SELECT DISTINCT s.version_id FROM $plugin_src_table s, $bug_table b
+      $query = "SELECT DISTINCT s.p_version_id FROM $plugin_src_table s, $bug_table b
           WHERE s.type_id = " . $type_id;
       if ( $project_id != 0 )
       {
@@ -461,26 +466,26 @@ class database_api
       $result = $this->mysqli->query( $query );
 
       $tmp_row = null;
-      $srcs = array();
+      $p_version_ids = array();
       while ( $row = $result->fetch_row() )
       {
          if ( $row[0] != $tmp_row )
          {
-            $srcs[] = $row[0];
+            $p_version_ids[] = $row[0];
             $tmp_row = $row[0];
          }
       }
 
-      return $srcs;
+      return $p_version_ids;
    }
 
    /**
     * Get all work packages assigned to a version of a document
     *
-    * @param $version_id
+    * @param $p_version_id
     * @return array
     */
-   public function getDocumentSpecWorkPackages( $version_id )
+   public function getDocumentSpecWorkPackages( $p_version_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -491,10 +496,10 @@ class database_api
          $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
       }
 
-      if ( $version_id != null )
+      if ( $p_version_id != null )
       {
          $query = "SELECT DISTINCT s.work_package FROM $plugin_src_table s
-          WHERE s.version_id = '" . $version_id . "'";
+          WHERE s.p_version_id = '" . $p_version_id . "'";
 
          $result = $this->mysqli->query( $query );
 
@@ -518,11 +523,11 @@ class database_api
    /**
     * Get all bugs of a specific work package and the version
     *
-    * @param $version_id
+    * @param $p_version_id
     * @param $work_package
     * @return array
     */
-   public function getWorkPackageSpecBugs( $version_id, $work_package )
+   public function getWorkPackageSpecBugs( $p_version_id, $work_package )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -536,7 +541,7 @@ class database_api
       }
 
       $query = "SELECT DISTINCT s.bug_id FROM $plugin_src_table s, $bug_table b
-         WHERE s.version_id = '" . $version_id . "'
+         WHERE s.p_version_id = '" . $p_version_id . "'
          AND s.work_package = '" . $work_package . "'
          AND s.bug_id = b.id
          AND NOT b.resolution = 90";
@@ -555,11 +560,11 @@ class database_api
    /**
     * Get the duration of all bugs in a specific work package and the version
     *
-    * @param $version_id
+    * @param $p_version_id
     * @param $work_package
     * @return mixed
     */
-   public function getWorkpackageDuration( $version_id, $work_package )
+   public function getWorkpackageDuration( $p_version_id, $work_package )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -576,7 +581,7 @@ class database_api
 
       $query = "SELECT SUM( p.time ) FROM $plugin_ptime_table p, $plugin_src_table s, $bug_table b
          WHERE p.bug_id = s.bug_id
-         AND s.version_id = '" . $version_id . "'
+         AND s.p_version_id = '" . $p_version_id . "'
          AND s.work_package = '" . $work_package . "'
          AND s.bug_id = b.id
          AND NOT b.resolution = 90";
@@ -590,6 +595,7 @@ class database_api
 
    /**
     * Returns true if incoming type id is in use
+    * TODO type_id ist hier nicht mehr vorhanden!!!
     *
     * @param $type_id
     * @return bool
@@ -617,7 +623,7 @@ class database_api
     * @param $type_id
     * @param $new_type_string
     */
-   public function updateType( $type_id, $new_type_string )
+   public function updateTypeString( $type_id, $new_type_string )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -642,19 +648,51 @@ class database_api
    }
 
    /**
+    * TODO type_id nicht länger in src_table vorhanden!!!
+    *
+    * @param $p_version_id
+    * @param $new_type_id
+    */
+   public function updateVersionTypeAssociation( $p_version_id, $new_type_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+      }
+
+      $query = 'SET SQL_SAFE_UPDATES = 0';
+      $this->mysqli->query( $query );
+
+      $query = "UPDATE $plugin_src_table s
+         SET s.type_id = '" . $new_type_id . "'
+         WHERE s.p_version_id = " . $p_version_id;
+
+      var_dump( $query );
+
+      $this->mysqli->query( $query );
+
+      $query = 'SET SQL_SAFE_UPDATES = 1';
+      $this->mysqli->query( $query );
+   }
+
+   /**
     * Get all bug ids from an array of work packages
     *
     * @param $work_packages
-    * @param $version_id
+    * @param $p_version_id
     * @return array
     */
-   public function getAllBugsFromWorkpackages( $work_packages, $version_id )
+   public function getAllBugsFromWorkpackages( $work_packages, $p_version_id )
    {
       $allBugs = array();
 
       foreach ( $work_packages as $work_package )
       {
-         $work_package_bug_ids = $this->getWorkPackageSpecBugs( $version_id, $work_package );
+         $work_package_bug_ids = $this->getWorkPackageSpecBugs( $p_version_id, $work_package );
 
          foreach ( $work_package_bug_ids as $bug_id )
          {
@@ -701,5 +739,61 @@ class database_api
       {
          return 0;
       }
+   }
+
+   /**
+    * Insert a new version into the plugin version table
+    *
+    * @param $version_id
+    * @param $type_id
+    */
+   public function addPluginVersion( $version_id, $type_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "INSERT INTO $plugin_vers_table (id, version_id, type_id)
+          SELECT null, " . $version_id . "," . $type_id . "
+          FROM DUAL WHERE NOT EXISTS (
+          SELECT 1 FROM $plugin_vers_table
+          WHERE version_id = " . $version_id . " AND type_id = " . $type_id . ")";
+
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Update an existing plugin version
+    *
+    * @param $version_id
+    * @param $type_id
+    */
+   public function updatePluginVersion( $version_id, $type_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = 'SET SQL_SAFE_UPDATES = 0';
+      $this->mysqli->query( $query );
+
+      $query = 'UPDATE ' . $plugin_vers_table . '
+         SET type_id = ' . $type_id . '
+         WHERE version_id = ' . $version_id;
+
+      $this->mysqli->query( $query );
+
+      $query = 'SET SQL_SAFE_UPDATES = 1';
+      $this->mysqli->query( $query );
    }
 }

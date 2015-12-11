@@ -64,17 +64,13 @@ echo '</form>';
 echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
 if ( $document_type != null || $_POST['types'] != 'blank' )
 {
-   $source_ids = $database_api->getSources( $document_type, $t_project_id );
+   $version_ids = $database_api->getVersionIDs( $document_type, $t_project_id );
 
-   echo '<select name="version">';
-   foreach ( $source_ids as $source )
+   echo '<select name="version_id">';
+   foreach ( $version_ids as $version_id )
    {
-      echo '<option value="' . $source . '"';
-      if ( $post && $_POST['types'] == $source )
-      {
-         echo ' selected="selected"';
-      }
-      echo '>' . $source . '</option>';
+      $version_string = version_full_name( $version_id );
+      echo '<option value="' . $version_id . '">' . $version_string . '</option>';
    }
    echo '</select>';
 }

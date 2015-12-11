@@ -43,6 +43,19 @@ class print_api
    }
 
    /**
+    * Creates a column in a table head
+    *
+    * @param $colspan
+    * @param $lang_string
+    */
+   public function printTableHeadCol( $colspan, $lang_string )
+   {
+      echo '<th colspan="' . $colspan . '">';
+      echo lang_get( $lang_string );
+      echo '</th>';
+   }
+
+   /**
     * Creates a new category-column
     *
     * @param $colspan
@@ -104,6 +117,12 @@ class print_api
       echo '</a> ]';
       echo '</td>';
 
+      echo '<td>';
+      echo '[ <a href="' . plugin_page( 'manage_versions' ) . '">';
+      echo plugin_lang_get( 'menu_manversions' );
+      echo '</a> ]';
+      echo '</td>';
+
       echo '</tr>';
       echo '</table>';
    }
@@ -138,7 +157,6 @@ class print_api
     *
     * @param $type
     * @param $types
-    * @param $version
     * @param $work_package
     * @param $ptime
     */
@@ -183,7 +201,6 @@ class print_api
     * Prints the specific plugin fields in the bug-view user interface
     *
     * @param $requirement
-    * @param $version
     * @param $work_package
     * @param $ptime
     */
@@ -209,7 +226,6 @@ class print_api
     * Prints the specific plugin fields in the bug-report user interface
     *
     * @param $types
-    * @param $version
     * @param $work_package
     * @param $ptime
     */
@@ -354,7 +370,7 @@ class print_api
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_date' ) . '</td>';
-      echo '<td class="form-title">' . date( 'j\. F Y' ) . '</td>';
+      echo '<td class="form-title">' . date( 'j\.m\.Y' ) . '</td>';
       echo '</tr>';
 
       echo '<tr>';

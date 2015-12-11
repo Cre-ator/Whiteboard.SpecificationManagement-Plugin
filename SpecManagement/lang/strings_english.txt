@@ -43,6 +43,7 @@ $s_plugin_SpecManagement_select_confirm = 'Generate Selected Document';
 /* Menu Area */
 $s_plugin_SpecManagement_menu_title = 'Specifications';
 $s_plugin_SpecManagement_menu_choosedoc = 'Generate Document';
+$s_plugin_SpecManagement_menu_manversions = 'Manage Document Versions';
 $s_plugin_SpecManagement_menu_printbutton = 'Print';
 
 /* Editor Area */
@@ -53,6 +54,13 @@ $s_plugin_SpecManagement_editor_duration_unit = 'Days per Person';
 $s_plugin_SpecManagement_editor_bug_duration = 'Duration';
 $s_plugin_SpecManagement_editor_bug_attachments = 'Attached Files';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'There are notes available';
+
+/* Version Manager Area */
+$s_plugin_SpecManagement_manversions_title = 'Document-Versionmanager';
+$s_plugin_SpecManagement_manversions_thead = 'Versionmanager';
+$s_plugin_SpecManagement_manversions_thdoctype = 'Document Type';
+$s_plugin_SpecManagement_manversions_thaddchangetype = 'Assign document type';
+$s_plugin_SpecManagement_manversions_assigntype = 'Assign';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Document Title';

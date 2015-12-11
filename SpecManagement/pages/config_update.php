@@ -78,7 +78,7 @@ if ( $option_changetype )
       $type_id = $database_api->getTypeId( $type_string );
       $new_type_string = $_POST['newtype'];
 
-      $database_api->updateType( $type_id, $new_type_string );
+      $database_api->updateTypeString( $type_id, $new_type_string );
    }
 }
 

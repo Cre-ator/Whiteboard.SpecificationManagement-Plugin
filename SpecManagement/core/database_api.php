@@ -36,19 +36,19 @@ class database_api
     */
    public function resetPlugin()
    {
-      $query = 'DROP TABLE mantis_plugin_SpecManagement_src_table';
+      $query = "DROP TABLE mantis_plugin_SpecManagement_src_table";
 
       $this->mysqli->query( $query );
 
-      $query = 'DROP TABLE mantis_plugin_SpecManagement_type_table';
+      $query = "DROP TABLE mantis_plugin_SpecManagement_type_table";
 
       $this->mysqli->query( $query );
 
-      $query = 'DROP TABLE mantis_plugin_SpecManagement_ptime_table';
+      $query = "DROP TABLE mantis_plugin_SpecManagement_ptime_table";
 
       $this->mysqli->query( $query );
 
-      $query = 'DROP TABLE mantis_plugin_SpecManagement_vers_table';
+      $query = "DROP TABLE mantis_plugin_SpecManagement_vers_table";
 
       $this->mysqli->query( $query );
 
@@ -81,8 +81,8 @@ class database_api
             $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
          }
 
-         $query = 'SELECT type FROM ' . $plugin_type_table . '
-            WHERE id = ' . $type_id;
+         $query = "SELECT t.type FROM $plugin_type_table t
+            WHERE t.id = " . $type_id;
 
          $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -136,8 +136,8 @@ class database_api
          $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
       }
 
-      $query = 'SELECT * FROM ' . $plugin_src_table . '
-         WHERE bug_id = ' . $bug_id;
+      $query = "SELECT * FROM $plugin_src_table s
+         WHERE s.bug_id = " . $bug_id;
 
       $src_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -161,8 +161,8 @@ class database_api
          $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
       }
 
-      $query = 'SELECT * FROM ' . $plugin_ptime_table . '
-         WHERE bug_id = ' . $bug_id;
+      $query = "SELECT * FROM $plugin_ptime_table p
+         WHERE p.bug_id = " . $bug_id;
 
       $ptime_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -269,11 +269,11 @@ class database_api
          $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_ptime_table . '( id, bug_id, time)
-         SELECT null, ' . $bug_id . ',' . $ptime . '
+      $query = "INSERT INTO $plugin_ptime_table ( id, bug_id, time)
+         SELECT null, " . $bug_id . "," . $ptime . "
          FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM ' . $plugin_ptime_table . '
-         WHERE bug_id = ' . $bug_id . ' AND time = ' . $ptime . ')';
+         SELECT 1 FROM $plugin_ptime_table
+         WHERE bug_id = " . $bug_id . " AND time = " . $ptime . ")";
 
       $this->mysqli->query( $query );
    }
@@ -328,16 +328,16 @@ class database_api
             $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
          }
 
-         $query = 'SET SQL_SAFE_UPDATES = 0';
+         $query = "SET SQL_SAFE_UPDATES = 0";
          $this->mysqli->query( $query );
 
-         $query = 'UPDATE ' . $plugin_src_table . '
-         SET version_id = ' . $p_version_id . ', work_package = \'' . $work_package . '\'
-         WHERE bug_id = ' . $bug_id;
+         $query = "UPDATE $plugin_src_table
+            SET version_id = " . $p_version_id . ", work_package = '" . $work_package . "'
+            WHERE bug_id = " . $bug_id;
 
          $this->mysqli->query( $query );
 
-         $query = 'SET SQL_SAFE_UPDATES = 1';
+         $query = "SET SQL_SAFE_UPDATES = 1";
          $this->mysqli->query( $query );
       }
    }
@@ -365,16 +365,16 @@ class database_api
             $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
          }
 
-         $query = 'SET SQL_SAFE_UPDATES = 0';
+         $query = "SET SQL_SAFE_UPDATES = 0";
          $this->mysqli->query( $query );
 
-         $query = 'UPDATE ' . $plugin_ptime_table . '
-         SET time = ' . $ptime . '
-         WHERE bug_id = ' . $bug_id;
+         $query = "UPDATE $plugin_ptime_table
+            SET time = " . $ptime . "
+            WHERE bug_id = " . $bug_id;
 
          $this->mysqli->query( $query );
 
-         $query = 'SET SQL_SAFE_UPDATES = 1';
+         $query = "SET SQL_SAFE_UPDATES = 1";
          $this->mysqli->query( $query );
       }
    }
@@ -419,6 +419,12 @@ class database_api
       }
    }
 
+   /**
+    * Update an existing association if it exists or, of not, create a new one
+    *
+    * @param $version_id
+    * @param $type_id
+    */
    public function updateVersionAssociatedType( $version_id, $type_id )
    {
       if ( $this->getVersionRowByVersionId( $version_id ) == null )
@@ -567,7 +573,7 @@ class database_api
          $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
       }
 
-      $query = "SELECT t.type FROM $plugin_type_table t";
+      $query = "SELECT t.type FROM $plugin_type_table t ORDER BY t.type ASC";
 
       $result = $this->mysqli->query( $query );
       $types = array();
@@ -605,8 +611,9 @@ class database_api
          $bug_table = db_get_table( 'bug' );
       }
 
-      $query = "SELECT DISTINCT v.version_id FROM $plugin_src_table s, $plugin_vers_table v, $bug_table b
-          WHERE v.type_id = " . $type_id;
+      $query = "SELECT DISTINCT v.version_id
+         FROM $plugin_src_table s, $plugin_vers_table v, $bug_table b
+         WHERE v.type_id = " . $type_id;
       if ( $project_id != 0 )
       {
          $query .= " AND b.id = s.bug_id
@@ -650,7 +657,7 @@ class database_api
       if ( $p_version_id != null )
       {
          $query = "SELECT DISTINCT s.work_package FROM $plugin_src_table s
-          WHERE s.p_version_id = '" . $p_version_id . "'";
+            WHERE s.p_version_id = '" . $p_version_id . "'";
 
          $result = $this->mysqli->query( $query );
 
@@ -764,7 +771,9 @@ class database_api
       $query = "SELECT COUNT(*) FROM $plugin_vers_table v
           WHERE v.type_id = " . $type_id;
 
-      return ( mysqli_fetch_row( $this->mysqli->query( $query ) ) > 0 );
+      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+
+      return ( $result[0] > 0 );
    }
 
    /**

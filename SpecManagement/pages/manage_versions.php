@@ -8,6 +8,11 @@ $print_api = new print_api();
 html_page_top1( plugin_lang_get( 'manversions_title' ) );
 html_page_top2();
 
+if ( plugin_is_installed( 'WhiteboardMenu' ) )
+{
+   $print_api->print_whiteboardplugin_menu();
+}
+
 $print_api->print_plugin_menu();
 
 echo '<div align="center">';
@@ -27,7 +32,6 @@ echo '</tr>';
 echo '</thead>';
 
 echo '<tbody>';
-
 $versions = version_get_all_rows( helper_get_current_project() );
 
 foreach ( $versions as $version )
@@ -49,7 +53,9 @@ foreach ( $versions as $version )
    echo '<select ' . helper_get_tab_index() . ' id="types" name="types">';
    foreach ( $types as $type )
    {
-      echo '<option value="' . $type . '">' . $type . '</option>';
+      echo '<option value="' . $type . '"';
+      check_selected( string_attribute( $current_type ), $type );
+      echo '>' . $type . '</option>';
    }
    echo '</select>&nbsp';
    echo '<input type="submit" name="assigntype" class="button" value="' . plugin_lang_get( 'manversions_assigntype' ) . '">';

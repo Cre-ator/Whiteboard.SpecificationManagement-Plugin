@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.2';
+      $this->version = '1.1.3';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -77,24 +77,24 @@ class SpecManagementPlugin extends MantisPlugin
          array
          (
             'CreateTableSQL', array( plugin_table( 'ptime' ), "
-            id          I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
-            bug_id      I       NOTNULL UNSIGNED,
-            time        I       NOTNULL UNSIGNED
+            id       I    NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            bug_id   I    NOTNULL UNSIGNED,
+            time     I    NOTNULL UNSIGNED
             " )
          ),
          array
          (
             'CreateTableSQL', array( plugin_table( 'vers' ), "
-            id          I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
-            version_id  I       NOTNULL UNSIGNED,
-            type_id     I       UNSIGNED
+            id          I   NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            version_id  I   NOTNULL UNSIGNED,
+            type_id     I   UNSIGNED
             " )
          ),
          array
          (
             'CreateTableSQL', array( plugin_table( 'type' ), "
-            id              I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
-            type            C(250)  NOTNULL DEFAULT ''
+            id      I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            type    C(250)  NOTNULL DEFAULT ''
             " )
          )
       );
@@ -175,14 +175,13 @@ class SpecManagementPlugin extends MantisPlugin
       {
          $source_obj = $database_api->getSourceRow( $bug_id );
          $ptime_obj = $database_api->getPtimeRow( $bug_id );
-
          $p_version_id = $source_obj[2];
-         $version_row = $database_api->getVersionRowByPrimary( $p_version_id );
-         $type_id = $version_row[2];
-         $type = $database_api->getTypeString( $type_id );
+         $version_obj = $database_api->getVersionRowByPrimary( $p_version_id );
 
          $work_package = $source_obj[3];
          $ptime = $ptime_obj[2];
+         $type_id = $version_obj[2];
+         $type = $database_api->getTypeString( $type_id );
       }
 
       if ( plugin_config_get( 'ShowFields' ) )

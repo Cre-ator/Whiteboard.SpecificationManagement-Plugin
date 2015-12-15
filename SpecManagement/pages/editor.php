@@ -50,6 +50,11 @@ if ( empty( $work_packages ) && !is_null( $version_id ) )
 html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $document_type . ' - ' . $version_string );
 html_page_top2();
 
+if ( plugin_is_installed( 'WhiteboardMenu' ) )
+{
+   $print_api->print_whiteboardplugin_menu();
+}
+
 $print_api->print_plugin_menu();
 $print_api->print_editor_menu();
 $print_api->print_document_head( $document_type, $version_string, $parent_project_id, $allRelevantBugs );

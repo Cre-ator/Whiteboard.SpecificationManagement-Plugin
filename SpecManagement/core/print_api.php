@@ -104,6 +104,38 @@ class print_api
    }
 
    /**
+    * Prints the whiteboardmenu plugin specific menu
+    */
+   public function print_whiteboardplugin_menu()
+   {
+      echo '<table align="center">';
+      echo '<tr">';
+
+      if ( plugin_is_installed( 'UserProjectView' ) )
+      {
+         echo '<td>';
+         echo '| ';
+         echo '<a href="' . plugin_page( 'UserProject', false, 'UserProjectView' ) . '&sortVal=userName&sort=ASC">' . plugin_lang_get( 'menu_userprojecttitle', 'UserProjectView' ) . '</a>';
+         echo '</td>';
+      }
+
+      if ( plugin_is_installed( 'SpecManagement' ) )
+      {
+         echo '<td>';
+         echo '| ';
+         echo '<a href="' . plugin_page( 'choose_document', false, 'SpecManagement' ) . '">' . plugin_lang_get( 'menu_title', 'SpecManagement' ) . '</a>';
+         echo '</td>';
+      }
+
+      echo '<td>';
+      echo ' |';
+      echo '</td>';
+
+      echo '</tr>';
+      echo '</table>';
+   }
+
+   /**
     * Prints the plugin specific menu
     */
    public function print_plugin_menu()
@@ -135,12 +167,6 @@ class print_api
       echo '<table align="center">';
       echo '<tr">';
       /* General */
-
-      echo '<td>';
-      echo '[ <a href="' . plugin_page( 'choose_document' ) . '">';
-      echo plugin_lang_get( 'menu_choosedoc' );
-      echo '</a> ]';
-      echo '</td>';
 
       echo '<td>';
       echo '[ <a href="' . plugin_page( 'document_print' ) . '">';

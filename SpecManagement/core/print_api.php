@@ -156,30 +156,14 @@ class print_api
     * Prints the specific plugin fields in the bug-update user interface
     *
     * @param $type
-    * @param $types
     * @param $work_package
     * @param $ptime
     */
-   public function printBugUpdateFields( $type, $types, $work_package, $ptime )
+   public function printBugUpdateFields( $type, $work_package, $ptime )
    {
       $this->printRow();
-      echo '<td class="category">';
-      echo '<form name="options" action="" method="get">';
-      echo '<label for="option"><span>' . plugin_lang_get( 'bug_view_specification_req' ) . '</span></label>';
-      echo '</form>';
-      echo '</th>';
-      echo '<td colspan="5">';
-      echo '<select ' . helper_get_tab_index() . ' name="types">';
-      echo '<option value=""></option>';
-      foreach ( $types as $act_type )
-      {
-         echo '<option value="' . $act_type . '"';
-         check_selected( string_attribute( $type ), $act_type );
-         echo '>' . string_html_specialchars( $act_type );
-         echo '</option>';
-      }
-      echo '</select>';
-      echo '</td>';
+      echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
+      echo '<td colspan="5" id="requirement">', $type, '</td>';
       echo '</tr>';
 
       $this->printRow();
@@ -200,15 +184,15 @@ class print_api
    /**
     * Prints the specific plugin fields in the bug-view user interface
     *
-    * @param $requirement
+    * @param $type
     * @param $work_package
     * @param $ptime
     */
-   public function printBugViewFields( $requirement, $work_package, $ptime )
+   public function printBugViewFields( $type, $work_package, $ptime )
    {
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
-      echo '<td colspan="5" id="types">', $requirement, '</td>';
+      echo '<td colspan="5" id="requirement">', $type, '</td>';
       echo '</tr>';
 
       $this->printRow();
@@ -225,31 +209,13 @@ class print_api
    /**
     * Prints the specific plugin fields in the bug-report user interface
     *
-    * @param $types
     * @param $work_package
     * @param $ptime
     */
-   public function printBugReportFields( $types, $work_package, $ptime )
+   public function printBugReportFields( $work_package, $ptime )
    {
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {
-         $this->printRow();
-         echo '<td class="category">';
-         echo '<form name="options" action="" method="get">';
-         echo '<label for="option"><span>' . plugin_lang_get( 'bug_view_specification_req' ) . '</span></label>';
-         echo '</td>';
-         echo '<td>';
-         echo '<select ' . helper_get_tab_index() . ' name="types">';
-         echo '<option value=""></option>';
-         foreach ( $types as $type )
-         {
-            echo '<option value="' . $type . '">' . $type . '</option>';
-         }
-         echo '<span class="label-style"></span>';
-         echo '</td>';
-         echo '</form>';
-         echo '</tr>';
-
          $this->printRow();
          echo '<td class="category">';
          echo '<label><span>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</span></label>';
@@ -276,21 +242,6 @@ class print_api
       }
       else
       {
-         echo '<div class="field-container">';
-         echo '<form name="options" action="" method="get">';
-         echo '<label for="option"><span>' . plugin_lang_get( 'bug_view_specification_req' ) . '</span></label>';
-         echo '<span class="select">';
-         echo '<select ' . helper_get_tab_index() . ' id="types" name="types">';
-         foreach ( $types as $type )
-         {
-            echo '<option value="' . $type . '">' . $type . '</option>';
-         }
-         echo '</select>';
-         echo '</span>';
-         echo '<span class="label-style"></span>';
-         echo '</form>';
-         echo '</div>';
-
          echo '<div class="field-container">';
          echo '<label><span>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</span></label>';
          echo '<span class="input">';

@@ -24,7 +24,7 @@ if ( $option_assign && !is_null( $_POST['version_id'] ) && !is_null( $_POST['typ
    $version_id = $_POST['version_id'];
    $new_type_id = $database_api->getTypeId( $_POST['types'] );
 
-   $database_api->updateVersionTypeAssociation( $version_id, $new_type_id );
+   $database_api->updateVersionAssociatedType( $version_id, $new_type_id );
 }
 
 /**

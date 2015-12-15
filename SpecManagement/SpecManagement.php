@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.1';
+      $this->version = '1.1.2';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -158,7 +158,6 @@ class SpecManagementPlugin extends MantisPlugin
 
       $bug_id = null;
       $type = null;
-      $types = null;
       $work_package = null;
       $ptime = null;
 
@@ -177,12 +176,14 @@ class SpecManagementPlugin extends MantisPlugin
          $source_obj = $database_api->getSourceRow( $bug_id );
          $ptime_obj = $database_api->getPtimeRow( $bug_id );
 
-         $type = $database_api->getTypeString( $source_obj[4] );
+         $p_version_id = $source_obj[2];
+         $version_row = $database_api->getVersionRowByPrimary( $p_version_id );
+         $type_id = $version_row[2];
+         $type = $database_api->getTypeString( $type_id );
+
          $work_package = $source_obj[3];
          $ptime = $ptime_obj[2];
       }
-
-      $types = $database_api->getTypes();
 
       if ( plugin_config_get( 'ShowFields' ) )
       {
@@ -197,13 +198,13 @@ class SpecManagementPlugin extends MantisPlugin
             case 'EVENT_REPORT_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
-                  $print_api->printBugReportFields( $types, $work_package, $ptime );
+                  $print_api->printBugReportFields( $work_package, $ptime );
                }
                break;
             case 'EVENT_UPDATE_BUG_FORM':
                if ( $this->getWriteLevel() )
                {
-                  $print_api->printBugUpdateFields( $type, $types, $work_package, $ptime );
+                  $print_api->printBugUpdateFields( $type, $work_package, $ptime );
                }
                break;
          }
@@ -238,11 +239,13 @@ class SpecManagementPlugin extends MantisPlugin
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
-            $database_api->insertSourceRow( $bug_id, $version_id, $work_package, $type_id );
+            $database_api->insertVersionRow( $version_id, $type_id );
+            $database_api->insertSourceRow( $bug_id, $version_id, $work_package );
             $database_api->insertPtimeRow( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
-            $database_api->updateSourceRow( $bug_id, $version_id, $work_package, $type_id );
+            $database_api->updateVersionRow( $version_id, $type_id );
+            $database_api->updateSourceRow( $bug_id, $version_id, $work_package );
             $database_api->updatePtimeRow( $bug_id, $ptime );
             break;
       }

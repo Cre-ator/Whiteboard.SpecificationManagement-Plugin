@@ -170,14 +170,63 @@ class database_api
    }
 
    /**
+    * Get version-related version entry
+    *
+    * @param $version_id
+    * @return array|null
+    */
+   public function getVersionRowByVersionId( $version_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "SELECT * FROM $plugin_vers_table v
+        WHERE v.version_id = " . $version_id;
+
+      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+
+      return $result;
+   }
+
+   /**
+    * Get primary key related version entry
+    *
+    * @param $primary_id
+    * @return array|null
+    */
+   public function getVersionRowByPrimary( $primary_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "SELECT * FROM $plugin_vers_table v
+        WHERE v.id = " . $primary_id;
+
+      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+
+      return $result;
+   }
+
+   /**
     * Create new bug-related src entry
     *
     * @param $bug_id
-    * @param $p_version_id
+    * @param $version_id
     * @param $work_package
-    * @param $type_id
     */
-   public function insertSourceRow( $bug_id, $p_version_id, $work_package )
+   public function insertSourceRow( $bug_id, $version_id, $work_package )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -188,14 +237,20 @@ class database_api
          $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_src_table . '( id, bug_id, p_version_id, work_package )
-         SELECT null, ' . $bug_id . ',' . $p_version_id . ',\'' . $work_package . '\'
+      $version_row = $this->getVersionRowByVersionId( $version_id );
+      $p_version_id = $version_row[0];
+
+      $query = "INSERT INTO $plugin_src_table ( id, bug_id, p_version_id, work_package )
+         SELECT null, " . $bug_id . "," . $p_version_id . ",'" . $work_package . "'
          FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM ' . $plugin_src_table . '
-         WHERE bug_id = ' . $bug_id . ' AND version_id = ' . $p_version_id . ' AND work_package = \'' . $work_package . '\')';
+         SELECT 1 FROM $plugin_src_table
+         WHERE bug_id = " . $bug_id . " AND p_version_id = " . $p_version_id . " AND work_package = '" . $work_package . "')";
+
+      var_dump( $query );
 
       $this->mysqli->query( $query );
    }
+
 
    /**
     * Create new bug-related time entry
@@ -224,12 +279,37 @@ class database_api
    }
 
    /**
+    * Create new version entry
+    *
+    * @param $version_id
+    * @param $type_id
+    */
+   public function insertVersionRow( $version_id, $type_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "INSERT INTO $plugin_vers_table ( id, version_id, type_id )
+         SELECT null, " . $version_id . "," . $type_id . "
+         FROM DUAL WHERE NOT EXISTS (
+         SELECT 1 FROM $plugin_vers_table
+         WHERE version_id = " . $version_id . " AND type_id = " . $type_id . ")";
+
+      $this->mysqli->query( $query );
+   }
+
+   /**
     * Update existing src
     *
     * @param $bug_id
     * @param $p_version_id
     * @param $work_package
-    * @param $type_id
     */
    public function updateSourceRow( $bug_id, $p_version_id, $work_package )
    {
@@ -300,6 +380,77 @@ class database_api
    }
 
    /**
+    * Update existing version
+    *
+    * @param $version_id
+    * @param $type_id
+    */
+   public function updateVersionRow( $version_id, $type_id )
+   {
+      if ( $this->getVersionRowByVersionId( $version_id ) == null )
+      {
+         $this->insertVersionRow( $version_id, $type_id );
+      }
+      else
+      {
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+         }
+         else
+         {
+            $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+         }
+
+         $version_row = $this->getVersionRowByVersionId( $version_id );
+         $p_version_id = $version_row[0];
+
+         $query = "SET SQL_SAFE_UPDATES = 0";
+         $this->mysqli->query( $query );
+
+         $query = "UPDATE $plugin_vers_table
+         SET version_id = " . $version_id . ", type_id = " . $type_id . "
+         WHERE id = " . $p_version_id;
+
+         $this->mysqli->query( $query );
+
+         $query = "SET SQL_SAFE_UPDATES = 1";
+         $this->mysqli->query( $query );
+      }
+   }
+
+   public function updateVersionAssociatedType( $version_id, $type_id )
+   {
+      if ( $this->getVersionRowByVersionId( $version_id ) == null )
+      {
+         $this->insertVersionRow( $version_id, $type_id );
+      }
+      else
+      {
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+         }
+         else
+         {
+            $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+         }
+
+         $query = "SET SQL_SAFE_UPDATES = 0";
+         $this->mysqli->query( $query );
+
+         $query = "UPDATE $plugin_vers_table
+         SET type_id = " . $type_id . "
+         WHERE version_id = " . $version_id;
+
+         $this->mysqli->query( $query );
+
+         $query = "SET SQL_SAFE_UPDATES = 1";
+         $this->mysqli->query( $query );
+      }
+   }
+
+   /**
     * Get the first element of type
     *
     * @return mixed
@@ -315,8 +466,8 @@ class database_api
          $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
       }
 
-      $query = "SELECT t.id FROM $plugin_type_table t
-          ORDER BY t.id ASC LIMIT 1";
+      $query = "SELECT t . id FROM $plugin_type_table t
+          ORDER BY t . id ASC LIMIT 1";
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -341,11 +492,11 @@ class database_api
          $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
       }
 
-      $query = 'INSERT INTO ' . $plugin_type_table . '( id, type )
-         SELECT null, \'' . $string . '\'
+      $query = "INSERT INTO $plugin_type_table ( id, type )
+         SELECT null, '" . $string . "'
          FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM ' . $plugin_type_table . '
-         WHERE type = \'' . $string . '\')';
+         SELECT 1 FROM $plugin_type_table
+         WHERE type = '" . $string . "')";
 
       $this->mysqli->query( $query );
    }
@@ -391,9 +542,8 @@ class database_api
          $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
       }
 
-      $query = 'SELECT id
-         FROM ' . $plugin_type_table . '
-         WHERE type = \'' . $string . '\'';
+      $query = "SELECT t.id FROM $plugin_type_table t
+         WHERE t.type = '" . $string . "'";
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
       $primary_key = $result[0];
@@ -417,8 +567,7 @@ class database_api
          $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
       }
 
-      $query = "SELECT type
-         FROM $plugin_type_table";
+      $query = "SELECT t.type FROM $plugin_type_table t";
 
       $result = $this->mysqli->query( $query );
       $types = array();
@@ -436,7 +585,6 @@ class database_api
 
    /**
     * Get available srcs (versions) for a specific req (type)
-    * TODO type_id nicht mehr vorhanden!!!!
     *
     * @param $type_id
     * @param $project_id
@@ -447,19 +595,22 @@ class database_api
       if ( $this->getMantisVersion() == '1.2.' )
       {
          $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
          $bug_table = db_get_table( 'mantis_bug_table' );
       }
       else
       {
          $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
          $bug_table = db_get_table( 'bug' );
       }
 
-      $query = "SELECT DISTINCT s.p_version_id FROM $plugin_src_table s, $bug_table b
-          WHERE s.type_id = " . $type_id;
+      $query = "SELECT DISTINCT v.version_id FROM $plugin_src_table s, $plugin_vers_table v, $bug_table b
+          WHERE v.type_id = " . $type_id;
       if ( $project_id != 0 )
       {
          $query .= " AND b.id = s.bug_id
+            AND s.p_version_id = v.version_id
             AND b.project_id = " . $project_id;
       }
 
@@ -595,7 +746,6 @@ class database_api
 
    /**
     * Returns true if incoming type id is in use
-    * TODO type_id ist hier nicht mehr vorhanden!!!
     *
     * @param $type_id
     * @return bool
@@ -604,15 +754,15 @@ class database_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
       }
       else
       {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
       }
 
-      $query = "SELECT COUNT(*) FROM $plugin_src_table s
-          WHERE s.type_id = " . $type_id;
+      $query = "SELECT COUNT(*) FROM $plugin_vers_table v
+          WHERE v.type_id = " . $type_id;
 
       return ( mysqli_fetch_row( $this->mysqli->query( $query ) ) > 0 );
    }
@@ -634,48 +784,16 @@ class database_api
          $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
       }
 
-      $query = 'SET SQL_SAFE_UPDATES = 0';
+      $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
 
-      $query = "UPDATE $plugin_type_table t
-         SET t.type = '" . $new_type_string . "'
+      $query = "UPDATE $plugin_type_table
+         SET type = '" . $new_type_string . "'
          WHERE id = " . $type_id;
 
       $this->mysqli->query( $query );
 
-      $query = 'SET SQL_SAFE_UPDATES = 1';
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * TODO type_id nicht länger in src_table vorhanden!!!
-    *
-    * @param $p_version_id
-    * @param $new_type_id
-    */
-   public function updateVersionTypeAssociation( $p_version_id, $new_type_id )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
-
-      $query = 'SET SQL_SAFE_UPDATES = 0';
-      $this->mysqli->query( $query );
-
-      $query = "UPDATE $plugin_src_table s
-         SET s.type_id = '" . $new_type_id . "'
-         WHERE s.p_version_id = " . $p_version_id;
-
-      var_dump( $query );
-
-      $this->mysqli->query( $query );
-
-      $query = 'SET SQL_SAFE_UPDATES = 1';
+      $query = "SET SQL_SAFE_UPDATES = 1";
       $this->mysqli->query( $query );
    }
 
@@ -739,61 +857,5 @@ class database_api
       {
          return 0;
       }
-   }
-
-   /**
-    * Insert a new version into the plugin version table
-    *
-    * @param $version_id
-    * @param $type_id
-    */
-   public function addPluginVersion( $version_id, $type_id )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-      }
-
-      $query = "INSERT INTO $plugin_vers_table (id, version_id, type_id)
-          SELECT null, " . $version_id . "," . $type_id . "
-          FROM DUAL WHERE NOT EXISTS (
-          SELECT 1 FROM $plugin_vers_table
-          WHERE version_id = " . $version_id . " AND type_id = " . $type_id . ")";
-
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * Update an existing plugin version
-    *
-    * @param $version_id
-    * @param $type_id
-    */
-   public function updatePluginVersion( $version_id, $type_id )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-      }
-
-      $query = 'SET SQL_SAFE_UPDATES = 0';
-      $this->mysqli->query( $query );
-
-      $query = 'UPDATE ' . $plugin_vers_table . '
-         SET type_id = ' . $type_id . '
-         WHERE version_id = ' . $version_id;
-
-      $this->mysqli->query( $query );
-
-      $query = 'SET SQL_SAFE_UPDATES = 1';
-      $this->mysqli->query( $query );
    }
 }

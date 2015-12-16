@@ -45,7 +45,7 @@ foreach ( $types as $type )
    echo '>' . string_html_specialchars( $type ) . '</option>';
 }
 echo '</select>';
-echo '<input type="submit" class="button-small" value="' . lang_get( 'switch' ) . '" />';
+echo '&nbsp<input type="submit" class="button-small" value="' . lang_get( 'switch' ) . '" />';
 echo '</td>';
 echo '</tr>';
 

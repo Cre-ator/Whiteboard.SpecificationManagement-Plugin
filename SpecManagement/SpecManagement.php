@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.3';
+      $this->version = '1.1.4';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -86,6 +86,7 @@ class SpecManagementPlugin extends MantisPlugin
          (
             'CreateTableSQL', array( plugin_table( 'vers' ), "
             id          I   NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            project_id  I   NOTNULL UNSIGNED,
             version_id  I   NOTNULL UNSIGNED,
             type_id     I   UNSIGNED
             " )
@@ -93,8 +94,8 @@ class SpecManagementPlugin extends MantisPlugin
          array
          (
             'CreateTableSQL', array( plugin_table( 'type' ), "
-            id      I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
-            type    C(250)  NOTNULL DEFAULT ''
+            id           I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            type         C(250)  NOTNULL DEFAULT ''
             " )
          )
       );
@@ -174,14 +175,18 @@ class SpecManagementPlugin extends MantisPlugin
       if ( $bug_id != null )
       {
          $source_obj = $database_api->getSourceRow( $bug_id );
-         $ptime_obj = $database_api->getPtimeRow( $bug_id );
-         $p_version_id = $source_obj[2];
-         $version_obj = $database_api->getVersionRowByPrimary( $p_version_id );
-
          $work_package = $source_obj[3];
+         $ptime_obj = $database_api->getPtimeRow( $bug_id );
          $ptime = $ptime_obj[2];
-         $type_id = $version_obj[2];
-         $type = $database_api->getTypeString( $type_id );
+
+         $p_version_id = $source_obj[2];
+
+         if ( !is_null( $p_version_id ) )
+         {
+            $version_obj = $database_api->getVersionRowByPrimary( $p_version_id );
+            $type_id = $version_obj[3];
+            $type = $database_api->getTypeString( $type_id );
+         }
       }
 
       if ( plugin_config_get( 'ShowFields' ) )
@@ -227,6 +232,7 @@ class SpecManagementPlugin extends MantisPlugin
       $source_obj = $database_api->getSourceRow( $bug_id );
       $ptime_obj = $database_api->getPtimeRow( $bug_id );
 
+      $project_id = helper_get_current_project();
       $version = gpc_get_string( 'target_version', '' );
       $version_id = version_get_id( $version );
 
@@ -238,12 +244,12 @@ class SpecManagementPlugin extends MantisPlugin
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
-            $database_api->insertVersionRow( $version_id, $type_id );
+            $database_api->insertVersionRow( $project_id, $version_id, $type_id );
             $database_api->insertSourceRow( $bug_id, $version_id, $work_package );
             $database_api->insertPtimeRow( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
-            $database_api->updateVersionRow( $version_id, $type_id );
+            $database_api->updateVersionRow( $project_id, $version_id, $type_id );
             $database_api->updateSourceRow( $bug_id, $version_id, $work_package );
             $database_api->updatePtimeRow( $bug_id, $ptime );
             break;

@@ -21,10 +21,11 @@ $new_version = null;
  */
 if ( $option_assign && !is_null( $_POST['version_id'] ) && !is_null( $_POST['types'] ) )
 {
+   $project_id = helper_get_current_project();
    $version_id = $_POST['version_id'];
    $new_type_id = $database_api->getTypeId( $_POST['types'] );
 
-   $database_api->updateVersionAssociatedType( $version_id, $new_type_id );
+   $database_api->updateVersionAssociatedType( $project_id, $version_id, $new_type_id );
 }
 
 /**

@@ -11,6 +11,8 @@ $document_type = null;
 $print_duration = null;
 /* initialize version */
 $version_id = null;
+/* initialize plugin primary key for version */
+$p_version_id = null;
 /* initialize version string */
 $version_string = '';
 /* initialize work packages */
@@ -30,15 +32,17 @@ if ( !empty( $_POST['print_duration'] ) )
 if ( !empty( $_POST['version_id'] ) )
 {
    $version_id = $_POST['version_id'];
+   $version_obj = $database_api->getVersionRowByVersionId( $version_id );
+   $p_version_id = $version_obj[0];
    $version_string = version_full_name( $version_id );
    $document_type = $database_api->getTypeString( $database_api->getTypeByVersion( $version_id ) );
 }
 
 /* get work packages from source */
-$work_packages = $database_api->getDocumentSpecWorkPackages( $version_id );
+$work_packages = $database_api->getDocumentSpecWorkPackages( $p_version_id );
 
 /* get all bug ids from an array of work packages */
-$allRelevantBugs = $database_api->getAllBugsFromWorkpackages( $work_packages, $version_id );
+$allRelevantBugs = $database_api->getAllBugsFromWorkpackages( $work_packages, $p_version_id );
 
 /* if there is no work package specified, the default work package named with "version" */
 /* will be used */
@@ -68,11 +72,11 @@ if ( $work_packages != null )
    /* for each work package */
    foreach ( $work_packages as $work_package )
    {
-      $duration = $database_api->getWorkpackageDuration( $version_id, $work_package );
+      $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
       /* print work package */
       $print_api->print_chapter_title( $chapter_index, $work_package, $print_duration, $duration );
       /* get work package assigned bugs */
-      $work_package_bug_ids = $database_api->getWorkPackageSpecBugs( $version_id, $work_package );
+      $work_package_bug_ids = $database_api->getWorkPackageSpecBugs( $p_version_id, $work_package );
 
       $sub_chapter_index = 10;
       /* for each bug in selected work package */

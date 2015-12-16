@@ -241,12 +241,10 @@ class database_api
       $p_version_id = $version_row[0];
 
       $query = "INSERT INTO $plugin_src_table ( id, bug_id, p_version_id, work_package )
-         SELECT null, " . $bug_id . "," . $p_version_id . ",'" . $work_package . "'
+         SELECT null," . $bug_id . "," . $p_version_id . ",'" . $work_package . "'
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM $plugin_src_table
          WHERE bug_id = " . $bug_id . " AND p_version_id = " . $p_version_id . " AND work_package = '" . $work_package . "')";
-
-      var_dump( $query );
 
       $this->mysqli->query( $query );
    }
@@ -269,8 +267,8 @@ class database_api
          $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
       }
 
-      $query = "INSERT INTO $plugin_ptime_table ( id, bug_id, time)
-         SELECT null, " . $bug_id . "," . $ptime . "
+      $query = "INSERT INTO $plugin_ptime_table ( id, bug_id, time )
+         SELECT null," . $bug_id . "," . $ptime . "
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM $plugin_ptime_table
          WHERE bug_id = " . $bug_id . " AND time = " . $ptime . ")";
@@ -281,10 +279,11 @@ class database_api
    /**
     * Create new version entry
     *
+    * @param $project_id
     * @param $version_id
     * @param $type_id
     */
-   public function insertVersionRow( $version_id, $type_id )
+   public function insertVersionRow( $project_id, $version_id, $type_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -295,11 +294,11 @@ class database_api
          $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
       }
 
-      $query = "INSERT INTO $plugin_vers_table ( id, version_id, type_id )
-         SELECT null, " . $version_id . "," . $type_id . "
+      $query = "INSERT INTO $plugin_vers_table ( id, project_id, version_id, type_id )
+         SELECT null," . $project_id . "," . $version_id . "," . $type_id . "
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM $plugin_vers_table
-         WHERE version_id = " . $version_id . " AND type_id = " . $type_id . ")";
+         WHERE project_id = " . $project_id . " AND version_id = " . $version_id . " AND type_id = " . $type_id . ")";
 
       $this->mysqli->query( $query );
    }
@@ -382,14 +381,15 @@ class database_api
    /**
     * Update existing version
     *
+    * @param $project_id
     * @param $version_id
     * @param $type_id
     */
-   public function updateVersionRow( $version_id, $type_id )
+   public function updateVersionRow( $project_id, $version_id, $type_id )
    {
       if ( $this->getVersionRowByVersionId( $version_id ) == null )
       {
-         $this->insertVersionRow( $version_id, $type_id );
+         $this->insertVersionRow( $project_id, $version_id, $type_id );
       }
       else
       {
@@ -409,7 +409,7 @@ class database_api
          $this->mysqli->query( $query );
 
          $query = "UPDATE $plugin_vers_table
-         SET version_id = " . $version_id . ", type_id = " . $type_id . "
+         SET project_id = " . $project_id . ", version_id = " . $version_id . ", type_id = " . $type_id . "
          WHERE id = " . $p_version_id;
 
          $this->mysqli->query( $query );
@@ -422,14 +422,15 @@ class database_api
    /**
     * Update an existing association if it exists or, of not, create a new one
     *
+    * @param $project_id
     * @param $version_id
     * @param $type_id
     */
-   public function updateVersionAssociatedType( $version_id, $type_id )
+   public function updateVersionAssociatedType( $project_id, $version_id, $type_id )
    {
       if ( $this->getVersionRowByVersionId( $version_id ) == null )
       {
-         $this->insertVersionRow( $version_id, $type_id );
+         $this->insertVersionRow( $project_id, $version_id, $type_id );
       }
       else
       {
@@ -472,8 +473,8 @@ class database_api
          $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
       }
 
-      $query = "SELECT t . id FROM $plugin_type_table t
-          ORDER BY t . id ASC LIMIT 1";
+      $query = "SELECT t.id FROM $plugin_type_table t
+          ORDER BY t.id ASC LIMIT 1";
 
       $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
 
@@ -499,7 +500,7 @@ class database_api
       }
 
       $query = "INSERT INTO $plugin_type_table ( id, type )
-         SELECT null, '" . $string . "'
+         SELECT null,'" . $string . "'
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM $plugin_type_table
          WHERE type = '" . $string . "')";
@@ -600,41 +601,35 @@ class database_api
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
          $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         $bug_table = db_get_table( 'mantis_bug_table' );
       }
       else
       {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
          $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         $bug_table = db_get_table( 'bug' );
       }
 
       $query = "SELECT DISTINCT v.version_id
-         FROM $plugin_src_table s, $plugin_vers_table v, $bug_table b
+         FROM $plugin_vers_table v
          WHERE v.type_id = " . $type_id;
       if ( $project_id != 0 )
       {
-         $query .= " AND b.id = s.bug_id
-            AND s.p_version_id = v.version_id
-            AND b.project_id = " . $project_id;
+         $query .= " AND v.project_id = " . $project_id;
       }
 
       $result = $this->mysqli->query( $query );
 
       $tmp_row = null;
-      $p_version_ids = array();
+      $version_ids = array();
       while ( $row = $result->fetch_row() )
       {
          if ( $row[0] != $tmp_row )
          {
-            $p_version_ids[] = $row[0];
+            $version_ids[] = $row[0];
             $tmp_row = $row[0];
          }
       }
 
-      return $p_version_ids;
+      return $version_ids;
    }
 
    /**

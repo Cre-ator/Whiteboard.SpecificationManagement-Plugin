@@ -68,8 +68,6 @@ class database_api
     */
    public function getTypeString( $type_id )
    {
-      $string = '';
-
       if ( $type_id != null )
       {
          if ( $this->getMantisVersion() == '1.2.' )
@@ -84,12 +82,20 @@ class database_api
          $query = "SELECT t.type FROM $plugin_type_table t
             WHERE t.id = " . $type_id;
 
-         $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+         $result = $this->mysqli->query( $query );
 
-         $string = $result[0];
+         if ( 0 != $result->num_rows )
+         {
+            $row = mysqli_fetch_row( $result );
+            $type_string = $row[0];
+            return $type_string;
+         }
+         else
+         {
+            return null;
+         }
       }
-
-      return $string;
+      return '';
    }
 
    /**
@@ -145,9 +151,17 @@ class database_api
       $query = "SELECT * FROM $plugin_src_table s
          WHERE s.bug_id = " . $bug_id;
 
-      $src_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $result = $this->mysqli->query( $query );
 
-      return $src_row;
+      if ( 0 != $result->num_rows )
+      {
+         $source_row = mysqli_fetch_row( $result );
+         return $source_row;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**
@@ -170,9 +184,17 @@ class database_api
       $query = "SELECT * FROM $plugin_ptime_table p
          WHERE p.bug_id = " . $bug_id;
 
-      $ptime_row = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $result = $this->mysqli->query( $query );
 
-      return $ptime_row;
+      if ( 0 != $result->num_rows )
+      {
+         $ptime_row = mysqli_fetch_row( $result );
+         return $ptime_row;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**
@@ -195,9 +217,17 @@ class database_api
       $query = "SELECT * FROM $plugin_vers_table v
         WHERE v.version_id = " . $version_id;
 
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $result = $this->mysqli->query( $query );
 
-      return $result;
+      if ( 0 != $result->num_rows )
+      {
+         $version_row = mysqli_fetch_row( $result );
+         return $version_row;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**
@@ -220,9 +250,17 @@ class database_api
       $query = "SELECT * FROM $plugin_vers_table v
         WHERE v.id = " . $primary_id;
 
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $result = $this->mysqli->query( $query );
 
-      return $result;
+      if ( 0 != $result->num_rows )
+      {
+         $version_row = mysqli_fetch_row( $result );
+         return $version_row;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**
@@ -482,11 +520,18 @@ class database_api
       $query = "SELECT t.id FROM $plugin_type_table t
           ORDER BY t.id ASC LIMIT 1";
 
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
+      $result = $this->mysqli->query( $query );
 
-      $first_type = $result[0];
-
-      return $first_type;
+      if ( 0 != $result->num_rows )
+      {
+         $row = mysqli_fetch_row( $result );
+         $first_type = $row[0];
+         return $first_type;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**
@@ -626,7 +671,7 @@ class database_api
 
       $tmp_row = null;
       $version_ids = array();
-      
+
       if ( 0 != $result->num_rows )
       {
          while ( $row = $result->fetch_row() )
@@ -668,7 +713,7 @@ class database_api
 
          $tmp_row = null;
          $work_packages = array();
-         
+
          if ( 0 != $result->num_rows )
          {
             while ( $row = $result->fetch_row() )

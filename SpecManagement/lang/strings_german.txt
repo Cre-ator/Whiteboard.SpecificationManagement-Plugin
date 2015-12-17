@@ -37,7 +37,8 @@ $s_plugin_SpecManagement_select_doc_title = 'SpecManagement - Dokument erzeugen'
 $s_plugin_SpecManagement_select_doc = 'Dokumentauswahl';
 $s_plugin_SpecManagement_select_type = 'Dokumenttyp:';
 $s_plugin_SpecManagement_select_version = 'Dokumentversion:';
-$s_plugin_SpecManagement_select_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
+$s_plugin_SpecManagement_select_show_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
+$s_plugin_SpecManagement_select_show_expenses_overview = 'Aufwandsübersicht im Dokument anzeigen?';
 $s_plugin_SpecManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 
 /* Menu Area */
@@ -54,6 +55,8 @@ $s_plugin_SpecManagement_editor_duration_unit = 'Personentage';
 $s_plugin_SpecManagement_editor_bug_duration = 'Dauer';
 $s_plugin_SpecManagement_editor_bug_attachments = 'Angehängte Dateien';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
+$s_plugin_SpecManagement_editor_expenses_overview = 'Aufwandsübersicht';
+$s_plugin_SpecManagement_editor_expenses_overview_sum = 'Summe';
 
 /* Version Manager Area */
 $s_plugin_SpecManagement_manversions_title = 'Dokument-Versionsverwaltung';

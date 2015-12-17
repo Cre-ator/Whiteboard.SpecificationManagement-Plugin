@@ -76,9 +76,16 @@ echo '</td>';
 echo '</tr>';
 
 $print_api->printRow();
-$print_api->printCategoryField( 1, 1, 'select_print_duration' );
+$print_api->printCategoryField( 1, 1, 'select_show_print_duration' );
 echo '<td>';
 echo '<input type="checkbox" name="print_duration" value="true" />';
+echo '</td>';
+echo '</tr>';
+
+$print_api->printRow();
+$print_api->printCategoryField( 1, 1, 'select_show_expenses_overview' );
+echo '<td>';
+echo '<input type="checkbox" name="expenses_overview" value="true" />';
 echo '</td>';
 echo '</tr>';
 

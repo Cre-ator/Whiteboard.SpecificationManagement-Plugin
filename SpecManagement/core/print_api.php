@@ -290,11 +290,11 @@ class print_api
     * Prints a new chapter title element in a document
     *
     * @param $chapter_index
-    * @param $chapter_title
+    * @param $work_package
     * @param $print_duration
     * @param $duration
     */
-   public function print_chapter_title( $chapter_index, $chapter_title, $print_duration, $duration )
+   public function print_chapter_title( $chapter_index, $work_package, $print_duration, $duration )
    {
       if ( is_null( $duration ) )
       {
@@ -303,7 +303,7 @@ class print_api
 
       echo '<tr>';
       echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
-      echo '<td class="form-title" colspan="2">' . $chapter_title;
+      echo '<td class="form-title" colspan="2">' . $work_package;
       if ( !is_null( $print_duration ) )
       {
          echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
@@ -682,5 +682,22 @@ document.getElementById( span ).style.display = displayType;
             $i++;
          }
       }
+   }
+
+   /**
+    * Prints the head of the expenses overview area
+    */
+   public function print_expenses_overview_head()
+   {
+      echo '<thead>';
+      echo '<tr>';
+      echo '<td class="form-title" colspan="2">' . plugin_lang_get( 'editor_expenses_overview' ) . '</td>';
+      echo '</tr>';
+
+      echo '<tr class="row-category">';
+      echo '<th colspan="1">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</th>';
+      echo '<th colspan="1">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')</th>';
+      echo '</tr>';
+      echo '</thead>';
    }
 }

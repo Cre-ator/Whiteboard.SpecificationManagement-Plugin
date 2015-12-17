@@ -9,6 +9,8 @@ $document_type = null;
 
 /* initialize print_duration */
 $print_duration = null;
+/* initialize expenses overview */
+$expenses_overview = null;
 /* initialize version */
 $version_id = null;
 /* initialize plugin primary key for version */
@@ -26,6 +28,12 @@ $parent_project_id = $database_api->getMainProjectByHierarchy( helper_get_curren
 if ( !empty( $_POST['print_duration'] ) )
 {
    $print_duration = $_POST['print_duration'];
+}
+
+/* get expenses overview option if not empty */
+if ( !empty( $_POST['expenses_overview'] ) )
+{
+   $expenses_overview = $_POST['expenses_overview'];
 }
 
 /* get version if not empty */
@@ -100,4 +108,33 @@ if ( $work_packages != null )
 
 echo '</table>';
 
+if ( !is_null( $expenses_overview ) )
+{
+   echo '<br /><table class="width60">';
+   $print_api->print_expenses_overview_head();
+
+   echo '<tbody>';
+   if ( $work_packages != null )
+   {
+      $document_duration = 0;
+      foreach ( $work_packages as $work_package )
+      {
+         $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
+         $document_duration += $duration;
+         echo '<tr>';
+         echo '<td colspan="1">' . $work_package . '</td>';
+         echo '<td colspan="1">' . $duration . '</td>';
+         echo '</tr>';
+      }
+      echo '<tr>';
+      echo '<td colspan="2"><hr width="100%" align="center" /></td>';
+      echo '</tr>';
+      echo '<tr>';
+      echo '<td />';
+      echo '<td>' . plugin_lang_get( 'editor_expenses_overview_sum' ) . ': ' . $document_duration . '</td>';
+      echo '</tr>';
+   }
+   echo '</tbody>';
+   echo '</table>';
+}
 html_page_bottom1();

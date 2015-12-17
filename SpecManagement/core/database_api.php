@@ -112,11 +112,17 @@ class database_api
       $query = "SELECT DISTINCT v.type_id FROM $plugin_vers_table v
           WHERE v.version_id = " . $version_id;
 
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
-
-      $type_id = $result[0];
-
-      return $type_id;
+      $result = $this->mysqli->query( $query );
+      if ( 0 != $result->num_rows )
+      {
+         $row = mysqli_fetch_row( $result );
+         $type_id = $row[0];
+         return $type_id;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**
@@ -620,12 +626,16 @@ class database_api
 
       $tmp_row = null;
       $version_ids = array();
-      while ( $row = $result->fetch_row() )
+      
+      if ( 0 != $result->num_rows )
       {
-         if ( $row[0] != $tmp_row )
+         while ( $row = $result->fetch_row() )
          {
-            $version_ids[] = $row[0];
-            $tmp_row = $row[0];
+            if ( $row[0] != $tmp_row )
+            {
+               $version_ids[] = $row[0];
+               $tmp_row = $row[0];
+            }
          }
       }
 
@@ -658,12 +668,16 @@ class database_api
 
          $tmp_row = null;
          $work_packages = array();
-         while ( $row = $result->fetch_row() )
+         
+         if ( 0 != $result->num_rows )
          {
-            if ( $row[0] != $tmp_row )
+            while ( $row = $result->fetch_row() )
             {
-               $work_packages[] = $row[0];
-               $tmp_row = $row[0];
+               if ( $row[0] != $tmp_row )
+               {
+                  $work_packages[] = $row[0];
+                  $tmp_row = $row[0];
+               }
             }
          }
 
@@ -702,9 +716,12 @@ class database_api
       $result = $this->mysqli->query( $query );
 
       $bugs = array();
-      while ( $row = $result->fetch_row() )
+      if ( 0 != $result->num_rows )
       {
-         $bugs[] = $row[0];
+         while ( $row = $result->fetch_row() )
+         {
+            $bugs[] = $row[0];
+         }
       }
 
       return $bugs;
@@ -812,13 +829,16 @@ class database_api
    {
       $allBugs = array();
 
-      foreach ( $work_packages as $work_package )
+      if ( $work_packages != null )
       {
-         $work_package_bug_ids = $this->getWorkPackageSpecBugs( $p_version_id, $work_package );
-
-         foreach ( $work_package_bug_ids as $bug_id )
+         foreach ( $work_packages as $work_package )
          {
-            $allBugs[] = $bug_id;
+            $work_package_bug_ids = $this->getWorkPackageSpecBugs( $p_version_id, $work_package );
+
+            foreach ( $work_package_bug_ids as $bug_id )
+            {
+               $allBugs[] = $bug_id;
+            }
          }
       }
 

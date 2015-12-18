@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.4';
+      $this->version = '1.1.5';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -235,9 +235,11 @@ class SpecManagementPlugin extends MantisPlugin
       $project_id = helper_get_current_project();
       $version = gpc_get_string( 'target_version', '' );
       $version_id = version_get_id( $version );
+      $version_obj = $database_api->getVersionRowByVersionId( $version_id );
+      $p_version_id = $version_obj[0];
 
       $work_package = gpc_get_string( 'work_package', $source_obj[3] );
-      $type = gpc_get_string( 'types', $database_api->getTypeString( $source_obj[4] ) );
+      $type = gpc_get_string( 'types', $database_api->getTypeString( $version_obj[3] ) );
       $type_id = $database_api->getTypeId( $type );
       $ptime = gpc_get_string( 'ptime', $ptime_obj[2] );
 
@@ -245,12 +247,12 @@ class SpecManagementPlugin extends MantisPlugin
       {
          case 'EVENT_REPORT_BUG':
             $database_api->insertVersionRow( $project_id, $version_id, $type_id );
-            $database_api->insertSourceRow( $bug_id, $version_id, $work_package );
+            $database_api->insertSourceRow( $bug_id, $p_version_id, $work_package );
             $database_api->insertPtimeRow( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
             $database_api->updateVersionRow( $project_id, $version_id, $type_id );
-            $database_api->updateSourceRow( $bug_id, $version_id, $work_package );
+            $database_api->updateSourceRow( $bug_id, $p_version_id, $work_package );
             $database_api->updatePtimeRow( $bug_id, $ptime );
             break;
       }

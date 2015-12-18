@@ -137,4 +137,14 @@ if ( !is_null( $expenses_overview ) )
    echo '</tbody>';
    echo '</table>';
 }
+echo '<br /><table class="width60">';
+echo '<thead><tr><th>Testbereich Bug Historie</th></tr></thead>';
+echo '<tbody>';
+
+
+
+echo '</tbody>';
+echo '</table>';
+
+
 html_page_bottom1();

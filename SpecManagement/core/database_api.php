@@ -68,7 +68,7 @@ class database_api
     */
    public function getTypeString( $type_id )
    {
-      if ( $type_id != null )
+      if ( !is_null( $type_id ) )
       {
          if ( $this->getMantisVersion() == '1.2.' )
          {
@@ -83,7 +83,6 @@ class database_api
             WHERE t.id = " . $type_id;
 
          $result = $this->mysqli->query( $query );
-
          if ( 0 != $result->num_rows )
          {
             $row = mysqli_fetch_row( $result );
@@ -152,7 +151,6 @@ class database_api
          WHERE s.bug_id = " . $bug_id;
 
       $result = $this->mysqli->query( $query );
-
       if ( 0 != $result->num_rows )
       {
          $source_row = mysqli_fetch_row( $result );
@@ -185,7 +183,6 @@ class database_api
          WHERE p.bug_id = " . $bug_id;
 
       $result = $this->mysqli->query( $query );
-
       if ( 0 != $result->num_rows )
       {
          $ptime_row = mysqli_fetch_row( $result );
@@ -218,7 +215,6 @@ class database_api
         WHERE v.version_id = " . $version_id;
 
       $result = $this->mysqli->query( $query );
-
       if ( 0 != $result->num_rows )
       {
          $version_row = mysqli_fetch_row( $result );
@@ -251,7 +247,6 @@ class database_api
         WHERE v.id = " . $primary_id;
 
       $result = $this->mysqli->query( $query );
-
       if ( 0 != $result->num_rows )
       {
          $version_row = mysqli_fetch_row( $result );
@@ -375,7 +370,7 @@ class database_api
          $this->mysqli->query( $query );
 
          $query = "UPDATE $plugin_src_table
-            SET version_id = " . $p_version_id . ", work_package = '" . $work_package . "'
+            SET p_version_id = " . $p_version_id . ", work_package = '" . $work_package . "'
             WHERE bug_id = " . $bug_id;
 
          $this->mysqli->query( $query );
@@ -603,10 +598,17 @@ class database_api
       $query = "SELECT t.id FROM $plugin_type_table t
          WHERE t.type = '" . $string . "'";
 
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
-      $primary_key = $result[0];
-
-      return $primary_key;
+      $result = $this->mysqli->query( $query );
+      if ( 0 != $result->num_rows )
+      {
+         $row = mysqli_fetch_row( $result );
+         $primary_key = $row[0];
+         return $primary_key;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**
@@ -629,8 +631,7 @@ class database_api
 
       $result = $this->mysqli->query( $query );
       $types = array();
-
-      if ( $result != null )
+      if ( 0 != $result->num_rows )
       {
          while ( $row = $result->fetch_row() )
          {
@@ -801,11 +802,17 @@ class database_api
          AND s.bug_id = b.id
          AND NOT b.resolution = 90";
 
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
-
-      $duration = $result[0];
-
-      return $duration;
+      $result = $this->mysqli->query( $query );
+      if ( 0 != $result->num_rows )
+      {
+         $row = mysqli_fetch_row( $result );
+         $duration = $row[0];
+         return $duration;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**
@@ -828,9 +835,16 @@ class database_api
       $query = "SELECT COUNT(*) FROM $plugin_vers_table v
           WHERE v.type_id = " . $type_id;
 
-      $result = mysqli_fetch_row( $this->mysqli->query( $query ) );
-
-      return ( $result[0] > 0 );
+      $result = $this->mysqli->query( $query );
+      if ( 0 != $result->num_rows )
+      {
+         $row = mysqli_fetch_row( $result );
+         return $row[0] > 0;
+      }
+      else
+      {
+         return null;
+      }
    }
 
    /**

@@ -14,18 +14,21 @@ $new_type_id = null;
 $project_id = null;
 $new_version = null;
 
-
-
 /**
  * Submit type changes
  */
 if ( $option_assign && !is_null( $_POST['version_id'] ) && !is_null( $_POST['types'] ) )
 {
    $project_id = helper_get_current_project();
-   $version_id = $_POST['version_id'];
-   $new_type_id = $database_api->getTypeId( $_POST['types'] );
+   $version_ids = $_POST['version_id'];
+   $new_types = $_POST['types'];
 
-   $database_api->updateVersionAssociatedType( $project_id, $version_id, $new_type_id );
+   for ( $index = 0; $index < count( $version_ids ); $index++ )
+   {
+      $new_type_id = $database_api->getTypeId( $new_types[$index] );
+      $version_id = $version_ids[$index];
+      $database_api->updateVersionAssociatedType( $project_id, $version_id, $new_type_id );
+   }
 }
 
 /**

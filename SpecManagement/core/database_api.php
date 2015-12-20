@@ -459,6 +459,62 @@ class database_api
    }
 
    /**
+    * Deletes a version row
+    *
+    * @param $version_id
+    */
+   public function deleteVersionRow( $version_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "DELETE FROM $plugin_vers_table
+         WHERE version_id = " . $version_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Deletes a source row
+    *
+    * @param $p_version_id
+    */
+   public function deleteSourceRow( $p_version_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "DELETE FROM $plugin_src_table
+         WHERE p_version_id = " . $p_version_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
     * Update an existing association if it exists or, of not, create a new one
     *
     * @param $project_id

@@ -27,20 +27,22 @@ $print_api->printTableHeadCol( 1, 'released' );
 $print_api->printTableHeadCol( 1, 'obsolete' );
 $print_api->printTableHeadCol( 1, 'timestamp' );
 echo '<th colspan="1">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
+echo '<th colspan="1">' . lang_get( 'actions' ) . '</th>';
 echo '</tr>';
 echo '</thead>';
 
 echo '<tbody>';
 $versions = version_get_all_rows( helper_get_current_project() );
-echo '<form action="' . plugin_page( 'manage_versions_update' ) . '" method="post">';
+
 
 foreach ( $versions as $version )
 {
    $current_type = $database_api->getTypeString( $database_api->getTypeByVersion( $version['id'] ) );
 
    $print_api->printRow();
+   echo '<form action="' . plugin_page( 'manage_versions_update' ) . '" method="post">';
    echo '<td>' . string_display( version_full_name( $version['id'] ) ) . '</td>';
-   echo '<input type="hidden" name="version_id[]" value="' . $version['id'] . '"/>';
+   echo '<input type="hidden" name="version_id" value="' . $version['id'] . '"/>';
    echo '<td>' . trans_bool( $version['released'] ) . '</td>';
    echo '<td>' . trans_bool( $version['obsolete'] ) . '</td>';
    echo '<td>' . date( config_get( 'complete_date_format' ), $version['date_order'] ) . '</td>';
@@ -48,7 +50,7 @@ foreach ( $versions as $version )
    echo '<td>';
    $types = $database_api->getTypes();
    echo '<span class="select">';
-   echo '<select ' . helper_get_tab_index() . ' id="types" name="types[]">';
+   echo '<select ' . helper_get_tab_index() . ' id="type" name="type">';
    echo '<option value=""></option>';
    foreach ( $types as $type )
    {
@@ -57,18 +59,23 @@ foreach ( $versions as $version )
       echo '>' . $type . '</option>';
    }
    echo '</select>&nbsp';
+   echo '<input type="submit" name="assigntype" class="button" value="' . plugin_lang_get( 'manversions_assigntype' ) . '"/>';
    echo '</td>';
 
+   echo '<td>';
+   echo '<input type="submit" name="setversion" class="button" value="' . lang_get( 'edit_link' ) . '"/>';
+   echo '&nbsp<input type="submit" name="deleteversion" class="button" value="' . lang_get( 'delete_link' ) . '"/>';
+   echo '</td>';
+
+   echo '</form>';
    echo '</tr>';
 }
+echo '<form action="' . plugin_page( 'manage_versions_update' ) . '" method="post">';
 echo '<tr>';
-echo '<td colspan="4">';
+echo '<td colspan="5">';
 echo '<input type="hidden" name="project_id" value="' . helper_get_current_project() . '"/>';
 echo '<input type="text" name="new_version" size="32" maxlength="64"/>';
 echo '&nbsp<input type="submit" name="addversion" class="button" value="' . lang_get( 'add_version_button' ) . '"/>';
-echo '</td>';
-echo '<td colspan="1">';
-echo '<input type="submit" name="assigntype" class="button" value="' . plugin_lang_get( 'manversions_assigntype' ) . '">';
 echo '</td>';
 echo '</tr>';
 echo '</form>';

@@ -7,6 +7,8 @@ include SPECMANAGEMENT_CORE_URI . 'database_api.php';
 $database_api = new database_api();
 
 $option_assign = gpc_get_bool( 'assigntype', false );
+$option_setversion = gpc_get_bool( 'setversion', false );
+$option_delversion = gpc_get_bool( 'deleteversion', false );
 $option_addversion = gpc_get_bool( 'addversion', false );
 
 $version_id = null;
@@ -17,18 +19,29 @@ $new_version = null;
 /**
  * Submit type changes
  */
-if ( $option_assign && !is_null( $_POST['version_id'] ) && !is_null( $_POST['types'] ) )
+if ( $option_assign && !is_null( $_POST['version_id'] ) && !is_null( $_POST['type'] ) )
 {
    $project_id = helper_get_current_project();
-   $version_ids = $_POST['version_id'];
-   $new_types = $_POST['types'];
+   $version_id = $_POST['version_id'];
+   $new_type_id = $database_api->getTypeId( $_POST['type'] );
 
-   for ( $index = 0; $index < count( $version_ids ); $index++ )
-   {
-      $new_type_id = $database_api->getTypeId( $new_types[$index] );
-      $version_id = $version_ids[$index];
-      $database_api->updateVersionAssociatedType( $project_id, $version_id, $new_type_id );
-   }
+   $database_api->updateVersionAssociatedType( $project_id, $version_id, $new_type_id );
+}
+
+/**
+ * Change a version
+ */
+if ( $option_setversion && !is_null( $_POST['version_id'] ) )
+{
+   print_successful_redirect( plugin_page( 'manage_versions_set', true ) . '&version_id=' . $_POST['version_id'] );
+}
+
+/**
+ * Delete a version
+ */
+if ( $option_delversion && !is_null( $_POST['version_id'] ) )
+{
+   print_successful_redirect( plugin_page( 'manage_versions_delete', true ) . '&version_id=' . $_POST['version_id'] );
 }
 
 /**

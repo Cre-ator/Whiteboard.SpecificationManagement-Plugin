@@ -8,6 +8,7 @@ $database_api = new database_api();
 $print_api = new print_api();
 
 html_page_top1( plugin_lang_get( 'manversions_title' ) );
+echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
 html_page_top2();
 
 if ( plugin_is_installed( 'WhiteboardMenu' ) )

@@ -472,7 +472,7 @@ class print_api
     * @param $allRelevantBugs
     * @return float
     */
-   private function calculate_document_progress( $allRelevantBugs )
+   private function calculate_status_doc_progress( $allRelevantBugs )
    {
       $segments = count( $allRelevantBugs );
       if ( $segments == 0 )
@@ -528,6 +528,32 @@ class print_api
       return $document_process;
    }
 
+   public function calculate_pt_doc_progress( $allRelevantBugs )
+   {
+      $database_api = new database_api();
+      $sum_pt = array();
+      $sum_pt_all = 0;
+      $sum_pt_bug = 0;
+      foreach ( $allRelevantBugs as $bug_id )
+      {
+         $ptime_row = $database_api->getPtimeRow( $bug_id );
+         if ( !is_null( $ptime_row[2] ) || 0 != $ptime_row[2] )
+         {
+            $sum_pt_all += $ptime_row[2];
+            if ( bug_get_field( $bug_id, 'status' ) == PLUGINS_SPECMANAGEMENT_STAT_RESOLVED
+               || bug_get_field( $bug_id, 'status' ) == PLUGINS_SPECMANAGEMENT_STAT_CLOSED
+            )
+            {
+               $sum_pt_bug += $ptime_row[2];
+            }
+         }
+      }
+      array_push( $sum_pt, $sum_pt_all );
+      array_push( $sum_pt, $sum_pt_bug );
+
+      return $sum_pt;
+   }
+
    /**
     * Prints the process of a document
     *
@@ -535,15 +561,44 @@ class print_api
     */
    public function print_document_progress( $allRelevantBugs )
    {
-      $document_process = 0;
-      if ( !empty( $allRelevantBugs ) )
+      $database_api = new database_api();
+      $status_flag = false;
+
+      foreach ( $allRelevantBugs as $bug_id )
       {
-         $document_process = $this->calculate_document_progress( $allRelevantBugs );
+         $ptime_row = $database_api->getPtimeRow( $bug_id );
+         if ( is_null( $ptime_row[2] ) || 0 == $ptime_row[2] )
+         {
+            $status_flag = true;
+            break;
+         }
       }
 
-      echo '<div class="progress400">';
-      echo '<span class="bar" style="width: ' . $document_process . '%;">' . $document_process . '%</span>';
-      echo '</div>';
+      if ( $status_flag )
+      {
+         $status_process = 0;
+         if ( !empty( $allRelevantBugs ) )
+         {
+            $status_process = $this->calculate_status_doc_progress( $allRelevantBugs );
+         }
+
+         echo '<div class="progress400">';
+         echo '<span class="bar" style="width: ' . $status_process . '%;">' . $status_process . '%</span>';
+         echo '</div>';
+      }
+      else
+      {
+         $sum_pt = $this->calculate_pt_doc_progress( $allRelevantBugs );
+         $sum_pt_all = $sum_pt[0];
+         $sum_pt_bug = $sum_pt[1];
+
+         $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
+
+         echo '<div class="progress400">';
+         echo '<span class="bar" style="width: ' . $pt_process . '%;">' . $pt_process . '%</span>';
+         echo '</div>';
+         echo 'Krass, wir haben schon ' . $sum_pt_bug . ' von ' . $sum_pt_all . ' Personentagen abgearbeitet!';
+      }
    }
 
    # List the attachments belonging to the specified bug.  This is used from within

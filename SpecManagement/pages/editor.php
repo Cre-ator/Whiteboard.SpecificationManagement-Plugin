@@ -60,6 +60,7 @@ if ( empty( $work_packages ) && !is_null( $version_id ) )
 }
 
 html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $document_type . ' - ' . $version_string );
+echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
 html_page_top2();
 
 if ( plugin_is_installed( 'WhiteboardMenu' ) )

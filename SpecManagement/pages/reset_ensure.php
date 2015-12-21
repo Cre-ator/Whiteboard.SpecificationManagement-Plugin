@@ -1,6 +1,7 @@
 <?php
 auth_reauthenticate();
 html_page_top1( plugin_lang_get( 'config_reset_title' ) );
+echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
 html_page_top2();
 
 echo '<div align="center">';

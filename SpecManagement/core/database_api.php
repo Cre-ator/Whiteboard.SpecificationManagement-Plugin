@@ -407,7 +407,7 @@ class database_api
          $this->mysqli->query( $query );
 
          $query = "UPDATE $plugin_ptime_table
-            SET time = " . $ptime . "
+            SET time = '" . $ptime . "'
             WHERE bug_id = " . $bug_id;
 
          $this->mysqli->query( $query );

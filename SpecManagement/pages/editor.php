@@ -25,19 +25,19 @@ $work_package_bug_ids = array();
 $parent_project_id = $database_api->getMainProjectByHierarchy( helper_get_current_project() );
 
 /* get print_duration option if not empty */
-if ( !empty( $_POST['print_duration'] ) )
+if ( isset( $_POST['print_duration'] ) )
 {
    $print_duration = $_POST['print_duration'];
 }
 
 /* get expenses overview option if not empty */
-if ( !empty( $_POST['expenses_overview'] ) )
+if ( isset( $_POST['expenses_overview'] ) )
 {
    $expenses_overview = $_POST['expenses_overview'];
 }
 
 /* get version if not empty */
-if ( !empty( $_POST['version_id'] ) )
+if ( isset( $_POST['version_id'] ) )
 {
    $version_id = $_POST['version_id'];
    $version_obj = $database_api->getVersionRowByVersionId( $version_id );
@@ -140,7 +140,6 @@ if ( !is_null( $expenses_overview ) )
 echo '<br /><table class="width60">';
 echo '<thead><tr><th>Testbereich Bug Historie</th></tr></thead>';
 echo '<tbody>';
-
 
 
 echo '</tbody>';

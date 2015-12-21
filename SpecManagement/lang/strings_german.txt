@@ -62,8 +62,6 @@ $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Summe';
 $s_plugin_SpecManagement_manversions_title = 'Dokument-Versionsverwaltung';
 $s_plugin_SpecManagement_manversions_thead = 'Versionsverwaltung';
 $s_plugin_SpecManagement_manversions_thdoctype = 'Dokumenttyp';
-$s_plugin_SpecManagement_manversions_thaddchangetype = 'Weise Dokumenttyp zu';
-$s_plugin_SpecManagement_manversions_assigntype = 'Zuweisen';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Dokumententitel';

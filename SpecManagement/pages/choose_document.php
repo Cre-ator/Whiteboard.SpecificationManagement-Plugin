@@ -11,7 +11,7 @@ $document_type = $database_api->getFirstType();
 $sources = array();
 
 $post = false;
-if ( !empty( $_POST['types'] ) )
+if ( isset( $_POST['types'] ) )
 {
    $post = true;
 }

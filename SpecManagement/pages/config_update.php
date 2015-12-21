@@ -44,7 +44,7 @@ if ( $option_reset )
  */
 if ( $option_addtype )
 {
-   if ( !empty( $_POST['type'] ) )
+   if ( isset( $_POST['type'] ) )
    {
       $database_api->addType( $_POST['type'] );
    }
@@ -55,15 +55,18 @@ if ( $option_addtype )
  */
 if ( $option_deltype )
 {
-   $type_string = $_POST['types'];
-   $type_id = $database_api->getTypeId( $type_string );
-
-   /*
-    * Just delete a type if it is not used!
-    */
-   if ( !$database_api->checkTypeIsUsed( $type_id ) )
+   if ( isset( $_POST['types'] ) )
    {
-      $database_api->deleteType( $type_string );
+      $type_string = $_POST['types'];
+      $type_id = $database_api->getTypeId( $type_string );
+
+      /*
+       * Just delete a type if it is not used!
+       */
+      if ( !$database_api->checkTypeIsUsed( $type_id ) )
+      {
+         $database_api->deleteType( $type_string );
+      }
    }
 }
 
@@ -72,7 +75,7 @@ if ( $option_deltype )
  */
 if ( $option_changetype )
 {
-   if ( !empty( $_POST['types'] ) && !empty( $_POST['newtype'] ) )
+   if ( isset( $_POST['types'] ) && isset( $_POST['newtype'] ) )
    {
       $type_string = $_POST['types'];
       $type_id = $database_api->getTypeId( $type_string );

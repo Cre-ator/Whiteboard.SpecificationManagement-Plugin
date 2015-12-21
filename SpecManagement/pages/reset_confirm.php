@@ -4,7 +4,7 @@ include SPECMANAGEMENT_CORE_URI . 'database_api.php';
 
 $database_api = new database_api();
 
-if ( !empty( $_POST['con_reset'] ) )
+if ( isset( $_POST['con_reset'] ) )
 {
    $database_api->resetPlugin();
 }

@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.7';
+      $this->version = '1.1.8';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -196,19 +196,19 @@ class SpecManagementPlugin extends MantisPlugin
          switch ( $event )
          {
             case 'EVENT_VIEW_BUG_DETAILS':
-               if ( $this->getReadLevel() || $this->getWriteLevel() )
+               if ( $this->getReadLevel() || $this->getWriteLevel() || $this->getUserHasLevel() )
                {
                   $print_api->printBugViewFields( $type, $work_package, $ptime );
                }
                break;
             case 'EVENT_REPORT_BUG_FORM':
-               if ( $this->getWriteLevel() )
+               if ( $this->getWriteLevel() || $this->getUserHasLevel() )
                {
                   $print_api->printBugReportFields( $work_package, $ptime );
                }
                break;
             case 'EVENT_UPDATE_BUG_FORM':
-               if ( $this->getWriteLevel() )
+               if ( $this->getWriteLevel() || $this->getUserHasLevel() )
                {
                   $print_api->printBugUpdateFields( $type, $work_package, $ptime );
                }
@@ -229,20 +229,25 @@ class SpecManagementPlugin extends MantisPlugin
       include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'database_api.php';
       $database_api = new database_api();
 
+      $version_id = null;
+      $type_id = null;
+      $p_version_id = null;
+
       $bug_id = $bug->id;
 
-      $source_obj = $database_api->getSourceRow( $bug_id );
-
       $project_id = helper_get_current_project();
-      $version = gpc_get_string( 'target_version', '' );
-      $version_id = version_get_id( $version );
-      $version_obj = $database_api->getVersionRowByVersionId( $version_id );
-      $p_version_id = $version_obj[0];
+      $version = gpc_get_string( 'target_version' );
+      $ptime = gpc_get_string( 'ptime', '0' );
+      $work_package = gpc_get_string( 'work_package', '' );
+      $type = gpc_get_string( 'types', '' );
 
-      $work_package = gpc_get_string( 'work_package', $source_obj[3] );
-      $type = gpc_get_string( 'types', $database_api->getTypeString( $version_obj[3] ) );
-      $type_id = $database_api->getTypeId( $type );
-      $ptime = gpc_get_string( 'ptime' );
+      if ( !is_null( $version ) )
+      {
+         $version_id = version_get_id( $version );
+         $version_obj = $database_api->getVersionRowByVersionId( $version_id );
+         $p_version_id = $version_obj[0];
+         $type_id = $database_api->getTypeId( $type );
+      }
 
       switch ( $event )
       {

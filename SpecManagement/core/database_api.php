@@ -211,18 +211,25 @@ class database_api
          $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
       }
 
-      $query = "SELECT * FROM $plugin_vers_table v
-        WHERE v.version_id = " . $version_id;
-
-      $result = $this->mysqli->query( $query );
-      if ( 0 != $result->num_rows )
+      if ( $version_id == false )
       {
-         $version_row = mysqli_fetch_row( $result );
-         return $version_row;
+         return null;
       }
       else
       {
-         return null;
+         $query = "SELECT * FROM $plugin_vers_table
+            WHERE version_id = " . $version_id;
+
+         $result = $this->mysqli->query( $query );
+         if ( 0 != $result->num_rows )
+         {
+            $version_row = mysqli_fetch_row( $result );
+            return $version_row;
+         }
+         else
+         {
+            return null;
+         }
       }
    }
 
@@ -262,10 +269,10 @@ class database_api
     * Create new bug-related src entry
     *
     * @param $bug_id
-    * @param $version_id
+    * @param $p_version_id
     * @param $work_package
     */
-   public function insertSourceRow( $bug_id, $version_id, $work_package )
+   public function insertSourceRow( $bug_id, $p_version_id, $work_package )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -275,9 +282,6 @@ class database_api
       {
          $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
       }
-
-      $version_row = $this->getVersionRowByVersionId( $version_id );
-      $p_version_id = $version_row[0];
 
       $query = "INSERT INTO $plugin_src_table ( id, bug_id, p_version_id, work_package )
          SELECT null," . $bug_id . "," . $p_version_id . ",'" . $work_package . "'
@@ -507,6 +511,34 @@ class database_api
 
       $query = "DELETE FROM $plugin_src_table
          WHERE p_version_id = " . $p_version_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Deletes a ptime row
+    *
+    * @param $bug_id
+    */
+   public function deletePtimeRow( $bug_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "DELETE FROM $plugin_ptime_table
+         WHERE bug_id = " . $bug_id;
 
       $this->mysqli->query( $query );
 

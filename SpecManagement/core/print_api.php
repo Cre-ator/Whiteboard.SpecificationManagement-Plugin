@@ -595,9 +595,8 @@ class print_api
          $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
 
          echo '<div class="progress400">';
-         echo '<span class="bar" style="width: ' . $pt_process . '%;">' . $pt_process . '%</span>';
+         echo '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get('editor_duration_unit') . ' (' . $pt_process . '%)</span>';
          echo '</div>';
-         echo 'Krass, wir haben schon ' . $sum_pt_bug . ' von ' . $sum_pt_all . ' Personentagen abgearbeitet!';
       }
    }
 

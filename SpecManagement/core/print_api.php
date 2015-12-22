@@ -135,7 +135,7 @@ class print_api
       echo '</table>';
    }
 
-   /**
+   /** todo *easier to find the method
     * Prints the plugin specific menu
     */
    public function print_plugin_menu()
@@ -152,6 +152,12 @@ class print_api
       echo '<td>';
       echo '[ <a href="' . plugin_page( 'manage_versions' ) . '">';
       echo plugin_lang_get( 'menu_manversions' );
+      echo '</a> ]';
+      echo '</td>';
+
+      echo '<td>';
+      echo '[ <a href="' . plugin_page( 'manage_types' ) . '">';
+      echo plugin_lang_get( 'menu_mantypes' );
       echo '</a> ]';
       echo '</td>';
 
@@ -187,6 +193,9 @@ class print_api
     */
    public function printBugUpdateFields( $type, $work_package, $ptime )
    {
+      $database_api = new database_api();
+      $work_packages = $database_api->getProjectSpecWorkPackages();
+
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
       echo '<td colspan="5" id="requirement">', $type, '</td>';
@@ -195,7 +204,13 @@ class print_api
       $this->printRow();
       echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</td>';
       echo '<td colspan="5">';
-      echo '<input ', helper_get_tab_index(), ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="', $work_package, '" />';
+      echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
+      echo '<datalist id="work_packages">';
+      foreach ( $work_packages as $existing_work_package )
+      {
+         echo '<option value="' . $existing_work_package . '">';
+      }
+      echo '</datalist>';
       echo '</td>';
       echo '</tr>';
 
@@ -240,6 +255,9 @@ class print_api
     */
    public function printBugReportFields( $work_package, $ptime )
    {
+      $database_api = new database_api();
+      $work_packages = $database_api->getProjectSpecWorkPackages();
+
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {
          $this->printRow();
@@ -248,7 +266,13 @@ class print_api
          echo '</td>';
          echo '<td>';
          echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="' . string_attribute( $work_package ) . '" />';
+         echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
+         echo '<datalist id="work_packages">';
+         foreach ( $work_packages as $existing_work_package )
+         {
+            echo '<option value="' . $existing_work_package . '">';
+         }
+         echo '</datalist>';
          echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</td>';
@@ -271,7 +295,13 @@ class print_api
          echo '<div class="field-container">';
          echo '<label><span>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</span></label>';
          echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="work_package" name="work_package" size="50" maxlength="50" value="' . string_attribute( $work_package ) . '" />';
+         echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
+         echo '<datalist id="work_packages">';
+         foreach ( $work_packages as $existing_work_package )
+         {
+            echo '<option value="' . $existing_work_package . '">';
+         }
+         echo '</datalist>';
          echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</div>';
@@ -595,7 +625,7 @@ class print_api
          $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
 
          echo '<div class="progress400">';
-         echo '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get('editor_duration_unit') . ' (' . $pt_process . '%)</span>';
+         echo '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';
          echo '</div>';
       }
    }

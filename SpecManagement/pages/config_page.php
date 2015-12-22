@@ -112,7 +112,7 @@ echo '</tr>';
 
 $print_api->printSpacer( 3 );
 
-$print_api->printFormTitle( 3, 'config_editor' );
+$print_api->printFormTitle( 3, 'config_type' );
 $print_api->printRow();
 echo '</tr>';
 

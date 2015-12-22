@@ -25,7 +25,7 @@ $s_plugin_SpecManagement_config_types = 'Available Document Types';
 $s_plugin_SpecManagement_config_del = 'Remove';
 $s_plugin_SpecManagement_config_change = 'Change';
 /* --------------- */
-$s_plugin_SpecManagement_config_editor = 'Editor Settings';
+$s_plugin_SpecManagement_config_type = 'configure document types';
 /* --------------- */
 $s_plugin_SpecManagement_config_reset_title = 'SpecManagement - Remove All Plugin Settings And Data';
 $s_plugin_SpecManagement_config_reset_expl = 'Caution, if you proceed all data stored in the plugin are permanently deleted. Continue?';
@@ -45,6 +45,7 @@ $s_plugin_SpecManagement_select_confirm = 'Generate Selected Document';
 $s_plugin_SpecManagement_menu_title = 'Specifications';
 $s_plugin_SpecManagement_menu_choosedoc = 'Generate Document';
 $s_plugin_SpecManagement_menu_manversions = 'Manage Document Versions';
+$s_plugin_SpecManagement_menu_mantypes = 'Manage Document Types';
 $s_plugin_SpecManagement_menu_printbutton = 'Print';
 
 /* Editor Area */
@@ -64,6 +65,11 @@ $s_plugin_SpecManagement_manversions_thead = 'Versionmanager';
 $s_plugin_SpecManagement_manversions_thdoctype = 'Document Type';
 $s_plugin_SpecManagement_manversions_edit = 'Edit Versions';
 $s_plugin_SpecManagement_manversions_edit_submit = 'Accept Changes';
+
+/* Types Manager Area */
+$s_plugin_SpecManagement_mantypes_title = 'Document-Typemanager';
+$s_plugin_SpecManagement_mantypes_thead = 'Typemanager';
+$s_plugin_SpecManagement_mantypes_edit = 'Edit Types';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Document Title';

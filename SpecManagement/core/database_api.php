@@ -266,6 +266,47 @@ class database_api
    }
 
    /**
+    * Get project id related version entry
+    *
+    * @param $project_id
+    * @return array|null
+    */
+   public function getVersionRowsByProjectId( $project_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "SELECT * FROM $plugin_vers_table v
+        WHERE v.project_id = " . $project_id;
+
+      $result = $this->mysqli->query( $query );
+      if ( 0 != $result->num_rows )
+      {
+         $tmp_row = null;
+         $version_rows = array();
+         while ( $row = $result->fetch_row() )
+         {
+            if ( $row[0] != $tmp_row )
+            {
+               $version_rows[] = $row[0];
+               $tmp_row = $row[0];
+            }
+         }
+         return $version_rows;
+      }
+      else
+      {
+         return null;
+      }
+   }
+
+   /**
     * Create new bug-related src entry
     *
     * @param $bug_id
@@ -730,6 +771,34 @@ class database_api
       return $types;
    }
 
+   /* TODO getTypes / getFullTypes zusammenfügen */
+   public function getFullTypes()
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
+      }
+
+      $query = "SELECT * FROM $plugin_type_table ORDER BY type ASC";
+
+      $result = $this->mysqli->query( $query );
+      $types = array();
+      if ( 0 != $result->num_rows )
+      {
+         while ( $row = $result->fetch_row() )
+         {
+            $types[] = $row;
+         }
+      }
+
+      return $types;
+   }
+
+
    /**
     * Get available srcs (versions) for a specific req (type)
     *
@@ -819,6 +888,54 @@ class database_api
       }
 
       return null;
+   }
+
+   /**
+    * Get all work packages assigned to a project
+    *
+    * @return array
+    */
+   public function getProjectSpecWorkPackages()
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+      }
+
+      $p_version_ids = $this->getVersionRowsByProjectId( helper_get_current_project() );
+      $work_packages = array();
+      $tmp_row = null;
+
+      foreach ( $p_version_ids as $p_version_id )
+      {
+         $query = "SELECT DISTINCT s.work_package FROM $plugin_src_table s
+            WHERE s.p_version_id = '" . $p_version_id . "'";
+
+         $result = $this->mysqli->query( $query );
+         $work_packages_tmps = array();
+
+         if ( 0 != $result->num_rows )
+         {
+            while ( $row = $result->fetch_row() )
+            {
+               if ( $row[0] != $tmp_row )
+               {
+                  $work_packages_tmps[] = $row[0];
+                  $tmp_row = $row[0];
+               }
+            }
+         }
+         foreach ( $work_packages_tmps as $work_packages_tmp )
+         {
+            $work_packages[] = $work_packages_tmp;
+         }
+
+      }
+      return $work_packages;
    }
 
    /**

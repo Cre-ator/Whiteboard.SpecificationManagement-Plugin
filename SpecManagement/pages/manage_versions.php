@@ -5,6 +5,7 @@ include SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
 $print_api = new print_api();
 
+$edit_page = false;
 if ( isset( $_POST['edit'] ) )
 {
    $edit_page = true;

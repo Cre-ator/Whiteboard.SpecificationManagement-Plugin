@@ -91,7 +91,7 @@ function print_table( $edit_page = false )
       {
          echo '<span class="checkbox">'; ?>
          <input type="checkbox" id="proj-version-released"
-                name="released<?php echo $version_index ?>" <?php check_checked( (boolean) $version['released'], true ); ?> />
+                name="released<?php echo $version_index ?>" <?php check_checked( (boolean)$version['released'], true ); ?> />
          <?php echo '</span>';
       }
       else
@@ -106,7 +106,7 @@ function print_table( $edit_page = false )
       {
          echo '<span class="checkbox">'; ?>
          <input type="checkbox" id="proj-version-obsolete"
-                name="obsolete<?php echo $version_index ?>" <?php check_checked( (boolean) $version['obsolete'], true ); ?> />
+                name="obsolete<?php echo $version_index ?>" <?php check_checked( (boolean)$version['obsolete'], true ); ?> />
          <?php echo '</span>';
       }
       else
@@ -134,7 +134,12 @@ function print_table( $edit_page = false )
       echo '<td>';
       if ( $edit_page )
       {
-         $types = $database_api->getTypes();
+         $types = array();
+         $types_rows = $database_api->getFullTypes();
+         foreach ( $types_rows as $types_row )
+         {
+            $types[] = $types_row[1];
+         }
          echo '<span class="select">';
          echo '<select ' . helper_get_tab_index() . ' id="proj-version-type" name="type[]">';
          echo '<option value=""></option>';

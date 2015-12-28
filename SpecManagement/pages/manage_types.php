@@ -37,6 +37,9 @@ function print_table( $edit_page = false )
    $database_api = new database_api();
    $print_api = new print_api();
 
+   $cols = 6;
+   $col_width = 100 / $cols;
+
    if ( $edit_page )
    {
       echo '<form action="' . plugin_page( 'manage_types_update' ) . '" method="post">';
@@ -44,14 +47,14 @@ function print_table( $edit_page = false )
    echo '<table class="width90" cellspacing="1">';
 
    echo '<thead>';
-   $print_api->printFormTitle( 6, 'mantypes_thead' );
+   $print_api->printFormTitle( $cols, 'mantypes_thead' );
    echo '<tr class="row-category">';
-   echo '<th colspan="1">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
-   echo '<th colspan="1">' . plugin_lang_get( 'select_show_print_duration' ) . '</th>';
-   echo '<th colspan="1">' . plugin_lang_get( 'select_show_expenses_overview' ) . '</th>';
-   echo '<th colspan="1">weitere option1</th>';
-   echo '<th colspan="1">weitere option2</th>';
-   echo '<th colspan="1">weitere option3</th>';
+   echo '<th colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
+   echo '<th colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'select_show_print_duration' ) . '</th>';
+   echo '<th colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'select_show_expenses_overview' ) . '</th>';
+   echo '<th colspan="1" width="' . $col_width . '">weitere option1</th>';
+   echo '<th colspan="1" width="' . $col_width . '">weitere option2</th>';
+   echo '<th colspan="1" width="' . $col_width . '">weitere option3</th>';
    echo '</tr>';
    echo '</thead>';
 
@@ -61,14 +64,22 @@ function print_table( $edit_page = false )
    for ( $type_index = 0; $type_index < count( $types ); $type_index++ )
    {
       $type = $types[$type_index];
-      var_dump( $type );
+
+      $type_id = $type[0];
+      $type_string = $type[1];
+
+      $type_options_set = $type[2];
+      $type_options = explode( ';', $type_options_set );
+
+      $option_show_duration = $type_options[0];
+      $option_show_expenses_overview = $type_options[1];
 
       $print_api->printRow();
-      echo '<input type="hidden" name="type_ids[]" value="' . $type[0] . '"/>';
+      echo '<input type="hidden" name="type_ids[]" value="' . $type_id . '"/>';
 
       /* Name */
       echo '<td>';
-      echo string_display( $type[1] );
+      echo string_display( $type_string );
       echo '</td>';
 
       /* Released */
@@ -76,14 +87,14 @@ function print_table( $edit_page = false )
       if ( $edit_page )
       {
          echo '<span class="checkbox">'; ?>
-         <input type="checkbox" id="proj-version-released"
-                name="released<?php echo $type_index ?>" <?php /*check_checked( (boolean) $type['released'], true ); */
+         <input type="checkbox"
+                name="showpt<?php echo $type_index ?>" <?php check_checked( (boolean)$option_show_duration, true );
          ?> />
          <?php echo '</span>';
       }
       else
       {
-//         echo trans_bool( $type['released'] );
+         echo trans_bool( $option_show_duration );
       }
       echo '</td>';
 
@@ -92,30 +103,30 @@ function print_table( $edit_page = false )
       if ( $edit_page )
       {
          echo '<span class="checkbox">'; ?>
-         <input type="checkbox" id="proj-version-obsolete"
-                name="obsolete<?php echo $type_index ?>" <?php/* check_checked( (boolean) $type['obsolete'], true ); */
+         <input type="checkbox"
+                name="showeo<?php echo $type_index ?>" <?php check_checked( (boolean)$option_show_expenses_overview, true );
          ?> />
          <?php echo '</span>';
       }
       else
       {
-//         echo trans_bool( $type['obsolete'] );
+         echo trans_bool( $option_show_expenses_overview );
       }
       echo '</td>';
 
       /* Date */
       echo '<td>';
-      echo 'option1';
+      echo 'placeholder option1';
       echo '</td>';
 
       /* Type */
       echo '<td>';
-      echo 'option2';
+      echo 'placeholder option2';
       echo '</td>';
 
       /* Description */
       echo '<td>';
-      echo 'option3';
+      echo 'placeholder option3';
       echo '</td>';
 
       echo '</tr>';
@@ -124,14 +135,14 @@ function print_table( $edit_page = false )
    if ( $edit_page )
    {
       echo '<tr>';
-      echo '<td colspan="6">';
+      echo '<td colspan="' . $cols . '">';
       echo '<input type="text" name="new_version" size="32" maxlength="64"/>';
       echo '&nbsp<input type="submit" name="addversion" class="button" value="' . lang_get( 'add_version_button' ) . '"/>';
       echo '</td>';
       echo '</tr>';
 
       echo '<tr>';
-      echo '<td colspan="6" class="center">';
+      echo '<td colspan="' . $cols . '" class="center">';
       echo '<input type="submit" name="update" class="button" value="' . plugin_lang_get( 'manversions_edit_submit' ) . '"/>';
       echo '</td>';
       echo '</tr>';
@@ -145,7 +156,7 @@ function print_table( $edit_page = false )
       if ( $authorization_api->userHasGlobalLevel() || $authorization_api->userHasWriteLevel() )
       {
          echo '<tr>';
-         echo '<td colspan="6" class="center">';
+         echo '<td colspan="' . $cols . '" class="center">';
          echo '<form action="' . plugin_page( 'manage_types' ) . '" method="post">';
          echo '<span class="input">';
          echo '<input type="submit" name="edit" class="button" value="' . plugin_lang_get( 'mantypes_edit' ) . '"/>';

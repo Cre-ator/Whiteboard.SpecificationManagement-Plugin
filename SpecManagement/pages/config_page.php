@@ -93,7 +93,11 @@ $print_api->printRow();
 $print_api->printCategoryField( 1, 1, 'config_types' );
 echo '<td>';
 
-$types = $database_api->getTypes();
+$types_rows = $database_api->getFullTypes();
+foreach( $types_rows as $types_row )
+{
+   $types[] = $types_row[1];
+}
 
 echo '<span class="select">';
 echo '<select ' . helper_get_tab_index() . ' id="types" name="types">';

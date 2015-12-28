@@ -321,10 +321,10 @@ class print_api
     *
     * @param $chapter_index
     * @param $work_package
-    * @param $print_duration
+    * @param $option_show_duration
     * @param $duration
     */
-   public function print_chapter_title( $chapter_index, $work_package, $print_duration, $duration )
+   public function print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration )
    {
       if ( is_null( $duration ) )
       {
@@ -334,7 +334,7 @@ class print_api
       echo '<tr>';
       echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
       echo '<td class="form-title" colspan="2">' . $work_package;
-      if ( !is_null( $print_duration ) )
+      if ( $option_show_duration == '1' )
       {
          echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
       }
@@ -403,10 +403,10 @@ class print_api
     * @param $chapter_index
     * @param $sub_chapter_index
     * @param $bug_id
-    * @param $print_duration
+    * @param $option_show_duration
     * @param $ptime
     */
-   public function print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $print_duration, $ptime )
+   public function print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $option_show_duration, $ptime )
    {
       $bug_description = bug_get_text_field( $bug_id, 'description' );
       $bug_streproduce = bug_get_text_field( $bug_id, 'steps_to_reproduce' );
@@ -424,7 +424,7 @@ class print_api
       echo '<td class="form-title" colspan="2">' . bug_get_field( $bug_id, 'summary' ) . ' (';
       print_bug_link( $bug_id, true );
       echo ')';
-      if ( !is_null( $print_duration ) )
+      if ( $option_show_duration == '1' )
       {
          echo ', ' . plugin_lang_get( 'editor_bug_duration' ) . ': ' . $ptime . ' ' . plugin_lang_get( 'editor_duration_unit' );
       }
@@ -621,8 +621,12 @@ class print_api
          $sum_pt = $this->calculate_pt_doc_progress( $allRelevantBugs );
          $sum_pt_all = $sum_pt[0];
          $sum_pt_bug = $sum_pt[1];
+         $pt_process = 0;
 
-         $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
+         if ( $sum_pt_all != 0 )
+         {
+            $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
+         }
 
          echo '<div class="progress400">';
          echo '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';

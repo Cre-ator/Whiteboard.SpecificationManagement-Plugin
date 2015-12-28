@@ -6,99 +6,51 @@ include SPECMANAGEMENT_CORE_URI . 'database_api.php';
 $database_api = new database_api();
 
 $update = gpc_get_bool( 'update', false );
-$addversion = gpc_get_bool( 'addversion', false );
 
 /**
- * Submit new version
+ * Change all existing types
  */
-if ( $addversion && isset( $_POST['new_version'] ) )
+if ( $update && !is_null( $_POST['type_ids'] ) )
 {
-   $project_id = helper_get_current_project();
-   $new_version = $_POST['new_version'];
+   $type_ids = $_POST['type_ids'];
 
-   if ( version_is_unique( $new_version, $project_id ) )
+   for ( $type_index = 0; $type_index < count( $type_ids ); $type_index++ )
    {
-      version_add( $project_id, $new_version );
-   }
-}
-
-/**
- * Change all existing versions
- */
-if ( $update && !is_null( $_POST['version_ids'] ) )
-{
-   $version_ids = $_POST['version_ids'];
-   $versions = $_POST['version'];
-   $date_order = $_POST['date_order'];
-   $type = $_POST['type'];
-   $description = $_POST['description'];
-
-   for ( $version_id = 0; $version_id < count( $version_ids ); $version_id++ )
-   {
-      $version = version_get( $version_ids[$version_id] );
       $project_id = helper_get_current_project();
+      $type_id = $type_ids[$type_index];
 
-      $released = null;
-      $obsolete = null;
+      $show_pt = null;
+      $show_eo = null;
+      $type_options = array();
 
-      if ( isset( $_POST['released' . $version_id] ) )
+      if ( isset( $_POST['showpt' . $type_index] ) )
       {
-         $released = $_POST['released' . $version_id];
-      }
-      if ( isset( $_POST['obsolete' . $version_id] ) )
-      {
-         $obsolete = $_POST['obsolete' . $version_id];
-      }
-
-      if ( !is_null( $versions ) )
-      {
-         $new_version = $versions[$version_id];
-         $version->version = trim( $new_version );
+         $show_pt = $_POST['showpt' . $type_index];
+         if ( $show_pt == 'on' )
+         {
+            $show_pt = 1;
+         }
       }
 
-      if ( is_null( $released ) )
+      if ( isset( $_POST['showeo' . $type_index] ) )
       {
-         $version->released = false;
-      }
-      else if ( $released == 'on' )
-      {
-         $version->released = true;
-      }
-
-      if ( is_null( $obsolete ) )
-      {
-         $version->obsolete = false;
-      }
-      else if ( $obsolete == 'on' )
-      {
-         $version->obsolete = true;
+         $show_eo = $_POST['showeo' . $type_index];
+         if ( $show_eo == 'on' )
+         {
+            $show_eo = 1;
+         }
       }
 
-      if ( !is_null( $date_order ) )
-      {
-         $new_date_order = $date_order[$version_id];
-         $version->date_order = $new_date_order;
-      }
-
-      if ( !is_null( $type ) )
-      {
-         $new_type = $type[$version_id];
-         $new_type_id = $database_api->getTypeId( $new_type );
-         $database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], $new_type_id );
-      }
-
-      if ( !is_null( $description ) )
-      {
-         $new_description = $description[$version_id];
-         $version->description = $new_description;
-      }
-
-      version_update( $version );
-
-      event_signal( 'EVENT_MANAGE_VERSION_UPDATE', array( $version->id ) );
+      /* fill array with option values */
+      array_push( $type_options, $show_pt );
+      array_push( $type_options, $show_eo );
+      /* generate option string */
+      $type_options_set = implode( ';', $type_options );
+      /* fill database with option string */
+      $database_api->updateTypeOptions( $type_id, $type_options_set );
    }
 }
 
-form_security_purge( 'plugin_SpecManagement_manage_versions_update' );
+form_security_purge( 'plugin_SpecManagement_manage_types_update' );
 
-print_successful_redirect( plugin_page( 'manage_versions', true ) );
+print_successful_redirect( plugin_page( 'manage_types', true ) );

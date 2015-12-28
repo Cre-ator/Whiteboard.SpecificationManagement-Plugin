@@ -131,6 +131,68 @@ class database_api
    }
 
    /**
+    * Get id related type row
+    *
+    * @param $type_id
+    * @return array|null
+    */
+   public function getTypeRow( $type_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
+      }
+
+      $query = "SELECT * FROM $plugin_type_table t
+         WHERE t.id = " . $type_id;
+
+      $result = $this->mysqli->query( $query );
+      if ( 0 != $result->num_rows )
+      {
+         $type_row = mysqli_fetch_row( $result );
+         return $type_row;
+      }
+      else
+      {
+         return null;
+      }
+   }
+
+   /**
+    * Updade options from a type
+    *
+    * @param $type_id
+    * @param $type_options
+    */
+   public function updateTypeOptions( $type_id, $type_options )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "UPDATE $plugin_type_table
+            SET opt = '" . $type_options . "'
+            WHERE id = " . $type_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
     * Get bug-related src entry
     *
     * @param $bug_id
@@ -332,7 +394,6 @@ class database_api
 
       $this->mysqli->query( $query );
    }
-
 
    /**
     * Create new bug-related time entry
@@ -745,33 +806,6 @@ class database_api
     *
     * @return array
     */
-   public function getTypes()
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
-
-      $query = "SELECT t.type FROM $plugin_type_table t ORDER BY t.type ASC";
-
-      $result = $this->mysqli->query( $query );
-      $types = array();
-      if ( 0 != $result->num_rows )
-      {
-         while ( $row = $result->fetch_row() )
-         {
-            $types[] = $row[0];
-         }
-      }
-
-      return $types;
-   }
-
-   /* TODO getTypes / getFullTypes zusammenfügen */
    public function getFullTypes()
    {
       if ( $this->getMantisVersion() == '1.2.' )
@@ -797,7 +831,6 @@ class database_api
 
       return $types;
    }
-
 
    /**
     * Get available srcs (versions) for a specific req (type)

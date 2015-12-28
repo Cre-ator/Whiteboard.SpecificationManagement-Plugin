@@ -6,7 +6,11 @@ $database_api = new database_api();
 $print_api = new print_api();
 
 $t_project_id = gpc_get_int( 'project_id', helper_get_current_project() );
-$types = $database_api->getTypes();
+$types_rows = $database_api->getFullTypes();
+foreach( $types_rows as $types_row )
+{
+   $types[] = $types_row[1];
+}
 $document_type = $database_api->getFirstType();
 $sources = array();
 
@@ -73,20 +77,6 @@ if ( $document_type != null || $_POST['types'] != 'blank' )
    }
    echo '</select>';
 }
-echo '</td>';
-echo '</tr>';
-
-$print_api->printRow();
-$print_api->printCategoryField( 1, 1, 'select_show_print_duration' );
-echo '<td>';
-echo '<input type="checkbox" name="print_duration" value="true" />';
-echo '</td>';
-echo '</tr>';
-
-$print_api->printRow();
-$print_api->printCategoryField( 1, 1, 'select_show_expenses_overview' );
-echo '<td>';
-echo '<input type="checkbox" name="expenses_overview" value="true" />';
 echo '</td>';
 echo '</tr>';
 

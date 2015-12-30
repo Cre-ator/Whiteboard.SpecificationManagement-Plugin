@@ -61,6 +61,38 @@ class database_api
    }
 
    /**
+    * Returns true if incoming type id is in use
+    *
+    * @param $type_id
+    * @return bool
+    */
+   public function checkTypeIsUsed( $type_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "SELECT COUNT(*) FROM $plugin_vers_table v
+          WHERE v.type_id = " . $type_id;
+
+      $result = $this->mysqli->query( $query );
+      if ( 0 != $result->num_rows )
+      {
+         $row = mysqli_fetch_row( $result );
+         return $row[0] > 0;
+      }
+      else
+      {
+         return null;
+      }
+   }
+
+   /**
     * Get id-related type string
     *
     * @param $type_id
@@ -160,36 +192,6 @@ class database_api
       {
          return null;
       }
-   }
-
-   /**
-    * Updade options from a type
-    *
-    * @param $type_id
-    * @param $type_options
-    */
-   public function updateTypeOptions( $type_id, $type_options )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
-
-      $query = "SET SQL_SAFE_UPDATES = 0";
-      $this->mysqli->query( $query );
-
-      $query = "UPDATE $plugin_type_table
-            SET opt = '" . $type_options . "'
-            WHERE id = " . $type_id;
-
-      $this->mysqli->query( $query );
-
-      $query = "SET SQL_SAFE_UPDATES = 1";
-      $this->mysqli->query( $query );
    }
 
    /**
@@ -369,324 +371,6 @@ class database_api
    }
 
    /**
-    * Create new bug-related src entry
-    *
-    * @param $bug_id
-    * @param $p_version_id
-    * @param $work_package
-    */
-   public function insertSourceRow( $bug_id, $p_version_id, $work_package )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
-
-      $query = "INSERT INTO $plugin_src_table ( id, bug_id, p_version_id, work_package )
-         SELECT null," . $bug_id . "," . $p_version_id . ",'" . $work_package . "'
-         FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM $plugin_src_table
-         WHERE bug_id = " . $bug_id . " AND p_version_id = " . $p_version_id . " AND work_package = '" . $work_package . "')";
-
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * Create new bug-related time entry
-    *
-    * @param $bug_id
-    * @param $ptime
-    */
-   public function insertPtimeRow( $bug_id, $ptime )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-      }
-
-      $query = "INSERT INTO $plugin_ptime_table ( id, bug_id, time )
-         SELECT null," . $bug_id . "," . $ptime . "
-         FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM $plugin_ptime_table
-         WHERE bug_id = " . $bug_id . " AND time = " . $ptime . ")";
-
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * Create new version entry
-    *
-    * @param $project_id
-    * @param $version_id
-    * @param $type_id
-    */
-   public function insertVersionRow( $project_id, $version_id, $type_id )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-      }
-
-      $query = "INSERT INTO $plugin_vers_table ( id, project_id, version_id, type_id )
-         SELECT null," . $project_id . "," . $version_id . "," . $type_id . "
-         FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM $plugin_vers_table
-         WHERE project_id = " . $project_id . " AND version_id = " . $version_id . " AND type_id = " . $type_id . ")";
-
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * Update existing src
-    *
-    * @param $bug_id
-    * @param $p_version_id
-    * @param $work_package
-    */
-   public function updateSourceRow( $bug_id, $p_version_id, $work_package )
-   {
-      if ( $this->getSourceRow( $bug_id ) == null )
-      {
-         $this->insertSourceRow( $bug_id, $p_version_id, $work_package );
-      }
-      else
-      {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-         }
-
-         $query = "SET SQL_SAFE_UPDATES = 0";
-         $this->mysqli->query( $query );
-
-         $query = "UPDATE $plugin_src_table
-            SET p_version_id = " . $p_version_id . ", work_package = '" . $work_package . "'
-            WHERE bug_id = " . $bug_id;
-
-         $this->mysqli->query( $query );
-
-         $query = "SET SQL_SAFE_UPDATES = 1";
-         $this->mysqli->query( $query );
-      }
-   }
-
-   /**
-    * Update existing planned time
-    *
-    * @param $bug_id
-    * @param $ptime
-    */
-   public function updatePtimeRow( $bug_id, $ptime )
-   {
-      if ( $this->getPtimeRow( $bug_id ) == null )
-      {
-         $this->insertPtimeRow( $bug_id, $ptime );
-      }
-      else
-      {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-         }
-
-         $query = "SET SQL_SAFE_UPDATES = 0";
-         $this->mysqli->query( $query );
-
-         $query = "UPDATE $plugin_ptime_table
-            SET time = '" . $ptime . "'
-            WHERE bug_id = " . $bug_id;
-
-         $this->mysqli->query( $query );
-
-         $query = "SET SQL_SAFE_UPDATES = 1";
-         $this->mysqli->query( $query );
-      }
-   }
-
-   /**
-    * Update existing version
-    *
-    * @param $project_id
-    * @param $version_id
-    * @param $type_id
-    */
-   public function updateVersionRow( $project_id, $version_id, $type_id )
-   {
-      if ( $this->getVersionRowByVersionId( $version_id ) == null )
-      {
-         $this->insertVersionRow( $project_id, $version_id, $type_id );
-      }
-      else
-      {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         }
-
-         $version_row = $this->getVersionRowByVersionId( $version_id );
-         $p_version_id = $version_row[0];
-
-         $query = "SET SQL_SAFE_UPDATES = 0";
-         $this->mysqli->query( $query );
-
-         $query = "UPDATE $plugin_vers_table
-         SET project_id = " . $project_id . ", version_id = " . $version_id . ", type_id = " . $type_id . "
-         WHERE id = " . $p_version_id;
-
-         $this->mysqli->query( $query );
-
-         $query = "SET SQL_SAFE_UPDATES = 1";
-         $this->mysqli->query( $query );
-      }
-   }
-
-   /**
-    * Deletes a version row
-    *
-    * @param $version_id
-    */
-   public function deleteVersionRow( $version_id )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-      }
-
-      $query = "SET SQL_SAFE_UPDATES = 0";
-      $this->mysqli->query( $query );
-
-      $query = "DELETE FROM $plugin_vers_table
-         WHERE version_id = " . $version_id;
-
-      $this->mysqli->query( $query );
-
-      $query = "SET SQL_SAFE_UPDATES = 1";
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * Deletes a source row
-    *
-    * @param $p_version_id
-    */
-   public function deleteSourceRow( $p_version_id )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
-
-      $query = "SET SQL_SAFE_UPDATES = 0";
-      $this->mysqli->query( $query );
-
-      $query = "DELETE FROM $plugin_src_table
-         WHERE p_version_id = " . $p_version_id;
-
-      $this->mysqli->query( $query );
-
-      $query = "SET SQL_SAFE_UPDATES = 1";
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * Deletes a ptime row
-    *
-    * @param $bug_id
-    */
-   public function deletePtimeRow( $bug_id )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-      }
-
-      $query = "SET SQL_SAFE_UPDATES = 0";
-      $this->mysqli->query( $query );
-
-      $query = "DELETE FROM $plugin_ptime_table
-         WHERE bug_id = " . $bug_id;
-
-      $this->mysqli->query( $query );
-
-      $query = "SET SQL_SAFE_UPDATES = 1";
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * Update an existing association if it exists or, of not, create a new one
-    *
-    * @param $project_id
-    * @param $version_id
-    * @param $type_id
-    */
-   public function updateVersionAssociatedType( $project_id, $version_id, $type_id )
-   {
-      if ( $this->getVersionRowByVersionId( $version_id ) == null )
-      {
-         $this->insertVersionRow( $project_id, $version_id, $type_id );
-      }
-      else
-      {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         }
-
-         $query = "SET SQL_SAFE_UPDATES = 0";
-         $this->mysqli->query( $query );
-
-         $query = "UPDATE $plugin_vers_table
-         SET type_id = " . $type_id . "
-         WHERE version_id = " . $version_id;
-
-         $this->mysqli->query( $query );
-
-         $query = "SET SQL_SAFE_UPDATES = 1";
-         $this->mysqli->query( $query );
-      }
-   }
-
-   /**
     * Get the first element of type
     *
     * @return mixed
@@ -717,55 +401,6 @@ class database_api
       {
          return null;
       }
-   }
-
-   /**
-    * Add a specific type
-    *
-    * @param $string
-    */
-   public function addType( $string )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
-
-      $query = "INSERT INTO $plugin_type_table ( id, type )
-         SELECT null,'" . $string . "'
-         FROM DUAL WHERE NOT EXISTS (
-         SELECT 1 FROM $plugin_type_table
-         WHERE type = '" . $string . "')";
-
-      $this->mysqli->query( $query );
-   }
-
-   /**
-    * Delete a specific type
-    *
-    * @param $string
-    */
-   public function deleteType( $string )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
-
-      $primary_key = $this->getTypeId( $string );
-
-      $query = "DELETE FROM $plugin_type_table
-         WHERE id = " . $primary_key;
-
-      $this->mysqli->query( $query );
    }
 
    /**
@@ -943,32 +578,36 @@ class database_api
       $work_packages = array();
       $tmp_row = null;
 
-      foreach ( $p_version_ids as $p_version_id )
+      if ( !is_null( $p_version_ids ) )
       {
-         $query = "SELECT DISTINCT s.work_package FROM $plugin_src_table s
-            WHERE s.p_version_id = '" . $p_version_id . "'";
-
-         $result = $this->mysqli->query( $query );
-         $work_packages_tmps = array();
-
-         if ( 0 != $result->num_rows )
+         foreach ( $p_version_ids as $p_version_id )
          {
-            while ( $row = $result->fetch_row() )
+            $query = "SELECT DISTINCT s.work_package FROM $plugin_src_table s
+               WHERE s.p_version_id = '" . $p_version_id . "'";
+
+            $result = $this->mysqli->query( $query );
+            $work_packages_tmps = array();
+
+            if ( 0 != $result->num_rows )
             {
-               if ( $row[0] != $tmp_row )
+               while ( $row = $result->fetch_row() )
                {
-                  $work_packages_tmps[] = $row[0];
-                  $tmp_row = $row[0];
+                  if ( $row[0] != $tmp_row )
+                  {
+                     $work_packages_tmps[] = $row[0];
+                     $tmp_row = $row[0];
+                  }
                }
             }
-         }
-         foreach ( $work_packages_tmps as $work_packages_tmp )
-         {
-            $work_packages[] = $work_packages_tmp;
-         }
+            foreach ( $work_packages_tmps as $work_packages_tmp )
+            {
+               $work_packages[] = $work_packages_tmp;
+            }
 
+         }
+         return $work_packages;
       }
-      return $work_packages;
+      return null;
    }
 
    /**
@@ -1054,68 +693,6 @@ class database_api
    }
 
    /**
-    * Returns true if incoming type id is in use
-    *
-    * @param $type_id
-    * @return bool
-    */
-   public function checkTypeIsUsed( $type_id )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-      }
-
-      $query = "SELECT COUNT(*) FROM $plugin_vers_table v
-          WHERE v.type_id = " . $type_id;
-
-      $result = $this->mysqli->query( $query );
-      if ( 0 != $result->num_rows )
-      {
-         $row = mysqli_fetch_row( $result );
-         return $row[0] > 0;
-      }
-      else
-      {
-         return null;
-      }
-   }
-
-   /**
-    * Update an existing type string
-    *
-    * @param $type_id
-    * @param $new_type_string
-    */
-   public function updateTypeString( $type_id, $new_type_string )
-   {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
-
-      $query = "SET SQL_SAFE_UPDATES = 0";
-      $this->mysqli->query( $query );
-
-      $query = "UPDATE $plugin_type_table
-         SET type = '" . $new_type_string . "'
-         WHERE id = " . $type_id;
-
-      $this->mysqli->query( $query );
-
-      $query = "SET SQL_SAFE_UPDATES = 1";
-      $this->mysqli->query( $query );
-   }
-
-   /**
     * Get all bug ids from an array of work packages
     *
     * @param $work_packages
@@ -1178,5 +755,432 @@ class database_api
       {
          return 0;
       }
+   }
+
+   /**
+    * Add a specific type
+    *
+    * @param $string
+    */
+   public function insertTypeRow( $string )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
+      }
+
+      $query = "INSERT INTO $plugin_type_table ( id, type, opt )
+         SELECT null,'" . $string . "', ';;'
+         FROM DUAL WHERE NOT EXISTS (
+         SELECT 1 FROM $plugin_type_table
+         WHERE type = '" . $string . "')";
+
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Create new bug-related src entry
+    *
+    * @param $bug_id
+    * @param $p_version_id
+    * @param $work_package
+    */
+   public function insertSourceRow( $bug_id, $p_version_id, $work_package )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+      }
+
+      $query = "INSERT INTO $plugin_src_table ( id, bug_id, p_version_id, work_package )
+         SELECT null," . $bug_id . "," . $p_version_id . ",'" . $work_package . "'
+         FROM DUAL WHERE NOT EXISTS (
+         SELECT 1 FROM $plugin_src_table
+         WHERE bug_id = " . $bug_id . " AND p_version_id = " . $p_version_id . " AND work_package = '" . $work_package . "')";
+
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Create new bug-related time entry
+    *
+    * @param $bug_id
+    * @param $ptime
+    */
+   public function insertPtimeRow( $bug_id, $ptime )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
+      }
+
+      $query = "INSERT INTO $plugin_ptime_table ( id, bug_id, time )
+         SELECT null," . $bug_id . "," . $ptime . "
+         FROM DUAL WHERE NOT EXISTS (
+         SELECT 1 FROM $plugin_ptime_table
+         WHERE bug_id = " . $bug_id . " AND time = " . $ptime . ")";
+
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Create new version entry
+    *
+    * @param $project_id
+    * @param $version_id
+    * @param $type_id
+    */
+   public function insertVersionRow( $project_id, $version_id, $type_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "INSERT INTO $plugin_vers_table ( id, project_id, version_id, type_id )
+         SELECT null," . $project_id . "," . $version_id . "," . $type_id . "
+         FROM DUAL WHERE NOT EXISTS (
+         SELECT 1 FROM $plugin_vers_table
+         WHERE project_id = " . $project_id . " AND version_id = " . $version_id . " AND type_id = " . $type_id . ")";
+
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Update an existing type string
+    *
+    * @param $type_id
+    * @param $new_type_string
+    */
+   public function updateTypeRow( $type_id, $new_type_string )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "UPDATE $plugin_type_table
+         SET type = '" . $new_type_string . "'
+         WHERE id = " . $type_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Updade options from a type
+    *
+    * @param $type_id
+    * @param $type_options
+    */
+   public function updateTypeOptions( $type_id, $type_options )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "UPDATE $plugin_type_table
+            SET opt = '" . $type_options . "'
+            WHERE id = " . $type_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Update existing src
+    *
+    * @param $bug_id
+    * @param $p_version_id
+    * @param $work_package
+    */
+   public function updateSourceRow( $bug_id, $p_version_id, $work_package )
+   {
+      if ( $this->getSourceRow( $bug_id ) == null )
+      {
+         $this->insertSourceRow( $bug_id, $p_version_id, $work_package );
+      }
+      else
+      {
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+         }
+         else
+         {
+            $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+         }
+
+         $query = "SET SQL_SAFE_UPDATES = 0";
+         $this->mysqli->query( $query );
+
+         $query = "UPDATE $plugin_src_table
+            SET p_version_id = " . $p_version_id . ", work_package = '" . $work_package . "'
+            WHERE bug_id = " . $bug_id;
+
+         $this->mysqli->query( $query );
+
+         $query = "SET SQL_SAFE_UPDATES = 1";
+         $this->mysqli->query( $query );
+      }
+   }
+
+   /**
+    * Update existing planned time
+    *
+    * @param $bug_id
+    * @param $ptime
+    */
+   public function updatePtimeRow( $bug_id, $ptime )
+   {
+      if ( $this->getPtimeRow( $bug_id ) == null )
+      {
+         $this->insertPtimeRow( $bug_id, $ptime );
+      }
+      else
+      {
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
+         }
+         else
+         {
+            $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
+         }
+
+         $query = "SET SQL_SAFE_UPDATES = 0";
+         $this->mysqli->query( $query );
+
+         $query = "UPDATE $plugin_ptime_table
+            SET time = '" . $ptime . "'
+            WHERE bug_id = " . $bug_id;
+
+         $this->mysqli->query( $query );
+
+         $query = "SET SQL_SAFE_UPDATES = 1";
+         $this->mysqli->query( $query );
+      }
+   }
+
+   /**
+    * Update existing version
+    *
+    * @param $project_id
+    * @param $version_id
+    * @param $type_id
+    */
+   public function updateVersionRow( $project_id, $version_id, $type_id )
+   {
+      if ( $this->getVersionRowByVersionId( $version_id ) == null )
+      {
+         $this->insertVersionRow( $project_id, $version_id, $type_id );
+      }
+      else
+      {
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+         }
+         else
+         {
+            $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+         }
+
+         $version_row = $this->getVersionRowByVersionId( $version_id );
+         $p_version_id = $version_row[0];
+
+         $query = "SET SQL_SAFE_UPDATES = 0";
+         $this->mysqli->query( $query );
+
+         $query = "UPDATE $plugin_vers_table
+         SET project_id = " . $project_id . ", version_id = " . $version_id . ", type_id = " . $type_id . "
+         WHERE id = " . $p_version_id;
+
+         $this->mysqli->query( $query );
+
+         $query = "SET SQL_SAFE_UPDATES = 1";
+         $this->mysqli->query( $query );
+      }
+   }
+
+   /**
+    * Update an existing association if it exists or, of not, create a new one
+    *
+    * @param $project_id
+    * @param $version_id
+    * @param $type_id
+    */
+   public function updateVersionAssociatedType( $project_id, $version_id, $type_id )
+   {
+      if ( $this->getVersionRowByVersionId( $version_id ) == null )
+      {
+         $this->insertVersionRow( $project_id, $version_id, $type_id );
+      }
+      else
+      {
+         if ( $this->getMantisVersion() == '1.2.' )
+         {
+            $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+         }
+         else
+         {
+            $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+         }
+
+         $query = "SET SQL_SAFE_UPDATES = 0";
+         $this->mysqli->query( $query );
+
+         $query = "UPDATE $plugin_vers_table
+         SET type_id = " . $type_id . "
+         WHERE version_id = " . $version_id;
+
+         $this->mysqli->query( $query );
+
+         $query = "SET SQL_SAFE_UPDATES = 1";
+         $this->mysqli->query( $query );
+      }
+   }
+
+   /**
+    * Delete a specific type
+    *
+    * @param $string
+    */
+   public function deleteTypeRow( $string )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
+      }
+
+      $primary_key = $this->getTypeId( $string );
+
+      $query = "DELETE FROM $plugin_type_table
+         WHERE id = " . $primary_key;
+
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Deletes a source row
+    *
+    * @param $p_version_id
+    */
+   public function deleteSourceRow( $p_version_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "DELETE FROM $plugin_src_table
+         WHERE p_version_id = " . $p_version_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Deletes a ptime row
+    *
+    * @param $bug_id
+    */
+   public function deletePtimeRow( $bug_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "DELETE FROM $plugin_ptime_table
+         WHERE bug_id = " . $bug_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
+    * Deletes a version row
+    *
+    * @param $version_id
+    */
+   public function deleteVersionRow( $version_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "DELETE FROM $plugin_vers_table
+         WHERE version_id = " . $version_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
    }
 }

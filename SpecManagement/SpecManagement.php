@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.9';
+      $this->version = '1.1.10';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -98,7 +98,7 @@ class SpecManagementPlugin extends MantisPlugin
             'CreateTableSQL', array( plugin_table( 'type' ), "
             id           I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             type         C(250)  NOTNULL DEFAULT '',
-            opt          C(250)  DEFAULT ';'
+            opt          C(250)  DEFAULT ''
             " )
          )
       );

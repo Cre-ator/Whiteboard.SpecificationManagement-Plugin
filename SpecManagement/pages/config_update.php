@@ -46,7 +46,7 @@ if ( $option_addtype )
 {
    if ( isset( $_POST['type'] ) )
    {
-      $database_api->addType( $_POST['type'] );
+      $database_api->insertTypeRow( $_POST['type'] );
    }
 }
 
@@ -65,7 +65,7 @@ if ( $option_deltype )
        */
       if ( !$database_api->checkTypeIsUsed( $type_id ) )
       {
-         $database_api->deleteType( $type_string );
+         $database_api->deleteTypeRow( $type_string );
       }
    }
 }
@@ -81,7 +81,7 @@ if ( $option_changetype )
       $type_id = $database_api->getTypeId( $type_string );
       $new_type_string = $_POST['newtype'];
 
-      $database_api->updateTypeString( $type_id, $new_type_string );
+      $database_api->updateTypeRow( $type_id, $new_type_string );
    }
 }
 

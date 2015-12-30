@@ -43,19 +43,6 @@ class print_api
    }
 
    /**
-    * Creates a column in a table head
-    *
-    * @param $colspan
-    * @param $lang_string
-    */
-   public function printTableHeadCol( $colspan, $lang_string )
-   {
-      echo '<th colspan="' . $colspan . '">';
-      echo lang_get( $lang_string );
-      echo '</th>';
-   }
-
-   /**
     * Creates a new category-column
     *
     * @param $colspan
@@ -205,12 +192,15 @@ class print_api
       echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</td>';
       echo '<td colspan="5">';
       echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
-      echo '<datalist id="work_packages">';
-      foreach ( $work_packages as $existing_work_package )
+      if ( !is_null( $work_packages ) )
       {
-         echo '<option value="' . $existing_work_package . '">';
+         echo '<datalist id="work_packages">';
+         foreach ( $work_packages as $existing_work_package )
+         {
+            echo '<option value="' . $existing_work_package . '">';
+         }
+         echo '</datalist>';
       }
-      echo '</datalist>';
       echo '</td>';
       echo '</tr>';
 

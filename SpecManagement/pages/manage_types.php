@@ -44,17 +44,26 @@ function print_table( $edit_page = false )
    {
       echo '<form action="' . plugin_page( 'manage_types_update' ) . '" method="post">';
    }
-   echo '<table class="width90" cellspacing="1">';
+
+   if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
+   {
+      echo '<table class="width90">';
+   }
+   else
+   {
+      echo '<div class="table-container">';
+      echo '<table>';
+   }
 
    echo '<thead>';
    $print_api->printFormTitle( $cols, 'mantypes_thead' );
-   echo '<tr class="row-category">';
-   echo '<th colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
-   echo '<th colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'select_show_print_duration' ) . '</th>';
-   echo '<th colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'select_show_expenses_overview' ) . '</th>';
-   echo '<th colspan="1" width="' . $col_width . '">weitere option1</th>';
-   echo '<th colspan="1" width="' . $col_width . '">weitere option2</th>';
-   echo '<th colspan="1" width="' . $col_width . '">weitere option3</th>';
+   echo '<tr class="row-category2">';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_print_duration' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_expenses_overview' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_directory' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">weitere option2</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">weitere option3</th>';
    echo '</tr>';
    echo '</thead>';
 
@@ -73,6 +82,7 @@ function print_table( $edit_page = false )
 
       $option_show_duration = $type_options[0];
       $option_show_expenses_overview = $type_options[1];
+      $option_show_directory = $type_options[2];
 
       $print_api->printRow();
       echo '<input type="hidden" name="type_ids[]" value="' . $type_id . '"/>';
@@ -83,7 +93,7 @@ function print_table( $edit_page = false )
       echo '</td>';
 
       /* Released */
-      echo '<td>';
+      echo '<td class="center">';
       if ( $edit_page )
       {
          echo '<span class="checkbox">'; ?>
@@ -99,7 +109,7 @@ function print_table( $edit_page = false )
       echo '</td>';
 
       /* Obsolete */
-      echo '<td>';
+      echo '<td class="center">';
       if ( $edit_page )
       {
          echo '<span class="checkbox">'; ?>
@@ -115,17 +125,28 @@ function print_table( $edit_page = false )
       echo '</td>';
 
       /* Date */
-      echo '<td>';
-      echo 'placeholder option1';
+      echo '<td class="center">';
+      if ( $edit_page )
+      {
+         echo '<span class="checkbox">'; ?>
+         <input type="checkbox"
+                name="showdy<?php echo $type_index ?>" <?php check_checked( (boolean)$option_show_directory, true );
+         ?> />
+         <?php echo '</span>';
+      }
+      else
+      {
+         echo trans_bool( $option_show_directory );
+      }
       echo '</td>';
 
       /* Type */
-      echo '<td>';
+      echo '<td class="center">';
       echo 'placeholder option2';
       echo '</td>';
 
       /* Description */
-      echo '<td>';
+      echo '<td class="center">';
       echo 'placeholder option3';
       echo '</td>';
 
@@ -149,6 +170,10 @@ function print_table( $edit_page = false )
 
       echo '</tbody>';
       echo '</table>';
+      if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+      {
+         echo '</div>';
+      }
       echo '</form>';
    }
    else
@@ -166,6 +191,10 @@ function print_table( $edit_page = false )
 
          echo '</tbody>';
          echo '</table>';
+         if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+         {
+            echo '</div>';
+         }
          echo '</form>';
       }
    }

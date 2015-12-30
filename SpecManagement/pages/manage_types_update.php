@@ -19,10 +19,14 @@ if ( $update && !is_null( $_POST['type_ids'] ) )
       $project_id = helper_get_current_project();
       $type_id = $type_ids[$type_index];
 
+      /* initialize option array */
+      $type_options = array();
+      /* initialize option values */
       $show_pt = null;
       $show_eo = null;
-      $type_options = array();
+      $show_dy = null;
 
+      /* get informations about changes */
       if ( isset( $_POST['showpt' . $type_index] ) )
       {
          $show_pt = $_POST['showpt' . $type_index];
@@ -41,9 +45,19 @@ if ( $update && !is_null( $_POST['type_ids'] ) )
          }
       }
 
+      if ( isset( $_POST['showdy' . $type_index] ) )
+      {
+         $show_dy = $_POST['showdy' . $type_index];
+         if ( $show_dy == 'on' )
+         {
+            $show_dy = 1;
+         }
+      }
+
       /* fill array with option values */
       array_push( $type_options, $show_pt );
       array_push( $type_options, $show_eo );
+      array_push( $type_options, $show_dy );
       /* generate option string */
       $type_options_set = implode( ';', $type_options );
       /* fill database with option string */

@@ -37,24 +37,36 @@ function print_table( $edit_page = false )
    $database_api = new database_api();
    $print_api = new print_api();
 
+   $cols = 7;
+   $col_width = 100 / $cols;
+
    if ( $edit_page )
    {
       echo '<form action="' . plugin_page( 'manage_versions_update' ) . '" method="post">';
    }
-   echo '<table class="width90" cellspacing="1">';
+
+   if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
+   {
+      echo '<table class="width90">';
+   }
+   else
+   {
+      echo '<div class="table-container">';
+      echo '<table>';
+   }
 
    echo '<thead>';
-   $print_api->printFormTitle( 7, 'manversions_thead' );
-   echo '<tr class="row-category">';
-   $print_api->printTableHeadCol( 1, 'version' );
-   $print_api->printTableHeadCol( 1, 'released' );
-   $print_api->printTableHeadCol( 1, 'obsolete' );
-   $print_api->printTableHeadCol( 1, 'timestamp' );
-   echo '<th colspan="1">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
-   $print_api->printTableHeadCol( 1, 'description' );
+   $print_api->printFormTitle( $cols, 'manversions_thead' );
+   echo '<tr class="row-category2">';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'version' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'released' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'obsolete' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'timestamp' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'description' ) . '</th>';
    if ( $edit_page )
    {
-      $print_api->printTableHeadCol( 1, 'actions' );
+      echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'actions' ) . '</th>';
    }
    echo '</tr>';
    echo '</thead>';
@@ -86,7 +98,7 @@ function print_table( $edit_page = false )
       echo '</td>';
 
       /* Released */
-      echo '<td>';
+      echo '<td class="center">';
       if ( $edit_page )
       {
          echo '<span class="checkbox">'; ?>
@@ -101,7 +113,7 @@ function print_table( $edit_page = false )
       echo '</td>';
 
       /* Obsolete */
-      echo '<td>';
+      echo '<td class="center">';
       if ( $edit_page )
       {
          echo '<span class="checkbox">'; ?>
@@ -205,6 +217,10 @@ function print_table( $edit_page = false )
 
       echo '</tbody>';
       echo '</table>';
+      if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+      {
+         echo '</div>';
+      }
       echo '</form>';
    }
    else
@@ -222,6 +238,10 @@ function print_table( $edit_page = false )
 
          echo '</tbody>';
          echo '</table>';
+         if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+         {
+            echo '</div>';
+         }
          echo '</form>';
       }
    }

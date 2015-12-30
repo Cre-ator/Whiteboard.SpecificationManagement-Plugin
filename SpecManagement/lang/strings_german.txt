@@ -37,8 +37,6 @@ $s_plugin_SpecManagement_select_doc_title = 'SpecManagement - Dokument erzeugen'
 $s_plugin_SpecManagement_select_doc = 'Dokumentauswahl';
 $s_plugin_SpecManagement_select_type = 'Dokumenttyp:';
 $s_plugin_SpecManagement_select_version = 'Dokumentversion:';
-$s_plugin_SpecManagement_select_show_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
-$s_plugin_SpecManagement_select_show_expenses_overview = 'Aufwandsübersicht im Dokument anzeigen?';
 $s_plugin_SpecManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 
 /* Menu Area */
@@ -70,6 +68,9 @@ $s_plugin_SpecManagement_manversions_edit_submit = 'Änderungen bestätigen';
 $s_plugin_SpecManagement_mantypes_title = 'Document-Typenverwaltung';
 $s_plugin_SpecManagement_mantypes_thead = 'Typenverwaltung';
 $s_plugin_SpecManagement_mantypes_edit = 'Typen bearbeiten';
+$s_plugin_SpecManagement_mantypes_show_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
+$s_plugin_SpecManagement_mantypes_show_expenses_overview = 'Aufwandsübersicht im Dokument anzeigen?';
+$s_plugin_SpecManagement_mantypes_show_directory = 'Inhaltsverzeichnis im Dokument anzeigen?';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Dokumententitel';

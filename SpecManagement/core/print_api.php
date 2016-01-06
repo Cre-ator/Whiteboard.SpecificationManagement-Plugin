@@ -148,6 +148,12 @@ class print_api
       echo '</a> ]';
       echo '</td>';
 
+      echo '<td>';
+      echo '[ <a href="' . plugin_page( 'version_view' ) . '">';
+      echo plugin_lang_get( 'menu_versview' );
+      echo '</a> ]';
+      echo '</td>';
+
       echo '</tr>';
       echo '</table>';
    }

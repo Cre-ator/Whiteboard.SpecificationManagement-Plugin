@@ -1183,4 +1183,76 @@ class database_api
       $query = "SET SQL_SAFE_UPDATES = 1";
       $this->mysqli->query( $query );
    }
+
+   /**
+    * Gets the related issues for a specific version
+    *
+    * @param $version_string
+    * @return array
+    */
+   public function getVersionSpecBugs( $version_string )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $bug_table = db_get_table( 'mantis_bug_table' );
+      }
+      else
+      {
+         $bug_table = db_get_table( 'bug' );
+      }
+
+      $query = "SELECT id FROM $bug_table
+          WHERE target_version = '" . string_display( $version_string ) . "'";
+
+      $result = $this->mysqli->query( $query );
+
+      $bugs = array();
+      if ( 0 != $result->num_rows )
+      {
+         while ( $row = $result->fetch_row() )
+         {
+            $bugs[] = $row[0];
+         }
+         return $bugs;
+      }
+
+      return null;
+   }
+
+   /**
+    * Get the duration of a bug array
+    *
+    * @param $bug_array
+    * @return int
+    */
+   public function getBugDuration( $bug_array )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
+      }
+
+      $duration = 0;
+      for ( $bug_index = 0; $bug_index < count( $bug_array ); $bug_index++ )
+      {
+         $query = "SELECT time FROM $plugin_ptime_table
+            WHERE bug_id = " . $bug_array[$bug_index];
+
+         $result = $this->mysqli->query( $query );
+         $bug_duration = 0;
+         if ( 0 != $result->num_rows )
+         {
+            $row = $result->fetch_row();
+            $bug_duration = $row[0];
+         }
+
+         $duration += $bug_duration;
+      }
+
+      return $duration;
+   }
 }

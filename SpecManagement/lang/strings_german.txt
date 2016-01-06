@@ -45,6 +45,7 @@ $s_plugin_SpecManagement_menu_choosedoc = 'Dokument erzeugen';
 $s_plugin_SpecManagement_menu_manversions = 'Dokumentversionen verwalten';
 $s_plugin_SpecManagement_menu_mantypes = 'Dokumenttypen verwalten';
 $s_plugin_SpecManagement_menu_printbutton = 'Drucken';
+$s_plugin_SpecManagement_menu_versview = 'Versionsübersicht';
 
 /* Editor Area */
 $s_plugin_SpecManagement_editor_title = 'SpecManagement';
@@ -71,6 +72,14 @@ $s_plugin_SpecManagement_mantypes_edit = 'Typen bearbeiten';
 $s_plugin_SpecManagement_mantypes_show_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
 $s_plugin_SpecManagement_mantypes_show_expenses_overview = 'Aufwandsübersicht im Dokument anzeigen?';
 $s_plugin_SpecManagement_mantypes_show_directory = 'Inhaltsverzeichnis im Dokument anzeigen?';
+
+/* Version Overview Area */
+$s_plugin_SpecManagement_versview_thead = 'Versionsübersicht';
+$s_plugin_SpecManagement_versview_deadline = 'Termin';
+$s_plugin_SpecManagement_versview_amount = 'Anzahl Einträge';
+$s_plugin_SpecManagement_versview_duration = 'Dauer';
+$s_plugin_SpecManagement_versview_information = 'Hinweis';
+$s_plugin_SpecManagement_versview_deadline = 'Termineinhaltung gefährdet!';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Dokumententitel';

@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.11';
+      $this->version = '1.1.12';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -205,7 +205,7 @@ class SpecManagementPlugin extends MantisPlugin
             case 'EVENT_REPORT_BUG_FORM':
                if ( $this->getWriteLevel() || $this->getUserHasLevel() )
                {
-                  $print_api->printBugReportFields( $work_package, $ptime );
+                  $print_api->printBugReportFields();
                }
                break;
             case 'EVENT_UPDATE_BUG_FORM':

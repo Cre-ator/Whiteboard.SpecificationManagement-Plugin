@@ -75,11 +75,15 @@ $s_plugin_SpecManagement_mantypes_show_directory = 'Inhaltsverzeichnis im Dokume
 
 /* Version Overview Area */
 $s_plugin_SpecManagement_versview_thead = 'Versionsübersicht';
+$s_plugin_SpecManagement_versview_obsolete_flag = 'Veraltete Versionen einblenden';
 $s_plugin_SpecManagement_versview_deadline = 'Termin';
 $s_plugin_SpecManagement_versview_amount = 'Anzahl Einträge';
 $s_plugin_SpecManagement_versview_duration = 'Dauer';
+$s_plugin_SpecManagement_versview_progress = 'Fortschritt';
 $s_plugin_SpecManagement_versview_information = 'Hinweis';
-$s_plugin_SpecManagement_versview_deadline = 'Termineinhaltung gefährdet!';
+$s_plugin_SpecManagement_versview_deadline_n = 'Termineinhaltung gefährdet!';
+$s_plugin_SpecManagement_versview_obsolete = 'Version veraltet!';
+$s_plugin_SpecManagement_versview_theadgraph = 'Versionsgraph';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Dokumententitel';

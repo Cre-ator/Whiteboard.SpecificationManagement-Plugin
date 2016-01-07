@@ -75,11 +75,15 @@ $s_plugin_SpecManagement_mantypes_show_directory = 'Show Directory in Editor / D
 
 /* Version Overview Area */
 $s_plugin_SpecManagement_versview_thead = 'Version Overview';
+$s_plugin_SpecManagement_versview_obsolete_flag = 'Show obsolete versions';
 $s_plugin_SpecManagement_versview_deadline = 'Deadline';
 $s_plugin_SpecManagement_versview_amount = 'Amount of Issues';
 $s_plugin_SpecManagement_versview_duration = 'Duration';
+$s_plugin_SpecManagement_versview_progress = 'Progress';
 $s_plugin_SpecManagement_versview_information = 'Information';
-$s_plugin_SpecManagement_versview_deadline = 'Deadline endangered!';
+$s_plugin_SpecManagement_versview_deadline_n = 'Deadline endangered!';
+$s_plugin_SpecManagement_versview_obsolete = 'Version is obsolete!';
+$s_plugin_SpecManagement_versview_theadgraph = 'Version Graph';
 
 /* head area of document */
 $s_plugin_SpecManagement_head_title = 'Document Title';

@@ -197,7 +197,8 @@ class print_api
       $this->printRow();
       echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</td>';
       echo '<td colspan="5">';
-      echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
+      echo '<input type="text" value="' . $work_package . '" id="work_package" name="work_package" list="work_packages"/>';
+      echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
       if ( !is_null( $work_packages ) )
       {
          echo '<datalist id="work_packages">';
@@ -245,11 +246,8 @@ class print_api
 
    /**
     * Prints the specific plugin fields in the bug-report user interface
-    *
-    * @param $work_package
-    * @param $ptime
     */
-   public function printBugReportFields( $work_package, $ptime )
+   public function printBugReportFields()
    {
       $database_api = new database_api();
       $work_packages = $database_api->getProjectSpecWorkPackages();
@@ -263,6 +261,7 @@ class print_api
          echo '<td>';
          echo '<span class="input">';
          echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
+         echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
          echo '<datalist id="work_packages">';
          foreach ( $work_packages as $existing_work_package )
          {
@@ -280,7 +279,7 @@ class print_api
          echo '</td>';
          echo '<td>';
          echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="' . string_attribute( $ptime ) . '" />';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="" />';
          echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</td>';
@@ -292,6 +291,7 @@ class print_api
          echo '<label><span>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</span></label>';
          echo '<span class="input">';
          echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
+         echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
          echo '<datalist id="work_packages">';
          foreach ( $work_packages as $existing_work_package )
          {
@@ -305,7 +305,7 @@ class print_api
          echo '<div class="field-container">';
          echo '<label><span>' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</span></label>';
          echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="' . string_attribute( $ptime ) . '" />';
+         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="" />';
          echo '</span>';
          echo '<span class="label-style"></span>';
          echo '</div>';
@@ -498,7 +498,7 @@ class print_api
     * @param $allRelevantBugs
     * @return float
     */
-   private function calculate_status_doc_progress( $allRelevantBugs )
+   public function calculate_status_doc_progress( $allRelevantBugs )
    {
       $segments = count( $allRelevantBugs );
       if ( $segments == 0 )

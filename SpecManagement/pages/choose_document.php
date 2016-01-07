@@ -39,7 +39,7 @@ $print_api->printFormTitle( 2, 'select_doc' );
 $print_api->printCategoryField( 1, 1, 'select_type' );
 echo '<td>';
 echo '<form method="post" name="form_set_requirement" action="' . plugin_page( 'choose_document' ) . '">';
-echo '<select name="types">';
+echo '<select name="types" id="document_types">';
 foreach ( $types as $type )
 {
    echo '<option value="' . $type . '"';

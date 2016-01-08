@@ -10,8 +10,6 @@ $type_string = null;
 $version_id = null;
 /* initialize plugin primary key for version */
 $p_version_id = null;
-/* initialize version string */
-$version_string = '';
 /* initialize work packages */
 $work_packages = array();
 /* initialize bug ids assigned to work package */
@@ -25,7 +23,6 @@ if ( isset( $_POST['version_id'] ) )
    $version_id = $_POST['version_id'];
    $version_obj = $database_api->getVersionRowByVersionId( $version_id );
    $p_version_id = $version_obj[0];
-   $version_string = version_full_name( $version_id );
    $type_string = $database_api->getTypeString( $database_api->getTypeByVersion( $version_id ) );
    $type_id = $database_api->getTypeId( $type_string );
    $type_row = $database_api->getTypeRow( $type_id );
@@ -49,7 +46,7 @@ if ( isset( $_POST['version_id'] ) )
       array_push( $work_packages, $version_id );
    }
 
-   html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . $version_string );
+   html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_full_name( $version_id ) );
    echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
    html_page_top2();
 
@@ -60,7 +57,7 @@ if ( isset( $_POST['version_id'] ) )
 
    $print_api->print_plugin_menu();
    $print_api->print_editor_menu();
-   $print_api->print_document_head( $type_string, $version_string, $parent_project_id, $allRelevantBugs );
+   $print_api->print_document_head( $type_string, $version_id, $parent_project_id, $allRelevantBugs );
 
    echo '<table class="width60">';
 

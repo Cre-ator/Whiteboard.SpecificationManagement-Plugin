@@ -58,6 +58,9 @@ $s_plugin_SpecManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
 $s_plugin_SpecManagement_editor_expenses_overview = 'Aufwandsübersicht';
 $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Summe';
 
+/* Changes Area */
+$s_plugin_SpecManagement_changes_title = 'Änderungsprotokoll';
+
 /* Version Manager Area */
 $s_plugin_SpecManagement_manversions_title = 'Dokument-Versionsverwaltung';
 $s_plugin_SpecManagement_manversions_thead = 'Versionsverwaltung';
@@ -93,3 +96,7 @@ $s_plugin_SpecManagement_head_project = 'Projekt';
 $s_plugin_SpecManagement_head_date = 'Datum';
 $s_plugin_SpecManagement_head_person_in_charge = 'Verantwortlicher';
 $s_plugin_SpecManagement_head_process = 'Fortschritt';
+$s_plugin_SpecManagement_head_versions_past = 'Vorgänger';
+$s_plugin_SpecManagement_head_versions_future = 'Nachfolger';
+$s_plugin_SpecManagement_head_changes = 'Änderungen anzeigen';
+$s_plugin_SpecManagement_head_view = 'Dokument anzeigen';

@@ -348,51 +348,112 @@ class print_api
    /**
     * Prints the header element of a document
     *
-    * @param $document_type
-    * @param $version
-    * @param $parent_project
+    * @param $type_string
+    * @param $version_id
+    * @param $parent_project_id
     * @param $allRelevantBugs
     */
-   public function print_document_head( $document_type, $version, $parent_project, $allRelevantBugs )
+   public function print_document_head( $type_string, $version_id, $parent_project_id, $allRelevantBugs )
    {
+      $versions = version_get_all_rows( helper_get_current_project() );
+      $act_version = version_get( $version_id );
+
       echo '<table class="width60">';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_title' ) . '</td>';
-      echo '<td class="form-title">' . $document_type . ' - ' . $version . '</td>';
+      echo '<td class="form-title" colspan="3">' . $type_string . ' - ' . version_full_name( $version_id ) . '</td>';
       echo '</tr>';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_version' ) . '</td>';
-      echo '<td class="form-title">' . $version . '</td>';
+      echo '<td class="form-title" colspan="3">' . version_full_name( $version_id ) . '</td>';
       echo '</tr>';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_customer' ) . '</td>';
-      echo '<td class="form-title">' . project_get_name( $parent_project ) . '</td>';
+      echo '<td class="form-title" colspan="3">' . project_get_name( $parent_project_id ) . '</td>';
       echo '</tr>';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_project' ) . '</td>';
-      echo '<td class="form-title">' . project_get_name( helper_get_current_project() ) . '</td>';
+      echo '<td class="form-title" colspan="3">' . project_get_name( helper_get_current_project() ) . '</td>';
       echo '</tr>';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_date' ) . '</td>';
-      echo '<td class="form-title">' . date( 'j\.m\.Y' ) . '</td>';
+      echo '<td class="form-title" colspan="3">' . date( 'j\.m\.Y' ) . '</td>';
       echo '</tr>';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_person_in_charge' ) . '</td>';
-      echo '<td class="form-title">' . user_get_realname( auth_get_current_user_id() ) . '</td>';
+      echo '<td class="form-title" colspan="3">' . user_get_realname( auth_get_current_user_id() ) . '</td>';
       echo '</tr>';
 
       echo '<tr>';
       echo '<td class="field-container">' . plugin_lang_get( 'head_process' ) . '</td>';
-      echo '<td class="form-title">';
+      echo '<td class="form-title" colspan="3">';
       $this->print_document_progress( $allRelevantBugs );
       echo '</td>';
       echo '</tr>';
+
+      echo '<tr>';
+      echo '<td class="field-container" colspan="4">' . plugin_lang_get( 'head_versions_past' ) . '</td>';
+      echo '</tr>';
+      foreach ( $versions as $version )
+      {
+         if ( $version['date_order'] < $act_version->date_order )
+         {
+            echo '<tr>';
+            echo '<td/>';
+            echo '<td class="form-title">';
+            echo version_full_name( $version['id'] );
+            echo '</td>';
+            echo '<td>';
+            echo '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">';
+            echo '<input type="hidden" name="version_old" value="' . $version['id'] . '" />';
+            echo '<input type="hidden" name="version_act" value="' . $act_version->id . '" />';
+            echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>';
+            echo '</form>';
+            echo '</td>';
+            echo '<td>';
+            echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
+            echo '<input type="hidden" name="version_id" value="' . $version['id'] . '" />';
+            echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_view' ) . '"/>';
+            echo '</form>';
+            echo '</td>';
+            echo '</tr>';
+         }
+      }
+
+      echo '<tr>';
+      echo '<td class="field-container" colspan="4">' . plugin_lang_get( 'head_versions_future' ) . '</td>';
+      echo '</tr>';
+      foreach ( $versions as $version )
+      {
+         if ( $version['date_order'] > $act_version->date_order )
+         {
+            echo '<tr>';
+            echo '<td/>';
+            echo '<td class="form-title">';
+            echo version_full_name( $version['id'] );
+            echo '</td>';
+            echo '<td>';
+            echo '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">';
+            echo '<input type="hidden" name="version_old" value="' . $act_version->id . '" />';
+            echo '<input type="hidden" name="version_act" value="' . $version['id'] . '" />';
+            echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>';
+            echo '</form>';
+            echo '</td>';
+            echo '<td>';
+            echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
+            echo '<input type="hidden" name="version_id" value="' . $version['id'] . '" />';
+            echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_view' ) . '"/>';
+            echo '</form>';
+            echo '</td>';
+            echo '</tr>';
+         }
+      }
 
       echo '</table>';
 

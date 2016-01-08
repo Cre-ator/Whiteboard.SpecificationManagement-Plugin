@@ -263,9 +263,12 @@ class print_api
          echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
          echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
          echo '<datalist id="work_packages">';
-         foreach ( $work_packages as $existing_work_package )
+         if ( !empty( $work_packages ) )
          {
-            echo '<option value="' . $existing_work_package . '">';
+            foreach ( $work_packages as $existing_work_package )
+            {
+               echo '<option value="' . $existing_work_package . '">';
+            }
          }
          echo '</datalist>';
          echo '</span>';
@@ -293,9 +296,12 @@ class print_api
          echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
          echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
          echo '<datalist id="work_packages">';
-         foreach ( $work_packages as $existing_work_package )
+         if ( !empty( $work_packages ) )
          {
-            echo '<option value="' . $existing_work_package . '">';
+            foreach ( $work_packages as $existing_work_package )
+            {
+               echo '<option value="' . $existing_work_package . '">';
+            }
          }
          echo '</datalist>';
          echo '</span>';

@@ -1255,4 +1255,32 @@ class database_api
 
       return $duration;
    }
+
+   public function getBugRelationshipTypeTwo( $src_bug_id, $dest_bug_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $bug_relationship_table = db_get_table( 'mantis_bug_relationship_table' );
+      }
+      else
+      {
+         $bug_relationship_table = db_get_table( 'bug_relationship' );
+      }
+
+      $query = "SELECT * FROM $bug_relationship_table
+          WHERE source_bug_id = " . $src_bug_id . "
+          AND destination_bug_id = " . $dest_bug_id . "
+          AND relationship_type = 2";
+
+      $result = $this->mysqli->query( $query );
+
+      $relationship = null;
+      if ( 0 != $result->num_rows )
+      {
+         $row = $result->fetch_row();
+         $relationship = $row;
+      }
+
+      return $relationship;
+   }
 }

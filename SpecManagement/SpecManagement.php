@@ -237,10 +237,19 @@ class SpecManagementPlugin extends MantisPlugin
       $bug_id = $bug->id;
 
       $project_id = helper_get_current_project();
-      $version = gpc_get_string( 'target_version' );
       $ptime = gpc_get_string( 'ptime', '0' );
       $work_package = gpc_get_string( 'work_package', '' );
       $type = gpc_get_string( 'types', '' );
+      $version = null;
+
+      $fields = config_get( 'bug_report_page_fields' );
+      $fields = columns_filter_disabled( $fields );
+      $show_versions = version_should_show_product_version( $project_id );
+      $show_target_version = $show_versions && in_array( 'target_version', $fields ) && access_has_project_level( config_get( 'roadmap_update_threshold' ) );
+      if ( $show_target_version )
+      {
+         $version = gpc_get_string( 'target_version' );
+      }
 
       if ( !is_null( $version ) )
       {

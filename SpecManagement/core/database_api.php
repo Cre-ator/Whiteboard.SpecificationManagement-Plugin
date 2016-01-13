@@ -1256,6 +1256,13 @@ class database_api
       return $duration;
    }
 
+   /**
+    * Get the relationship row (type 2) for a pair of bugs
+    *
+    * @param $src_bug_id
+    * @param $dest_bug_id
+    * @return mixed|null
+    */
    public function getBugRelationshipTypeTwo( $src_bug_id, $dest_bug_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
@@ -1268,9 +1275,9 @@ class database_api
       }
 
       $query = "SELECT * FROM $bug_relationship_table
-          WHERE source_bug_id = " . $src_bug_id . "
-          AND destination_bug_id = " . $dest_bug_id . "
-          AND relationship_type = 2";
+         WHERE source_bug_id = " . $src_bug_id . "
+         AND destination_bug_id = " . $dest_bug_id . "
+         AND relationship_type = 2";
 
       $result = $this->mysqli->query( $query );
 

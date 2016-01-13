@@ -54,7 +54,15 @@ if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
 
    $print_api->print_plugin_menu();
 
-   echo '<table class="width60">';
+   if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
+   {
+      echo '<table class="width60">';
+   }
+   else
+   {
+      echo '<div class="table-container">';
+      echo '<table>';
+   }
 
    echo '<thead>';
    echo '<tr>';
@@ -84,30 +92,38 @@ if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
    echo '<td>';
    if ( $relevant_bugs_old_duration > 0 )
    {
-      echo $status_process . '%';
+      echo $status_process_old . '%';
    }
    echo '</td>';
    echo '<td>';
    echo plugin_lang_get( 'versview_progress' );
    echo '</td>';
    echo '<td>';
-   echo date_is_null( $version_act->date_order ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version_act->date_order ) );
+   if ( $relevant_bugs_act_duration > 0 )
+   {
+      echo $status_process_act . '%';
+   }
+   echo '</td>';
+   echo '</tr>';
+
+   echo '<tr>';
+   echo '<td colspan="4">';
+   echo '<hr width="100%"/>';
    echo '</td>';
    echo '</tr>';
    echo '</thead>';
 
    echo '<tbody>';
 
-   var_dump( $relevant_bugs_old );
-   var_dump( $relevant_bugs_act );
-
+   /* get relationships and save them in hashtable */
+   $relationship_array = array();
+   $relationship_record = array();
    for ( $bug_index_old = 0; $bug_index_old < $bug_count_old; $bug_index_old++ )
    {
       $bug_id_old = null;
       if ( key_exists( $bug_index_old, $relevant_bugs_old ) )
       {
          $bug_id_old = $relevant_bugs_old[$bug_index_old];
-         $bug_old = bug_get( $bug_id_old );
       }
 
       for ( $bug_index_act = 0; $bug_index_act < $bug_count_act; $bug_index_act++ )
@@ -116,39 +132,57 @@ if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
          if ( key_exists( $bug_index_act, $relevant_bugs_act ) )
          {
             $bug_id_act = $relevant_bugs_act[$bug_index_act];
-            $bug_act = bug_get( $bug_id_act );
          }
 
          if ( relationship_exists( $bug_id_old, $bug_id_act ) )
          {
-            $relationship = $database_api->getBugRelationshipTypeTwo( $bug_id_act, $bug_id_old );
+            $relationship_data = $database_api->getBugRelationshipTypeTwo( $bug_id_act, $bug_id_old );
             if ( !is_null( $database_api->getBugRelationshipTypeTwo( $bug_id_old, $bug_id_act ) ) )
             {
                /* TODO */
                /* falsche zuordnung relation -> alter bug ist abhängig von neuem bug */
                continue;
             }
-            if ( ( $key = array_search( $bug_id_old, $relevant_bugs_old ) ) !== false )
-            {
-               unset( $relevant_bugs_old[$key] );
-            }
-            if ( ( $key = array_search( $bug_id_act, $relevant_bugs_act ) ) !== false )
-            {
-               unset( $relevant_bugs_act[$key] );
-            }
 
-            echo '<tr>';
-            echo '<td colspan="2">';
-            echo bug_format_id( $relationship[2] ) . ' ==>';
-            echo '</td>';
-            echo '<td colspan="2">';
-            echo bug_format_id( $relationship[1] );
-            echo '</td>';
-            echo '</tr>';
+            $relationship_record[0] = $relationship_data[2];
+            $relationship_record[1] = $relationship_data[1];
+            $relationship_array[] = $relationship_record;
          }
       }
    }
 
+   /* print relationships first / delete used bug ids from array */
+   for ( $relationship_index = 0; $relationship_index < count( $relationship_array ); $relationship_index++ )
+   {
+      $relationship_record = $relationship_array[$relationship_index];
+      $bug_id_old = $relationship_record[0];
+      $bug_id_act = $relationship_record[1];
+
+      if ( ( $key = array_search( $bug_id_old, $relevant_bugs_old ) ) !== false )
+      {
+         unset( $relevant_bugs_old[$key] );
+      }
+      if ( ( $key = array_search( $bug_id_act, $relevant_bugs_act ) ) !== false )
+      {
+         unset( $relevant_bugs_act[$key] );
+      }
+
+      echo '<tr>';
+      echo '<td colspan="2">';
+      echo '<a href="view.php?id=' . $bug_id_old . '">';
+      echo bug_format_id( $bug_id_old );
+      echo '</a>';
+      echo ' <img border="0" src="' . SPECMANAGEMENT_PLUGIN_URL . 'files/rel_next_version.png"/> ';
+      echo '</td>';
+      echo '<td colspan="2">';
+      echo '<a href="view.php?id=' . $bug_id_act . '">';
+      echo bug_format_id( $bug_id_act );
+      echo '</a>';
+      echo '</td>';
+      echo '</tr>';
+   }
+
+   /* then print rest of issues */
    for ( $bug_index = 0; $bug_index < max( $bug_count_old, $bug_count_act ); $bug_index++ )
    {
       $scnd_bug_id_old = null;
@@ -174,16 +208,20 @@ if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
       {
          echo '<tr>';
          echo '<td colspan="2">';
+         echo '<a href="view.php?id=' . $bug_id_old . '">';
          if ( !is_null( $scnd_bug_id_old ) )
          {
             echo bug_format_id( $scnd_bug_id_old );
          }
+         echo '</a>';
          echo '</td>';
          echo '<td colspan="2">';
+         echo '<a href="view.php?id=' . $bug_id_act . '">';
          if ( !is_null( $scnd_bug_id_act ) )
          {
             echo bug_format_id( $scnd_bug_id_act );
          }
+         echo '</a>';
          echo '</td>';
          echo '</tr>';
       }
@@ -195,6 +233,10 @@ if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
    echo '</tbody>';
 
    echo '</table>';
+   if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+   {
+      echo '</div>';
+   }
 }
 
 html_page_bottom1();

@@ -93,6 +93,7 @@ $print_api->printRow();
 $print_api->printCategoryField( 1, 1, 'config_types' );
 echo '<td>';
 
+
 $types_rows = $database_api->getFullTypes();
 foreach( $types_rows as $types_row )
 {
@@ -112,12 +113,6 @@ echo '<input type="text" id="newtype" name="newtype" size="15" maxlength="128" v
 echo '<input type="submit" name="changetype" class="button" value="' . plugin_lang_get( 'config_change' ) . '">';
 
 echo '</td>';
-echo '</tr>';
-
-$print_api->printSpacer( 3 );
-
-$print_api->printFormTitle( 3, 'config_type' );
-$print_api->printRow();
 echo '</tr>';
 
 $print_api->printSpacer( 3 );

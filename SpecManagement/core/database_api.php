@@ -961,6 +961,35 @@ class database_api
    }
 
    /**
+    * Reset p_version_id when a version has been deleted
+    *
+    * @param $p_version_id
+    */
+   public function updateSourceVersion( $p_version_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "UPDATE $plugin_src_table
+            SET p_version_id = null
+            WHERE p_version_id = " . $p_version_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
     * Update existing planned time
     *
     * @param $bug_id

@@ -107,4 +107,4 @@ if ( $update && !is_null( $_POST['version_ids'] ) )
 
 form_security_purge( 'plugin_SpecManagement_manage_versions_update' );
 
-//print_successful_redirect( plugin_page( 'manage_versions', true ) );
+print_successful_redirect( plugin_page( 'manage_versions', true ) );

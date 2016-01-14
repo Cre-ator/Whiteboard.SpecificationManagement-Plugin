@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.13';
+      $this->version = '1.1.14';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -33,7 +33,9 @@ class SpecManagementPlugin extends MantisPlugin
 
          'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
 
-         'EVENT_MENU_MAIN' => 'menu'
+         'EVENT_MENU_MAIN' => 'menu',
+
+         'EVENT_MANAGE_VERSION_DELETE' => 'deleteVersion'
       );
       return $hooks;
    }
@@ -72,7 +74,7 @@ class SpecManagementPlugin extends MantisPlugin
             'CreateTableSQL', array( plugin_table( 'src' ), "
             id              I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id          I       NOTNULL UNSIGNED,
-            p_version_id    I       NOTNULL UNSIGNED,
+            p_version_id    I       UNSIGNED,
             work_package    C(250)  DEFAULT ''
             " )
          ),
@@ -182,8 +184,12 @@ class SpecManagementPlugin extends MantisPlugin
          $ptime_obj = $database_api->getPtimeRow( $bug_id );
          $ptime = $ptime_obj[2];
 
-         $p_version_id = $source_obj[2];
+         if ( empty( bug_get_field( $bug_id, 'target_version' ) ) )
+         {
+            $database_api->updateSourceRow( $bug_id, null, $work_package );
+         }
 
+         $p_version_id = $source_obj[2];
          if ( !is_null( $p_version_id ) )
          {
             $version_obj = $database_api->getVersionRowByPrimary( $p_version_id );
@@ -240,7 +246,7 @@ class SpecManagementPlugin extends MantisPlugin
       $ptime = gpc_get_string( 'ptime', '0' );
       $work_package = gpc_get_string( 'work_package', '' );
       $type = gpc_get_string( 'types', '' );
-      $version = null;
+      $target_version = null;
 
       $fields = config_get( 'bug_report_page_fields' );
       $fields = columns_filter_disabled( $fields );
@@ -248,12 +254,12 @@ class SpecManagementPlugin extends MantisPlugin
       $show_target_version = $show_versions && in_array( 'target_version', $fields ) && access_has_project_level( config_get( 'roadmap_update_threshold' ) );
       if ( $show_target_version )
       {
-         $version = gpc_get_string( 'target_version' );
+         $target_version = gpc_get_string( 'target_version' );
       }
 
-      if ( !is_null( $version ) )
+      if ( !is_null( $target_version ) )
       {
-         $version_id = version_get_id( $version );
+         $version_id = version_get_id( $target_version );
          $version_obj = $database_api->getVersionRowByVersionId( $version_id );
          $p_version_id = $version_obj[0];
          $type_id = $database_api->getTypeId( $type );
@@ -274,6 +280,11 @@ class SpecManagementPlugin extends MantisPlugin
       }
    }
 
+   /**
+    * If the whiteboard menu plugin isnt installed, show the specificationmanagement menu instead
+    *
+    * @return null|string
+    */
    function menu()
    {
       if ( !plugin_is_installed( 'WhiteboardMenu' ) && plugin_config_get( 'ShowMenu' ) && $this->getUserHasLevel() )
@@ -281,5 +292,22 @@ class SpecManagementPlugin extends MantisPlugin
          return '<a href="' . plugin_page( 'choose_document' ) . '">' . plugin_lang_get( 'menu_title' ) . '</a>';
       }
       return null;
+   }
+
+   /**
+    * Trigger the removal of plugin version data if a mantis version was removed
+    */
+   function deleteVersion()
+   {
+      include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'database_api.php';
+      $database_api = new database_api();
+
+      $version_id = gpc_get_int( 'version_id' );
+
+      $plugin_version_row = $database_api->getVersionRowByVersionId( $version_id );
+      $p_version_id = $plugin_version_row[0];
+
+      $database_api->updateSourceVersion( $p_version_id );
+      $database_api->deleteVersionRow( $version_id );
    }
 }

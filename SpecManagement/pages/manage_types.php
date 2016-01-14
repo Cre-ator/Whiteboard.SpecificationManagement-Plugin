@@ -47,12 +47,12 @@ function print_table( $edit_page = false )
 
    if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
    {
-      echo '<table class="width90">';
+      echo '<table class="width100" cellspacing="1" cellpadding="0">';
    }
    else
    {
       echo '<div class="table-container">';
-      echo '<table>';
+      echo '<table cellspacing="1" cellpadding="0">';
    }
 
    echo '<thead>';

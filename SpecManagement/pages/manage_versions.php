@@ -37,8 +37,11 @@ function print_table( $edit_page = false )
    $database_api = new database_api();
    $print_api = new print_api();
 
-   $cols = 7;
-   $col_width = 100 / $cols;
+   $cols = 5;
+   if ( $edit_page )
+   {
+      $cols = 6;
+   }
 
    if ( $edit_page )
    {
@@ -47,26 +50,26 @@ function print_table( $edit_page = false )
 
    if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
    {
-      echo '<table class="width90">';
+      echo '<table class="width100" cellspacing="1" cellpadding="0">';
    }
    else
    {
       echo '<div class="table-container">';
-      echo '<table>';
+      echo '<table cellspacing="1" cellpadding="0">';
    }
 
    echo '<thead>';
    $print_api->printFormTitle( $cols, 'manversions_thead' );
    echo '<tr class="row-category2">';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'version' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'released' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'obsolete' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'timestamp' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'description' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="40%">' . lang_get( 'version' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="10%">' . lang_get( 'released' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="10%">' . lang_get( 'obsolete' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="10%">' . lang_get( 'timestamp' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="10%">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="10%">' . lang_get( 'description' ) . '</th>';
    if ( $edit_page )
    {
-      echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'actions' ) . '</th>';
+      echo '<th class="form-title" colspan="1" width="10%">' . lang_get( 'actions' ) . '</th>';
    }
    echo '</tr>';
    echo '</thead>';
@@ -83,7 +86,7 @@ function print_table( $edit_page = false )
       echo '<input type="hidden" name="version_ids[]" value="' . $version['id'] . '"/>';
 
       /* Name */
-      echo '<td>';
+      echo '<td width="200">';
       if ( $edit_page )
       {
          echo '<span class="input" style="width:100%;">';
@@ -172,7 +175,7 @@ function print_table( $edit_page = false )
       echo '</td>';
 
       /* Description */
-      echo '<td>';
+      echo '<td width="100">';
       if ( $edit_page )
       {
          echo '<span class="text">';

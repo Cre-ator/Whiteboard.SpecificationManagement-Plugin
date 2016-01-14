@@ -31,6 +31,8 @@ class SpecManagementPlugin extends MantisPlugin
          'EVENT_UPDATE_BUG_FORM' => 'bugViewFields',
          'EVENT_UPDATE_BUG' => 'bugUpdateData',
 
+         'EVENT_BUG_DELETED' => 'deleteBugReference',
+
          'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
 
          'EVENT_MENU_MAIN' => 'menu',
@@ -309,5 +311,20 @@ class SpecManagementPlugin extends MantisPlugin
 
       $database_api->updateSourceVersion( $p_version_id );
       $database_api->deleteVersionRow( $version_id );
+   }
+
+   /**
+    * Trigger the removal of plugin data if a bug was removed
+    *
+    * @param $event
+    * @param $bug_id
+    */
+   function deleteBugReference( $event, $bug_id )
+   {
+      include config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'database_api.php';
+      $database_api = new database_api();
+
+      $database_api->deleteSourceRowByBug( $bug_id );
+      $database_api->deletePtimeRow( $bug_id );
    }
 }

@@ -1158,6 +1158,34 @@ class database_api
    }
 
    /**
+    * Deletes a source row by specific bug id
+    *
+    * @param $bug_id
+    */
+   public function deleteSourceRowByBug( $bug_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
+      }
+
+      $query = "SET SQL_SAFE_UPDATES = 0";
+      $this->mysqli->query( $query );
+
+      $query = "DELETE FROM $plugin_src_table
+         WHERE bug_id = " . $bug_id;
+
+      $this->mysqli->query( $query );
+
+      $query = "SET SQL_SAFE_UPDATES = 1";
+      $this->mysqli->query( $query );
+   }
+
+   /**
     * Deletes a ptime row
     *
     * @param $bug_id

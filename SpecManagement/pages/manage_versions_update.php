@@ -33,6 +33,12 @@ if ( $update && !is_null( $_POST['version_ids'] ) )
    $type = $_POST['type'];
    $description = $_POST['description'];
 
+   var_dump( $version_ids );
+   var_dump( $versions );
+   var_dump( $date_order );
+   var_dump( $type );
+   var_dump( $description );
+
    for ( $version_id = 0; $version_id < count( $version_ids ); $version_id++ )
    {
       $version = version_get( $version_ids[$version_id] );
@@ -101,4 +107,4 @@ if ( $update && !is_null( $_POST['version_ids'] ) )
 
 form_security_purge( 'plugin_SpecManagement_manage_versions_update' );
 
-print_successful_redirect( plugin_page( 'manage_versions', true ) );
+//print_successful_redirect( plugin_page( 'manage_versions', true ) );

@@ -103,7 +103,7 @@ function print_table( $edit_page = false )
       {
          echo '<span class="checkbox">'; ?>
          <input type="checkbox" id="proj-version-released"
-                name="released<?php echo $version_index ?>" <?php check_checked( (boolean)$version['released'], true ); ?> />
+                name="released<?php echo $version_index ?>" <?php check_checked( (boolean) $version['released'], true ); ?> />
          <?php echo '</span>';
       }
       else
@@ -118,7 +118,7 @@ function print_table( $edit_page = false )
       {
          echo '<span class="checkbox">'; ?>
          <input type="checkbox" id="proj-version-obsolete"
-                name="obsolete<?php echo $version_index ?>" <?php check_checked( (boolean)$version['obsolete'], true ); ?> />
+                name="obsolete<?php echo $version_index ?>" <?php check_checked( (boolean) $version['obsolete'], true ); ?> />
          <?php echo '</span>';
       }
       else
@@ -175,10 +175,8 @@ function print_table( $edit_page = false )
       echo '<td>';
       if ( $edit_page )
       {
-         echo '<span class="textarea">';
-         echo '<textarea id="proj-version-description" name="description[]" cols="40" rows="1">';
-         echo string_attribute( $version['description'] );
-         echo '</textarea>';
+         echo '<span class="text">';
+         echo '<input type="text" id="proj-version-description" name="description[]" value="' . string_attribute( $version['description'] ) . '"/>';
          echo '</span>';
       }
       else

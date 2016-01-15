@@ -36,15 +36,7 @@ if ( isset( $_POST['version_id'] ) )
    /* get work packages from source */
    $work_packages = $database_api->getDocumentSpecWorkPackages( $p_version_id );
 
-   /* get all bug ids from an array of work packages */
-   $allRelevantBugs = $database_api->getAllBugsFromWorkpackages( $work_packages, $p_version_id );
-
-   /* if there is no work package specified, the default work package named with "version" */
-   /* will be used */
-   if ( empty( $work_packages ) && !is_null( $version_id ) )
-   {
-      array_push( $work_packages, $version_id );
-   }
+   $versionSpecBugIds = $database_api->getVersionSpecBugs( version_full_name( $version_id ) );
 
    html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_full_name( $version_id ) );
    echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
@@ -57,17 +49,26 @@ if ( isset( $_POST['version_id'] ) )
 
    $print_api->print_plugin_menu();
    $print_api->print_editor_menu();
-   $print_api->print_document_head( $type_string, $version_id, $parent_project_id, $allRelevantBugs );
+   $print_api->print_document_head( $type_string, $version_id, $parent_project_id, $versionSpecBugIds );
 
    echo '<table class="width60">';
 
    $chapter_index = 1;
 
+   /**
+    * Generate work packages first
+    */
    if ( $work_packages != null )
    {
       /* for each work package */
       foreach ( $work_packages as $work_package )
       {
+         /* go to next record, if workpackage is empty */
+         if ( $work_package == '' )
+         {
+            continue;
+         }
+
          $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
          /* print work package */
          $print_api->print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration );
@@ -87,10 +88,46 @@ if ( isset( $_POST['version_id'] ) )
                $print_api->print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $option_show_duration, $ptime );
                /* increment index */
                $sub_chapter_index += 10;
+               /* remove bug from version spec bugs */
+               if ( ( $key = array_search( $bug_id, $versionSpecBugIds ) ) !== false )
+               {
+                  unset( $versionSpecBugIds[$key] );
+               }
             }
          }
          /* increment index */
          $chapter_index++;
+      }
+   }
+
+   /*
+    * If there are bugs left without work packages, print them too, if it is set in the config
+    * TODO: set config
+    */
+   if ( true && !is_null( $versionSpecBugIds ) )
+   {
+      $duration = $database_api->getBugDuration( $versionSpecBugIds );
+      /* print work package */
+      $print_api->print_simple_chapter_title( $chapter_index, $option_show_duration, $duration );
+
+      $sub_chapter_index = 10;
+      foreach ( $versionSpecBugIds as $versionSpecBugId )
+      {
+         /* ensure that bug exists */
+         if ( bug_exists( $versionSpecBugId ) )
+         {
+            /* planned duration for each bug */
+            $ptime = $database_api->getPtimeRow( $versionSpecBugId )[2];
+            /* print bugs */
+            $print_api->print_bugs( $chapter_index, $sub_chapter_index, $versionSpecBugId, $option_show_duration, $ptime );
+            /* increment index */
+            $sub_chapter_index += 10;
+            /* remove bug from version spec bugs */
+            if ( ( $key = array_search( $versionSpecBugId, $versionSpecBugIds ) ) !== false )
+            {
+               unset( $versionSpecBugIds[$key] );
+            }
+         }
       }
    }
 
@@ -107,6 +144,12 @@ if ( isset( $_POST['version_id'] ) )
          $document_duration = 0;
          foreach ( $work_packages as $work_package )
          {
+            /* go to next record, if workpackage is empty */
+            if ( $work_package == '' )
+            {
+               continue;
+            }
+
             $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
             $document_duration += $duration;
             echo '<tr>';

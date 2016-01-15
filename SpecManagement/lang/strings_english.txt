@@ -51,6 +51,7 @@ $s_plugin_SpecManagement_menu_versview = 'Version Overview';
 $s_plugin_SpecManagement_editor_title = 'SpecManagement';
 $s_plugin_SpecManagement_editor_work_package_duration = 'Planned Duration for Completion';
 $s_plugin_SpecManagement_editor_work_package_duration_null = '-not specified-';
+$s_plugin_SpecManagement_editor_no_workpackage = 'Without Workpackage';
 $s_plugin_SpecManagement_editor_duration_unit = 'Days per Person';
 $s_plugin_SpecManagement_editor_bug_duration = 'Duration';
 $s_plugin_SpecManagement_editor_bug_attachments = 'Attached Files';

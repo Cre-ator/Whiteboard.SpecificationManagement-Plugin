@@ -348,6 +348,31 @@ class print_api
       echo '</tr>';
    }
 
+   /**
+    * Prints a new chapter title element in a document
+    *
+    * @param $chapter_index
+    * @param $option_show_duration
+    * @param $duration
+    */
+   public function print_simple_chapter_title( $chapter_index, $option_show_duration, $duration )
+   {
+      if ( is_null( $duration ) )
+      {
+         $duration = plugin_lang_get( 'editor_work_package_duration_null' );
+      }
+
+      echo '<tr>';
+      echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
+      echo '<td class="form-title" colspan="2">' . plugin_lang_get( 'editor_no_workpackage' );
+      if ( $option_show_duration == '1' )
+      {
+         echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
+      }
+      echo '</td>';
+      echo '</tr>';
+   }
+
 
    /**
     * Prints the header element of a document
@@ -394,12 +419,15 @@ class print_api
       echo '<td class="form-title" colspan="3">' . user_get_realname( auth_get_current_user_id() ) . '</td>';
       echo '</tr>';
 
-      echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get( 'head_process' ) . '</td>';
-      echo '<td class="form-title" colspan="3">';
-      $this->print_document_progress( $allRelevantBugs );
-      echo '</td>';
-      echo '</tr>';
+      if ( !is_null( $allRelevantBugs ) )
+      {
+         echo '<tr>';
+         echo '<td class="field-container">' . plugin_lang_get( 'head_process' ) . '</td>';
+         echo '<td class="form-title" colspan="3">';
+         $this->print_document_progress( $allRelevantBugs );
+         echo '</td>';
+         echo '</tr>';
+      }
 
       echo '<tr>';
       echo '<td class="field-container" colspan="4">' . plugin_lang_get( 'head_versions_past' ) . '</td>';

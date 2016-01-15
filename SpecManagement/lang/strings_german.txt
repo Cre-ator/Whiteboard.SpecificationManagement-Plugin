@@ -51,6 +51,7 @@ $s_plugin_SpecManagement_menu_versview = 'Versionsübersicht';
 $s_plugin_SpecManagement_editor_title = 'SpecManagement';
 $s_plugin_SpecManagement_editor_work_package_duration = 'Geplante Dauer für Fertigstellung';
 $s_plugin_SpecManagement_editor_work_package_duration_null = '-nicht spezifiziert-';
+$s_plugin_SpecManagement_editor_no_workpackage = 'Ohne Arbeitspaket';
 $s_plugin_SpecManagement_editor_duration_unit = 'Personentage';
 $s_plugin_SpecManagement_editor_bug_duration = 'Dauer';
 $s_plugin_SpecManagement_editor_bug_attachments = 'Angehängte Dateien';

@@ -80,6 +80,7 @@ $s_plugin_SpecManagement_mantypes_show_directory = 'Show Directory in Editor / D
 /* Version Overview Area */
 $s_plugin_SpecManagement_versview_thead = 'Version Overview';
 $s_plugin_SpecManagement_versview_obsolete_flag = 'Show obsolete versions';
+$s_plugin_SpecManagement_versview_non_obsolete_flag = 'Hide obsolete versions';
 $s_plugin_SpecManagement_versview_deadline = 'Deadline';
 $s_plugin_SpecManagement_versview_amount = 'Amount of Issues';
 $s_plugin_SpecManagement_versview_duration = 'Duration';

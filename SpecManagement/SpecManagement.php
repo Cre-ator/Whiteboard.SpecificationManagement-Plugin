@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.15';
+      $this->version = '1.1.16';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -21,24 +21,36 @@ class SpecManagementPlugin extends MantisPlugin
 
    function hooks()
    {
-      $hooks = array
-      (
-         'EVENT_LAYOUT_PAGE_FOOTER' => 'footer',
+      if ( substr( MANTIS_VERSION, 0, 4 ) > '1.2.' )
+      {
+         $hooks = array
+         (
+            'EVENT_LAYOUT_PAGE_FOOTER' => 'footer',
+            'EVENT_REPORT_BUG_FORM' => 'bugViewFields',
+            'EVENT_REPORT_BUG' => 'bugUpdateData',
+            'EVENT_UPDATE_BUG_FORM' => 'bugViewFields',
+            'EVENT_UPDATE_BUG' => 'bugUpdateData',
+            'EVENT_BUG_DELETED' => 'deleteBugReference',
+            'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
+            'EVENT_MENU_MAIN' => 'menu',
+            'EVENT_MANAGE_VERSION_DELETE' => 'deleteVersion'
+         );
+      }
+      else
+      {
+         $hooks = array
+         (
+            'EVENT_LAYOUT_PAGE_FOOTER' => 'footer',
+            'EVENT_REPORT_BUG_FORM' => 'bugViewFields',
+            'EVENT_REPORT_BUG' => 'bugUpdateData',
+            'EVENT_UPDATE_BUG_FORM' => 'bugViewFields',
+            'EVENT_UPDATE_BUG' => 'bugUpdateData',
+            'EVENT_BUG_DELETED' => 'deleteBugReference',
+            'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
+            'EVENT_MENU_MAIN' => 'menu'
+         );
+      }
 
-         'EVENT_REPORT_BUG_FORM' => 'bugViewFields',
-         'EVENT_REPORT_BUG' => 'bugUpdateData',
-
-         'EVENT_UPDATE_BUG_FORM' => 'bugViewFields',
-         'EVENT_UPDATE_BUG' => 'bugUpdateData',
-
-         'EVENT_BUG_DELETED' => 'deleteBugReference',
-
-         'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
-
-         'EVENT_MENU_MAIN' => 'menu',
-
-         'EVENT_MANAGE_VERSION_DELETE' => 'deleteVersion'
-      );
       return $hooks;
    }
 

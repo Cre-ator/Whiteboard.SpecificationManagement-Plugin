@@ -80,6 +80,7 @@ $s_plugin_SpecManagement_mantypes_show_directory = 'Inhaltsverzeichnis im Dokume
 /* Version Overview Area */
 $s_plugin_SpecManagement_versview_thead = 'Versionsübersicht';
 $s_plugin_SpecManagement_versview_obsolete_flag = 'Veraltete Versionen einblenden';
+$s_plugin_SpecManagement_versview_non_obsolete_flag = 'Veraltete Versionen ausblenden';
 $s_plugin_SpecManagement_versview_deadline = 'Termin';
 $s_plugin_SpecManagement_versview_amount = 'Anzahl Einträge';
 $s_plugin_SpecManagement_versview_duration = 'Dauer';

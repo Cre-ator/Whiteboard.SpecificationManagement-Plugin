@@ -9,29 +9,48 @@ if ( isset( $_POST['obsolete_flag'] ) )
 {
    $obsolete_flag = null;
 }
+if ( isset( $_POST['non_obsolete_flag'] ) )
+{
+   $obsolete_flag = false;
+}
+
+$print_flag = false;
+if ( isset( $_POST['print_flag'] ) )
+{
+   $print_flag = true;
+}
 
 /**
  * Page content
  */
-html_page_top1( plugin_lang_get( 'select_doc_title' ) );
 echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
-html_page_top2();
-if ( plugin_is_installed( 'WhiteboardMenu' ) )
+html_page_top1( plugin_lang_get( 'select_doc_title' ) );
+
+if ( !$print_flag )
 {
-   $print_api->print_whiteboardplugin_menu();
+   html_page_top2();
+   if ( plugin_is_installed( 'WhiteboardMenu' ) )
+   {
+      $print_api->print_whiteboardplugin_menu();
+   }
+   $print_api->print_plugin_menu();
+   echo '<div align="center">';
+   echo '<hr size="1" width="100%" />';
 }
-$print_api->print_plugin_menu();
-echo '<div align="center">';
-echo '<hr size="1" width="100%" />';
-print_table( $obsolete_flag );
+
+print_table( $obsolete_flag, $print_flag );
 if ( helper_get_current_project() != 0 )
 {
    print_graph( $obsolete_flag );
 }
-html_page_bottom1();
+
+if ( !$print_flag )
+{
+   html_page_bottom1();
+}
 /* **************************** */
 
-function print_table( $obsolete_flag )
+function print_table( $obsolete_flag, $print_flag )
 {
    $database_api = new database_api();
    $print_api = new print_api();
@@ -54,11 +73,28 @@ function print_table( $obsolete_flag )
 
    echo '<thead>';
    echo '<tr>';
-   echo '<td class="form-title" colspan="' . ( $cols - 1 ) . '">' . plugin_lang_get( 'versview_thead' ) . '</td>';
-   echo '<td colspan="1"><form action="' . plugin_page( 'version_view' ) . '" method="post">';
-   echo '<input type="submit" name="obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_obsolete_flag' ) . '"/>';
-   echo '</form></td>';
+   if ( !$print_flag )
+   {
+      echo '<td class="form-title" colspan="' . ( $cols - 1 ) . '">' . plugin_lang_get( 'versview_thead' ) . '</td>';
+      echo '<td colspan="1"><form action="' . plugin_page( 'version_view' ) . '" method="post">';
+      if ( $obsolete_flag === false )
+      {
+         echo '<input type="submit" name="obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_obsolete_flag' ) . '"/>';
+      }
+      elseif ( is_null( $obsolete_flag ) )
+      {
+         echo '<input type="submit" name="non_obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_non_obsolete_flag' ) . '"/>';
+      }
+
+      echo '&nbsp<input type="submit" name="print_flag" class="button" value="' . lang_get( 'print' ) . '"/>';
+      echo '</form></td>';
+   }
+   else
+   {
+      echo '<td class="center" colspan="' . $cols . '">' . plugin_lang_get( 'versview_thead' ) . '</td>';
+   }
    echo '</tr>';
+
    echo '<tr class="row-category2">';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'version' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_deadline' ) . '</th>';
@@ -66,6 +102,7 @@ function print_table( $obsolete_flag )
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_duration' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_progress' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_information' ) . '</th>';
+
    echo '</tr>';
    echo '</thead>';
 
@@ -99,13 +136,13 @@ function print_table( $obsolete_flag )
 
       /* amount of issues */
       echo '<td>';
-      if ( $version_spec_bug_count > 0 && !$version['obsolete'] )
+      if ( $version_spec_bug_count > 0 && !$version['obsolete'] && !$print_flag )
       {
          echo '<a href="search.php?project_id=' . $project_id . '&target_version=' . $version['version'] .
             '&sortby=last_updated&dir=DESC&hide_status_id=-2&match_type=0">';
       }
       echo string_display( $version_spec_bug_count );
-      if ( $version_spec_bug_count > 0 && !$version['obsolete'] )
+      if ( $version_spec_bug_count > 0 && !$version['obsolete'] && !$print_flag )
       {
          echo '</a>';
       }

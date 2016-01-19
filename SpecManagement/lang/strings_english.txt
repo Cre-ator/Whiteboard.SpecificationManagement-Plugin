@@ -1,0 +1,104 @@
+<?php
+/* Configuration page */
+
+/* Additional Bugview Fields */
+$s_plugin_SpecManagement_bug_view_specification_req = 'Source/Name';
+$s_plugin_SpecManagement_bug_view_specification_src = 'Requirement';
+$s_plugin_SpecManagement_bug_view_specification_wpg = 'Work Package';
+$s_plugin_SpecManagement_bug_view_planned_time = 'Planned Duration';
+
+/* Configuration Page */
+$s_plugin_SpecManagement_config_title = 'SpecManagement - Configuration';
+/* --------------- */
+$s_plugin_SpecManagement_config_caption = 'General Configuration';
+$s_plugin_SpecManagement_config_accesslevel = 'Access Level';
+$s_plugin_SpecManagement_config_readlevel = 'Access Level Read Permissions';
+$s_plugin_SpecManagement_config_writelevel = 'Access Level Write Permissions';
+$s_plugin_SpecManagement_config_fields = 'Show Plugin Field in Issues?';
+$s_plugin_SpecManagement_config_menu = 'Show Plugin Menu Entry?';
+$s_plugin_SpecManagement_config_footer = 'Show Plugin Info In Footer?';
+/* --------------- */
+$s_plugin_SpecManagement_config_document = 'Document Management';
+$s_plugin_SpecManagement_config_typeadd = 'Add Document Type';
+$s_plugin_SpecManagement_config_add = 'Add';
+$s_plugin_SpecManagement_config_types = 'Available Document Types';
+$s_plugin_SpecManagement_config_del = 'Remove';
+$s_plugin_SpecManagement_config_change = 'Change';
+/* --------------- */
+$s_plugin_SpecManagement_config_type = 'configure document types';
+/* --------------- */
+$s_plugin_SpecManagement_config_reset_title = 'SpecManagement - Remove All Plugin Settings And Data';
+$s_plugin_SpecManagement_config_reset_expl = 'Caution, if you proceed all data stored in the plugin are permanently deleted. Continue?';
+$s_plugin_SpecManagement_config_reset_conf = 'Continue';
+$s_plugin_SpecManagement_config_reset_dont = 'Abort';
+
+/* Choose Doc Page */
+$s_plugin_SpecManagement_select_doc_title = 'SpecManagement - Create Document';
+$s_plugin_SpecManagement_select_doc = 'Document Selection';
+$s_plugin_SpecManagement_select_type = 'Document Type:';
+$s_plugin_SpecManagement_select_version = 'Document Version:';
+$s_plugin_SpecManagement_select_confirm = 'Generate Selected Document';
+
+/* Menu Area */
+$s_plugin_SpecManagement_menu_title = 'Specifications';
+$s_plugin_SpecManagement_menu_choosedoc = 'Generate Document';
+$s_plugin_SpecManagement_menu_manversions = 'Manage Document Versions';
+$s_plugin_SpecManagement_menu_mantypes = 'Manage Document Types';
+$s_plugin_SpecManagement_menu_printbutton = 'Print';
+$s_plugin_SpecManagement_menu_versview = 'Version Overview';
+
+/* Editor Area */
+$s_plugin_SpecManagement_editor_title = 'SpecManagement';
+$s_plugin_SpecManagement_editor_work_package_duration = 'Planned Duration for Completion';
+$s_plugin_SpecManagement_editor_work_package_duration_null = '-not specified-';
+$s_plugin_SpecManagement_editor_no_workpackage = 'Without Workpackage';
+$s_plugin_SpecManagement_editor_duration_unit = 'Days per Person';
+$s_plugin_SpecManagement_editor_bug_duration = 'Duration';
+$s_plugin_SpecManagement_editor_bug_attachments = 'Attached Files';
+$s_plugin_SpecManagement_editor_bug_notes_note = 'There are notes available';
+$s_plugin_SpecManagement_editor_expenses_overview = 'Expenses Overview';
+$s_plugin_SpecManagement_editor_expenses_overview_sum = 'Total';
+
+/* Changes Area */
+$s_plugin_SpecManagement_changes_title = 'Changes';
+
+/* Version Manager Area */
+$s_plugin_SpecManagement_manversions_title = 'Document-Versionmanager';
+$s_plugin_SpecManagement_manversions_thead = 'Versionmanager';
+$s_plugin_SpecManagement_manversions_thdoctype = 'Document Type';
+$s_plugin_SpecManagement_manversions_edit = 'Edit Versions';
+$s_plugin_SpecManagement_manversions_edit_submit = 'Accept Changes';
+
+/* Types Manager Area */
+$s_plugin_SpecManagement_mantypes_title = 'Document-Typemanager';
+$s_plugin_SpecManagement_mantypes_thead = 'Typemanager';
+$s_plugin_SpecManagement_mantypes_edit = 'Edit Types';
+$s_plugin_SpecManagement_mantypes_show_print_duration = 'Show Planned Duration in Editor / Document?';
+$s_plugin_SpecManagement_mantypes_show_expenses_overview = 'Show Expenses Overview in Editor / Document?';
+$s_plugin_SpecManagement_mantypes_show_directory = 'Show Directory in Editor / Document?';
+
+/* Version Overview Area */
+$s_plugin_SpecManagement_versview_thead = 'Version Overview';
+$s_plugin_SpecManagement_versview_obsolete_flag = 'Show obsolete versions';
+$s_plugin_SpecManagement_versview_non_obsolete_flag = 'Hide obsolete versions';
+$s_plugin_SpecManagement_versview_deadline = 'Deadline';
+$s_plugin_SpecManagement_versview_amount = 'Amount of Issues';
+$s_plugin_SpecManagement_versview_duration = 'Duration';
+$s_plugin_SpecManagement_versview_progress = 'Progress';
+$s_plugin_SpecManagement_versview_information = 'Information';
+$s_plugin_SpecManagement_versview_deadline_n = 'Deadline endangered!';
+$s_plugin_SpecManagement_versview_obsolete = 'Version is obsolete!';
+$s_plugin_SpecManagement_versview_theadgraph = 'Version Graph';
+
+/* head area of document */
+$s_plugin_SpecManagement_head_title = 'Document Title';
+$s_plugin_SpecManagement_head_version = 'Version';
+$s_plugin_SpecManagement_head_customer = 'Customer';
+$s_plugin_SpecManagement_head_project = 'Project';
+$s_plugin_SpecManagement_head_date = 'Date';
+$s_plugin_SpecManagement_head_person_in_charge = 'Person In Charge';
+$s_plugin_SpecManagement_head_process = 'Process';
+$s_plugin_SpecManagement_head_versions_past = 'Predecessor';
+$s_plugin_SpecManagement_head_versions_future = 'Follower';
+$s_plugin_SpecManagement_head_changes = 'Show Changes';
+$s_plugin_SpecManagement_head_view = 'Show Document';

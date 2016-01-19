@@ -132,7 +132,9 @@ class print_api
    public function print_plugin_menu()
    {
       echo '<table align="center">';
-      echo '<tr">';
+      echo '<tr><td colspan="4" class="center" ><font color="#8b0000" size="5">*** Plugin befindet sich in Entwicklungsphase ***</font></td></tr>';
+
+      echo '<tr>';
 
       echo '<td>';
       echo '[ <a href="' . plugin_page( 'choose_document' ) . '">';

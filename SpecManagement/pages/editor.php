@@ -33,13 +33,11 @@ if ( isset( $_POST['version_id'] ) )
    $option_show_duration = $type_options[0];
    $option_show_expenses_overview = $type_options[1];
 
-   /* get work packages from source */
    $work_packages = $database_api->getDocumentSpecWorkPackages( $p_version_id );
-
    $versionSpecBugIds = $database_api->getVersionSpecBugs( version_full_name( $version_id ) );
 
-   html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_full_name( $version_id ) );
    echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
+   html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_full_name( $version_id ) );
    html_page_top2();
 
    if ( plugin_is_installed( 'WhiteboardMenu' ) )

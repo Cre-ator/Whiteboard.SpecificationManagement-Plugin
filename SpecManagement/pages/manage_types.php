@@ -3,6 +3,7 @@ include SPECMANAGEMENT_CORE_URI . 'authorization_api.php';
 include SPECMANAGEMENT_CORE_URI . 'database_api.php';
 include SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
+define( 'COLS', 4 );
 $print_api = new print_api();
 
 $edit_page = false;
@@ -28,17 +29,11 @@ print_table( $edit_page );
 html_page_bottom1();
 /* **************************** */
 
-/**
- * @param bool $edit_page
- */
 function print_table( $edit_page = false )
 {
-   $authorization_api = new authorization_api();
+
    $database_api = new database_api();
    $print_api = new print_api();
-
-   $cols = 6;
-   $col_width = 100 / $cols;
 
    if ( $edit_page )
    {
@@ -55,17 +50,7 @@ function print_table( $edit_page = false )
       echo '<table cellspacing="1" cellpadding="0">';
    }
 
-   echo '<thead>';
-   $print_api->printFormTitle( $cols, 'mantypes_thead' );
-   echo '<tr class="row-category2">';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_print_duration' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_expenses_overview' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_directory' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">weitere option2</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">weitere option3</th>';
-   echo '</tr>';
-   echo '</thead>';
+   print_tablehead();
 
    echo '<tbody>';
    $types = $database_api->getFullTypes();
@@ -87,115 +72,142 @@ function print_table( $edit_page = false )
       $print_api->printRow();
       echo '<input type="hidden" name="type_ids[]" value="' . $type_id . '"/>';
 
-      /* Name */
-      echo '<td>';
-      echo string_display( $type_string );
-      echo '</td>';
-
-      /* Released */
-      echo '<td class="center">';
-      if ( $edit_page )
-      {
-         echo '<span class="checkbox">'; ?>
-         <input type="checkbox"
-                name="showpt<?php echo $type_index ?>" <?php check_checked( (boolean)$option_show_duration, true );
-         ?> />
-         <?php echo '</span>';
-      }
-      else
-      {
-         echo trans_bool( $option_show_duration );
-      }
-      echo '</td>';
-
-      /* Obsolete */
-      echo '<td class="center">';
-      if ( $edit_page )
-      {
-         echo '<span class="checkbox">'; ?>
-         <input type="checkbox"
-                name="showeo<?php echo $type_index ?>" <?php check_checked( (boolean)$option_show_expenses_overview, true );
-         ?> />
-         <?php echo '</span>';
-      }
-      else
-      {
-         echo trans_bool( $option_show_expenses_overview );
-      }
-      echo '</td>';
-
-      /* Date */
-      echo '<td class="center">';
-      if ( $edit_page )
-      {
-         echo '<span class="checkbox">'; ?>
-         <input type="checkbox"
-                name="showdy<?php echo $type_index ?>" <?php check_checked( (boolean)$option_show_directory, true );
-         ?> />
-         <?php echo '</span>';
-      }
-      else
-      {
-         echo trans_bool( $option_show_directory );
-      }
-      echo '</td>';
-
-      /* Type */
-      echo '<td class="center">';
-      echo 'placeholder option2';
-      echo '</td>';
-
-      /* Description */
-      echo '<td class="center">';
-      echo 'placeholder option3';
-      echo '</td>';
-
+      print_name( $type_string );
+      print_duration( $edit_page, $type_index, $option_show_duration );
+      print_expoverview( $edit_page, $type_index, $option_show_expenses_overview );
+      print_dictionary( $edit_page, $type_index, $option_show_directory );
       echo '</tr>';
    }
 
    if ( $edit_page )
    {
-      echo '<tr>';
-      echo '<td colspan="' . $cols . '">';
-      echo '<input type="text" name="new_version" size="32" maxlength="64"/>';
-      echo '&nbsp<input type="submit" name="addversion" class="button" value="' . lang_get( 'add_version_button' ) . '"/>';
-      echo '</td>';
-      echo '</tr>';
-
-      echo '<tr>';
-      echo '<td colspan="' . $cols . '" class="center">';
-      echo '<input type="submit" name="update" class="button" value="' . plugin_lang_get( 'manversions_edit_submit' ) . '"/>';
-      echo '</td>';
-      echo '</tr>';
-
-      echo '</tbody>';
-      echo '</table>';
-      if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
-      {
-         echo '</div>';
-      }
-      echo '</form>';
+      print_editbuttons();
    }
    else
    {
-      if ( $authorization_api->userHasGlobalLevel() || $authorization_api->userHasWriteLevel() )
-      {
-         echo '<tr>';
-         echo '<td colspan="' . $cols . '" class="center">';
-         echo '<form action="' . plugin_page( 'manage_types' ) . '" method="post">';
-         echo '<span class="input">';
-         echo '<input type="submit" name="edit" class="button" value="' . plugin_lang_get( 'mantypes_edit' ) . '"/>';
-         echo '</span>';
-         echo '</td>';
-         echo '</tr>';
-
-         echo '</tbody>';
-         echo '</table>';
-         if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
-         {
-            echo '</div>';
-         }
-         echo '</form>';
-      }
+      print_tablefooter();
    }
+   echo '</tbody>';
+   echo '</table>';
+   if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+   {
+      echo '</div>';
+   }
+   echo '</form>';
+}
+
+function print_tablefooter()
+{
+   $authorization_api = new authorization_api();
+
+   if ( $authorization_api->userHasGlobalLevel() || $authorization_api->userHasWriteLevel() )
+   {
+      echo '<tr>';
+      echo '<td colspan="' . COLS . '" class="center">';
+      echo '<form action="' . plugin_page( 'manage_types' ) . '" method="post">';
+      echo '<span class="input">';
+      echo '<input type="submit" name="edit" class="button" value="' . plugin_lang_get( 'mantypes_edit' ) . '"/>';
+      echo '</span>';
+      echo '</td>';
+      echo '</tr>';
+   }
+}
+
+function print_editbuttons()
+{
+   echo '<tr>';
+   echo '<td colspan="' . COLS . '">';
+   echo '<input type="text" name="new_version" size="32" maxlength="64"/>';
+   echo '&nbsp<input type="submit" name="addversion" class="button" value="' . lang_get( 'add_version_button' ) . '"/>';
+   echo '</td>';
+   echo '</tr>';
+
+   echo '<tr>';
+   echo '<td colspan="' . COLS . '" class="center">';
+   echo '<input type="submit" name="update" class="button" value="' . plugin_lang_get( 'manversions_edit_submit' ) . '"/>';
+   echo '</td>';
+   echo '</tr>';
+}
+
+function print_dictionary( $edit_page, $type_index, $option_show_directory )
+{
+   echo '<td class="center">';
+   if ( $edit_page )
+   {
+      echo '<span class="checkbox">'; ?>
+      <label>
+         <input type="checkbox"
+                name="showdy<?php echo $type_index ?>" <?php check_checked( (boolean) $option_show_directory, true );
+         ?> />
+      </label>
+      <?php echo '</span>';
+   }
+   else
+   {
+      echo trans_bool( $option_show_directory );
+   }
+   echo '</td>';
+}
+
+function print_expoverview( $edit_page, $type_index, $option_show_expenses_overview )
+{
+   echo '<td class="center">';
+   if ( $edit_page )
+   {
+      echo '<span class="checkbox">'; ?>
+      <label>
+         <input type="checkbox"
+                name="showeo<?php echo $type_index ?>" <?php check_checked( (boolean) $option_show_expenses_overview, true );
+         ?> />
+      </label>
+      <?php echo '</span>';
+   }
+   else
+   {
+      echo trans_bool( $option_show_expenses_overview );
+   }
+   echo '</td>';
+}
+
+function print_duration( $edit_page, $type_index, $option_show_duration )
+{
+   echo '<td class="center">';
+   if ( $edit_page )
+   {
+      echo '<span class="checkbox">'; ?>
+      <label>
+         <input type="checkbox"
+                name="showpt<?php echo $type_index ?>" <?php check_checked( (boolean) $option_show_duration, true );
+         ?> />
+      </label>
+      <?php echo '</span>';
+   }
+   else
+   {
+      echo trans_bool( $option_show_duration );
+   }
+   echo '</td>';
+}
+
+function print_name( $type_string )
+{
+   echo '<td>';
+   echo string_display( $type_string );
+   echo '</td>';
+}
+
+function print_tablehead()
+{
+   $print_api = new print_api();
+
+   $col_width = 100 / COLS;
+   echo '<thead>';
+   $print_api->printFormTitle( COLS, 'mantypes_thead' );
+   echo '<tr class="row-category2">';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_print_duration' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_expenses_overview' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_directory' ) . '</th>';
+   echo '</tr>';
+   echo '</thead>';
 }

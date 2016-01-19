@@ -4,13 +4,12 @@ auth_reauthenticate();
 include SPECMANAGEMENT_CORE_URI . 'database_api.php';
 
 $database_api = new database_api();
-
 $update = gpc_get_bool( 'update', false );
 
 /**
  * Change all existing types
  */
-if ( $update && !is_null( $_POST['type_ids'] ) )
+if ( $update && isset( $_POST['type_ids'] ) )
 {
    $type_ids = $_POST['type_ids'];
 

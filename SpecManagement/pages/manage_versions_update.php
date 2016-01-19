@@ -4,7 +4,6 @@ auth_reauthenticate();
 include SPECMANAGEMENT_CORE_URI . 'database_api.php';
 
 $database_api = new database_api();
-
 $update = gpc_get_bool( 'update', false );
 $addversion = gpc_get_bool( 'addversion', false );
 
@@ -25,7 +24,7 @@ if ( $addversion && isset( $_POST['new_version'] ) )
 /**
  * Change all existing versions
  */
-if ( $update && !is_null( $_POST['version_ids'] ) )
+if ( $update && isset( $_POST['version_ids'] ) )
 {
    $version_ids = $_POST['version_ids'];
    $versions = $_POST['version'];

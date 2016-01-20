@@ -95,16 +95,19 @@ echo '<td>';
 
 
 $types_rows = $database_api->getFullTypes();
-foreach( $types_rows as $types_row )
+foreach ( $types_rows as $types_row )
 {
    $types[] = $types_row[1];
 }
 
 echo '<span class="select">';
 echo '<select ' . helper_get_tab_index() . ' id="types" name="types">';
-foreach ( $types as $type )
+if ( !is_null( $types ) )
 {
-   echo '<option value="' . $type . '">' . $type . '</option>';
+   foreach ( $types as $type )
+   {
+      echo '<option value="' . $type . '">' . $type . '</option>';
+   }
 }
 echo '</select>&nbsp';
 $new_type = gpc_get_string( 'newtype', '' );

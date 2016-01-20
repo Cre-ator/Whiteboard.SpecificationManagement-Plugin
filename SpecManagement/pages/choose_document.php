@@ -6,8 +6,9 @@ $database_api = new database_api();
 $print_api = new print_api();
 
 $t_project_id = gpc_get_int( 'project_id', helper_get_current_project() );
+$types = array();
 $types_rows = $database_api->getFullTypes();
-foreach( $types_rows as $types_row )
+foreach ( $types_rows as $types_row )
 {
    $types[] = $types_row[1];
 }
@@ -20,8 +21,8 @@ if ( isset( $_POST['types'] ) )
    $post = true;
 }
 
-html_page_top1( plugin_lang_get( 'select_doc_title' ) );
 echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
+html_page_top1( plugin_lang_get( 'select_doc_title' ) );
 html_page_top2();
 
 if ( plugin_is_installed( 'WhiteboardMenu' ) )
@@ -33,52 +34,37 @@ $print_api->print_plugin_menu();
 
 echo '<div align="center">';
 echo '<hr size="1" width="50%" />';
-echo '<table class="width50" cellspacing="1">';
+if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
+{
+   echo '<table class="width50" cellspacing="1" cellpadding="0">';
+}
+else
+{
+   echo '<div class="table-container">';
+   echo '<table width="50%">';
+}
 $print_api->printFormTitle( 2, 'select_doc' );
 
 $print_api->printCategoryField( 1, 1, 'select_type' );
 echo '<td>';
-echo '<form method="post" name="form_set_requirement" action="' . plugin_page( 'choose_document' ) . '">';
-echo '<select name="types" id="document_types">';
+echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
+echo '<select name="version_id">';
 foreach ( $types as $type )
 {
-   echo '<option value="' . $type . '"';
-   if ( $post && $_POST['types'] == $type )
-   {
-      echo ' selected="selected"';
-   }
-   echo '>' . string_html_specialchars( $type ) . '</option>';
-}
-echo '</select>';
-echo '&nbsp<input type="submit" class="button-small" value="' . lang_get( 'switch' ) . '" />';
-echo '</td>';
-echo '</tr>';
+   $type_string = string_html_specialchars( $type );
 
-$print_api->printRow();
-$print_api->printCategoryField( 1, 1, 'select_version' );
-echo '<td>';
-
-if ( $post )
-{
-   $document_type = $database_api->getTypeId( $_POST['types'] );
-}
-
-echo '</form>';
-echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
-if ( $document_type != null || $_POST['types'] != 'blank' )
-{
-   $version_ids = $database_api->getVersionIDs( $document_type, $t_project_id );
-
-   echo '<select name="version_id">';
+   $type_id = $database_api->getTypeId( $type );
+   $version_ids = $database_api->getVersionIDs( $type_id, $t_project_id );
    foreach ( $version_ids as $version_id )
    {
       $version_string = version_full_name( $version_id );
-      echo '<option value="' . $version_id . '">' . $version_string . '</option>';
+
+      echo '<option value="' . $version_id . '">';
+      echo $type_string . " - " . $version_string;
+      echo '</option>';
    }
-   echo '</select>';
 }
-echo '</td>';
-echo '</tr>';
+echo '</select>';
 
 $print_api->printRow();
 echo '<td class="center" colspan="2">';

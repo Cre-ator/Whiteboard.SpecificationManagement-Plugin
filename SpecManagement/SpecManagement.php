@@ -52,7 +52,6 @@ class SpecManagementPlugin extends MantisPlugin
             'EVENT_MENU_MAIN' => 'menu'
          );
       }
-
       return $hooks;
    }
 

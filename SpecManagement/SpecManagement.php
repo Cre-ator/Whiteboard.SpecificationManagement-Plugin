@@ -8,13 +8,13 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.16';
+      $this->version = '1.1.17';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
       );
 
-      $this->author = 'Stefan Schwarz';
+      $this->author = 'Stefan Schwarz, Rainer Dierck';
       $this->contact = '';
       $this->url = '';
    }
@@ -30,6 +30,7 @@ class SpecManagementPlugin extends MantisPlugin
             'EVENT_REPORT_BUG' => 'bugUpdateData',
             'EVENT_UPDATE_BUG_FORM' => 'bugViewFields',
             'EVENT_UPDATE_BUG' => 'bugUpdateData',
+            'EVENT_BUG_ACTION' => 'actiongroupUpdateData',
             'EVENT_BUG_DELETED' => 'deleteBugReference',
             'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
             'EVENT_MENU_MAIN' => 'menu',
@@ -45,6 +46,7 @@ class SpecManagementPlugin extends MantisPlugin
             'EVENT_REPORT_BUG' => 'bugUpdateData',
             'EVENT_UPDATE_BUG_FORM' => 'bugViewFields',
             'EVENT_UPDATE_BUG' => 'bugUpdateData',
+            'EVENT_BUG_ACTION' => 'actiongroupUpdateData',
             'EVENT_BUG_DELETED' => 'deleteBugReference',
             'EVENT_VIEW_BUG_DETAILS' => 'bugViewFields',
             'EVENT_MENU_MAIN' => 'menu'
@@ -209,7 +211,7 @@ class SpecManagementPlugin extends MantisPlugin
 
          if ( 0 == strlen( bug_get_field( $bug_id, 'target_version' ) ) )
          {
-            $database_api->updateSourceVersion( null );
+            $database_api->updateSourceVersion( $bug_id, null );
          }
 
          $p_version_id = $source_obj[2];
@@ -304,6 +306,44 @@ class SpecManagementPlugin extends MantisPlugin
    }
 
    /**
+    * Updates the version and associated type of the document if several issues
+    * are updated
+    *
+    * @param $event
+    * @param $event_type
+    * @param $bug_id
+    */
+   function actiongroupUpdateData( $event, $event_type, $bug_id )
+   {
+      // Get path to core folder
+      $t_core_path = config_get_global( 'plugin_path' )
+         . plugin_get_current()
+         . DIRECTORY_SEPARATOR
+         . 'core'
+         . DIRECTORY_SEPARATOR;
+
+      // Include constants
+      require_once( $t_core_path . 'database_api.php' );
+
+      $database_api = new database_api();
+
+      if ( $event_type == 'UP_TARGET_VERSION' )
+      {
+         $target_version = gpc_get_string( 'target_version', null );
+         $p_version_id = null;
+
+         if ( !( is_null( $target_version ) || $target_version == '' ) )
+         {
+            $version_id = version_get_id( $target_version );
+            $version_obj = $database_api->getVersionRowByVersionId( $version_id );
+            $p_version_id = $version_obj[0];
+         }
+
+         $database_api->updateSourceVersion( $bug_id, $p_version_id );
+      }
+   }
+
+   /**
     * If the whiteboard menu plugin isnt installed, show the specificationmanagement menu instead
     *
     * @return null|string
@@ -339,7 +379,7 @@ class SpecManagementPlugin extends MantisPlugin
       $plugin_version_row = $database_api->getVersionRowByVersionId( $version_id );
       $p_version_id = $plugin_version_row[0];
 
-      $database_api->updateSourceVersion( $p_version_id );
+      $database_api->updateSourceVersionSetNull( $p_version_id );
       $database_api->deleteVersionRow( $version_id );
    }
 

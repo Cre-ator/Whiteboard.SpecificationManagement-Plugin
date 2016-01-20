@@ -1,7 +1,7 @@
 <?php
-require_once( SPECMANAGEMENT_CORE_URI . 'constant_api.php' );
-include SPECMANAGEMENT_CORE_URI . 'database_api.php';
-include SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'constant_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
 $database_api = new database_api();
 $print_api = new print_api();

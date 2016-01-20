@@ -1,5 +1,5 @@
 <?php
-include SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
 
 auth_reauthenticate();
 

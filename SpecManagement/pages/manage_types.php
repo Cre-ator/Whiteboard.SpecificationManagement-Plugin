@@ -1,7 +1,7 @@
 <?php
-include SPECMANAGEMENT_CORE_URI . 'authorization_api.php';
-include SPECMANAGEMENT_CORE_URI . 'database_api.php';
-include SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'authorization_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
 define( 'COLS', 4 );
 $print_api = new print_api();
@@ -15,8 +15,8 @@ if ( isset( $_POST['edit'] ) )
 /**
  * Page content
  */
-html_page_top1( plugin_lang_get( 'mantypes_title' ) );
 echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
+html_page_top1( plugin_lang_get( 'mantypes_title' ) );
 html_page_top2();
 if ( plugin_is_installed( 'WhiteboardMenu' ) )
 {

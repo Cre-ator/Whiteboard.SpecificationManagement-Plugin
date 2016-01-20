@@ -505,9 +505,11 @@ class print_api
     */
    public function print_bugs( $chapter_index, $sub_chapter_index, $bug_id, $option_show_duration, $ptime )
    {
-      $bug_description = bug_get_text_field( $bug_id, 'description' );
-      $bug_streproduce = bug_get_text_field( $bug_id, 'steps_to_reproduce' );
-      $bug_ainformation = bug_get_text_field( $bug_id, 'additional_information' );
+      $bug = bug_get( $bug_id, true );
+
+      $bug_description = string_display_links( $bug->description );
+      $bug_streproduce = string_display_links( $bug->steps_to_reproduce );
+      $bug_ainformation = string_display_links( $bug->additional_information );
       $bug_attachments = bug_get_attachments( $bug_id );
       $bug_bugnotes = bugnote_get_all_bugnotes( $bug_id );
 
@@ -531,11 +533,11 @@ class print_api
       $this->print_bug_infos( $bug_description );
       $this->print_bug_infos( $bug_streproduce );
       $this->print_bug_infos( $bug_ainformation );
-      if ( !empty( $bug_attachments ) )
+      if ( !is_null( $bug_attachments ) )
       {
          $this->print_bug_attachments( $bug_id );
       }
-      if ( !empty( $bug_bugnotes ) )
+      if ( !is_null( $bug_bugnotes ) )
       {
          $this->print_bugnote_note( $bug_id );
       }

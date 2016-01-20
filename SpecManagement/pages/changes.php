@@ -1,6 +1,6 @@
 <?php
-include SPECMANAGEMENT_CORE_URI . 'database_api.php';
-include SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
 $database_api = new database_api();
 $print_api = new print_api();
@@ -43,8 +43,8 @@ if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
       $status_process_act = $print_api->calculate_status_doc_progress( $relevant_bugs_act );
    }
 
-   html_page_top1( plugin_lang_get( 'changes_title' ) . ': ' . $version_old->version . ' / ' . $version_act->version );
    echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
+   html_page_top1( plugin_lang_get( 'changes_title' ) . ': ' . $version_old->version . ' / ' . $version_act->version );
    html_page_top2();
 
    if ( plugin_is_installed( 'WhiteboardMenu' ) )

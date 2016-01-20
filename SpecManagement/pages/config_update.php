@@ -1,12 +1,11 @@
 <?php
 auth_reauthenticate();
 access_ensure_global_level( config_get( 'AccessLevel' ) );
-
 form_security_validate( 'plugin_SpecManagement_config_update' );
 
-require_once( SPECMANAGEMENT_CORE_URI . 'constant_api.php' );
-include SPECMANAGEMENT_CORE_URI . 'database_api.php';
-include SPECMANAGEMENT_CORE_URI . 'config_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'constant_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'config_api.php';
 
 $database_api = new database_api();
 $config_api = new config_api();

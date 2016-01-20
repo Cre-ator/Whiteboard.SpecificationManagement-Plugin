@@ -1,7 +1,7 @@
 <?php
 auth_reauthenticate();
 
-include SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
 
 $database_api = new database_api();
 $update = gpc_get_bool( 'update', false );

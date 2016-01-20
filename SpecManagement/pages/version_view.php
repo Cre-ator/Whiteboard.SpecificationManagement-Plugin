@@ -1,6 +1,6 @@
 <?php
-include SPECMANAGEMENT_CORE_URI . 'database_api.php';
-include SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
 define( 'COLS', 6 );
 $print_api = new print_api();

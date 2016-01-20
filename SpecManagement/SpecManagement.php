@@ -172,16 +172,16 @@ class SpecManagementPlugin extends MantisPlugin
    function bugViewFields( $event )
    {
       // Get path to core folder
-      $t_core_path   =  config_get_global ('plugin_path')
-                     .  plugin_get_current ()
-                     .  DIRECTORY_SEPARATOR
-                     .  'core'
-                     .  DIRECTORY_SEPARATOR;
-      
+      $t_core_path = config_get_global( 'plugin_path' )
+         . plugin_get_current()
+         . DIRECTORY_SEPARATOR
+         . 'core'
+         . DIRECTORY_SEPARATOR;
+
       // Include constants
-      require_once ($t_core_path . 'database_api.php');
-      require_once ($t_core_path . 'print_api.php');
-      
+      require_once( $t_core_path . 'database_api.php' );
+      require_once( $t_core_path . 'print_api.php' );
+
       $database_api = new database_api();
       $print_api = new print_api();
 
@@ -207,10 +207,9 @@ class SpecManagementPlugin extends MantisPlugin
          $ptime_obj = $database_api->getPtimeRow( $bug_id );
          $ptime = $ptime_obj[2];
 
-         if ( 0 == strlen ( bug_get_field( $bug_id, 'target_version' ) ) )
-         //if ( empty( bug_get_field( $bug_id, 'target_version' ) ) )
+         if ( 0 == strlen( bug_get_field( $bug_id, 'target_version' ) ) )
          {
-            $database_api->updateSourceRow( $bug_id, null, $work_package );
+            $database_api->updateSourceVersion( null );
          }
 
          $p_version_id = $source_obj[2];
@@ -258,14 +257,14 @@ class SpecManagementPlugin extends MantisPlugin
    function bugUpdateData( $event, BugData $bug )
    {
       // Get path to core folder
-      $t_core_path   =  config_get_global ('plugin_path')
-                     .  plugin_get_current ()
-                     .  DIRECTORY_SEPARATOR
-                     .  'core'
-                     .  DIRECTORY_SEPARATOR;
-      
+      $t_core_path = config_get_global( 'plugin_path' )
+         . plugin_get_current()
+         . DIRECTORY_SEPARATOR
+         . 'core'
+         . DIRECTORY_SEPARATOR;
+
       // Include constants
-      require_once ($t_core_path . 'database_api.php');
+      require_once( $t_core_path . 'database_api.php' );
 
       $database_api = new database_api();
 
@@ -324,14 +323,14 @@ class SpecManagementPlugin extends MantisPlugin
    function deleteVersion()
    {
       // Get path to core folder
-      $t_core_path   =  config_get_global ('plugin_path')
-                     .  plugin_get_current ()
-                     .  DIRECTORY_SEPARATOR
-                     .  'core'
-                     .  DIRECTORY_SEPARATOR;
-      
+      $t_core_path = config_get_global( 'plugin_path' )
+         . plugin_get_current()
+         . DIRECTORY_SEPARATOR
+         . 'core'
+         . DIRECTORY_SEPARATOR;
+
       // Include constants
-      require_once ($t_core_path . 'database_api.php');
+      require_once( $t_core_path . 'database_api.php' );
 
       $database_api = new database_api();
 
@@ -353,14 +352,14 @@ class SpecManagementPlugin extends MantisPlugin
    function deleteBugReference( $event, $bug_id )
    {
       // Get path to core folder
-      $t_core_path   =  config_get_global ('plugin_path')
-                     .  plugin_get_current ()
-                     .  DIRECTORY_SEPARATOR
-                     .  'core'
-                     .  DIRECTORY_SEPARATOR;
-      
+      $t_core_path = config_get_global( 'plugin_path' )
+         . plugin_get_current()
+         . DIRECTORY_SEPARATOR
+         . 'core'
+         . DIRECTORY_SEPARATOR;
+
       // Include constants
-      require_once ($t_core_path . 'database_api.php');
+      require_once( $t_core_path . 'database_api.php' );
 
       $database_api = new database_api();
 

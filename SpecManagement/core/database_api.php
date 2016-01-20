@@ -801,10 +801,29 @@ class database_api
       }
 
       $query = "INSERT INTO $plugin_src_table ( id, bug_id, p_version_id, work_package )
-         SELECT null," . $bug_id . "," . $p_version_id . ",'" . $work_package . "'
+         SELECT null," . $bug_id . ",";
+      if ( is_null( $p_version_id ) )
+      {
+         $query .= "null,";
+      }
+      else
+      {
+         $query .= $p_version_id . ",";
+      }
+
+      $query .= "'" . $work_package . "'
          FROM DUAL WHERE NOT EXISTS (
          SELECT 1 FROM $plugin_src_table
-         WHERE bug_id = " . $bug_id . " AND p_version_id = " . $p_version_id . " AND work_package = '" . $work_package . "')";
+         WHERE bug_id = " . $bug_id . " AND p_version_id = ";
+      if ( is_null( $p_version_id ) )
+      {
+         $query .= " null";
+      }
+      else
+      {
+         $query .= $p_version_id;
+      }
+      $query .= " AND work_package = '" . $work_package . "')";
 
       $this->mysqli->query( $query );
    }
@@ -950,8 +969,17 @@ class database_api
          $this->mysqli->query( $query );
 
          $query = "UPDATE $plugin_src_table
-            SET p_version_id = " . $p_version_id . ", work_package = '" . $work_package . "'
-            WHERE bug_id = " . $bug_id;
+            SET work_package = '" . $work_package . "'";
+
+         if ( is_null( $p_version_id ) )
+         {
+            $query .= ",p_version_id=null";
+         }
+         else
+         {
+            $query .= ",p_version_id=" . $p_version_id;
+         }
+         $query .= " WHERE bug_id = " . $bug_id;
 
          $this->mysqli->query( $query );
 

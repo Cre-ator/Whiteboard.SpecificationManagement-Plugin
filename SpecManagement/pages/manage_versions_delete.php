@@ -13,7 +13,7 @@ helper_ensure_confirmed( lang_get( 'version_delete_sure' ) .
    '<br/>' . lang_get( 'version_label' ) . lang_get( 'word_separator' ) . string_display_line( $version->version ),
    lang_get( 'delete_version_button' ) );
 
-$plugin_version_row = $database_api->getVersionRowByVersionId( $version_id );
+$plugin_version_row = $database_api->getPluginVersionRowByVersionId( $version_id );
 $p_version_id = $plugin_version_row[0];
 
 $database_api->updateSourceVersionSetNull( $p_version_id );

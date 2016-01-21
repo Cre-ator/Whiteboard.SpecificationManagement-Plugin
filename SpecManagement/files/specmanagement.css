@@ -1,45 +1,11 @@
-a:link
+a
 {
-   color: black;
-   background: transparent;
-   text-decoration: none;
-}
-
-a:visited
-{
-   color: black;
-   background: transparent;
-   text-decoration: none;
+    color: black;
+    background: transparent;
+    text-decoration: none;
 }
 
 a:hover
 {
-   color: black;
-   background: transparent;
-   text-decoration: underline;
-}
-
-a:active
-{
-   color: black;
-   background: transparent;
-   text-decoration: none;
-}
-
-td.infohead
-{
-   background-color: #ffffff;
-   color: #000000;
-   font-size: 8pt;
-   font-weight: bold;
-   text-align: left;
-}
-
-td.workpackagehead
-{
-   background-color: #ffffff;
-   color: #000000;
-   font-size: 10pt;
-   font-weight: bold;
-   text-align: left;
+    text-decoration: underline;
 }

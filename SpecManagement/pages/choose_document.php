@@ -68,10 +68,7 @@ echo '</select>';
 
 $print_api->printRow();
 echo '<td class="center" colspan="2">';
-?>
-   <input type="submit" name="formSubmit" class="button"
-          value="<?php echo plugin_lang_get( 'select_confirm' ); ?>"/>
-<?php
+echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'select_confirm' ) . '"/>';
 echo '</td>';
 echo '</tr>';
 echo '</form>';

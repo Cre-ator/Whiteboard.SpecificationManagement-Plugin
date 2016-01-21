@@ -17,11 +17,10 @@ $work_package_bug_ids = array();
 /* initialize parent project */
 $parent_project_id = $database_api->getMainProjectByHierarchy( helper_get_current_project() );
 
-/* get version if not empty */
 if ( isset( $_POST['version_id'] ) )
 {
    $version_id = $_POST['version_id'];
-   $version_obj = $database_api->getVersionRowByVersionId( $version_id );
+   $version_obj = $database_api->getPluginVersionRowByVersionId( $version_id );
    $p_version_id = $version_obj[0];
    $type_string = $database_api->getTypeString( $database_api->getTypeByVersion( $version_id ) );
    $type_id = $database_api->getTypeId( $type_string );
@@ -46,7 +45,7 @@ if ( isset( $_POST['version_id'] ) )
    }
 
    $print_api->print_plugin_menu();
-   $print_api->print_editor_menu();
+//   $print_api->print_editor_menu();
    $print_api->print_document_head( $type_string, $version_id, $parent_project_id, $versionSpecBugIds );
 
    echo '<table class="width60">';
@@ -167,8 +166,113 @@ if ( isset( $_POST['version_id'] ) )
       echo '</table>';
    }
    echo '<br /><table class="width60">';
-   echo '<thead><tr><th>Testbereich Bug Historie</th></tr></thead>';
+   echo '<thead><tr><th>Testbereich Bug Historie zu gegebener Version und deren Termin</th></tr></thead>';
    echo '<tbody>';
+
+   $ex_bug_id = 1;
+
+   $version = version_get( $version_id );
+   $version_date = $version->date_order;
+
+   /* Letzte Summary vor Versionstermin */
+   /**
+    * Eintrag #1 Summary geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Zusammenfassung: ';
+
+   $summary_value = null;
+   $int_filter_string = 'summary';
+   $summary_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   if ( strlen( $summary_value ) == 0 )
+   {
+      $summary_value = bug_get_field( $ex_bug_id, 'summary' );
+   }
+   echo string_display( $summary_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /* Letzte Priorität vor Versionstermin */
+   /**
+    * Eintrag #1 Priorität geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Priorität: ';
+
+   $priority_value = null;
+   $int_filter_string = 'priority';
+   $priority_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   if ( strlen( $priority_value ) == 0 )
+   {
+      $priority_value = bug_get_field( $ex_bug_id, 'priority' );
+   }
+   echo string_display( $priority_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /* Letzte Produktversion vor Versionstermin */
+   /**
+    * Eintrag #1 Produktversion geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Produktversion: ';
+
+   $product_version_value = null;
+   $int_filter_string = 'product_version';
+   $product_version_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   if ( strlen( $product_version_value ) == 0 )
+   {
+      $product_version_value = bug_get_field( $ex_bug_id, 'version' );
+   }
+   echo string_display( $product_version_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /* Letzter Status vor Versionstermin */
+   /**
+    * Eintrag #1 Status geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Status: ';
+
+   $status_value = null;
+   $int_filter_string = 'status';
+   $status_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   if ( strlen( $status_value ) == 0 )
+   {
+      $status_value = bug_get_field( $ex_bug_id, 'status' );
+   }
+   echo string_display( $status_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /* Letzte Lösung vor Versionstermin */
+   /**
+    * Eintrag #1 Lösung geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Lösung: ';
+
+   $resolution_value = null;
+   $int_filter_string = 'resolution';
+   $resolution_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   if ( strlen( $resolution_value ) == 0 )
+   {
+      $resolution_value = get_enum_element( 'resolution', bug_get_field( $ex_bug_id, 'resolution' ) );
+   }
+   echo string_display_line( $resolution_value );
+
+   echo '</td>';
+   echo '</tr>';
 
 
    echo '</tbody>';
@@ -176,3 +280,60 @@ if ( isset( $_POST['version_id'] ) )
 
 }
 html_page_bottom1();
+
+/**
+ * @param $ex_bug_id
+ * @param $version_date
+ * @param $int_filter_string
+ * @return array
+ */
+function calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string )
+{
+   $output_value = null;
+   $spec_filter_string = lang_get( $int_filter_string );
+
+   $min_time_difference = 0;
+   $min_time_difference_event_id = 0;
+   $bug_history_events = history_get_events_array( $ex_bug_id );
+
+//   var_dump( $bug_history_events );
+
+   for ( $event_index = 0; $event_index < count( $bug_history_events ); $event_index++ )
+   {
+      $bug_history_event = $bug_history_events[$event_index];
+
+      if ( $bug_history_event['note'] == $spec_filter_string )
+      {
+         $bug_history_event_date = strtotime( $bug_history_event['date'] );
+         $local_time_difference = ( $version_date - $bug_history_event_date );
+
+         /* initial value */
+         if ( $min_time_difference == 0 )
+         {
+            $min_time_difference = $local_time_difference;
+            $min_time_difference_event_id = $event_index;
+         }
+
+         /* overwrite existing if it is closer to event date */
+         if ( $min_time_difference > $local_time_difference )
+         {
+            $min_time_difference = $local_time_difference;
+            $min_time_difference_event_id = $event_index;
+         }
+      }
+   }
+
+   $output_change = $bug_history_events[$min_time_difference_event_id]['change'];
+   $output_values = explode( ' => ', $output_change );
+
+   if ( $min_time_difference <= 0 )
+   {
+      $output_value = $output_values[0];
+   }
+   else
+   {
+      $output_value = $output_values[1];
+   }
+
+   return $output_value;
+}

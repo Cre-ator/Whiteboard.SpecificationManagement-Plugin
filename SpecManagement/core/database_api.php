@@ -264,7 +264,7 @@ class database_api
     * @param $version_id
     * @return array|null
     */
-   public function getVersionRowByVersionId( $version_id )
+   public function getPluginVersionRowByVersionId( $version_id )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -1101,7 +1101,7 @@ class database_api
     */
    public function updateVersionRow( $project_id, $version_id, $type_id )
    {
-      if ( $this->getVersionRowByVersionId( $version_id ) == null )
+      if ( $this->getPluginVersionRowByVersionId( $version_id ) == null )
       {
          $this->insertVersionRow( $project_id, $version_id, $type_id );
       }
@@ -1116,7 +1116,7 @@ class database_api
             $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
          }
 
-         $version_row = $this->getVersionRowByVersionId( $version_id );
+         $version_row = $this->getPluginVersionRowByVersionId( $version_id );
          $p_version_id = $version_row[0];
 
          $query = "SET SQL_SAFE_UPDATES = 0";
@@ -1142,7 +1142,7 @@ class database_api
     */
    public function updateVersionAssociatedType( $project_id, $version_id, $type_id )
    {
-      if ( $this->getVersionRowByVersionId( $version_id ) == null )
+      if ( $this->getPluginVersionRowByVersionId( $version_id ) == null )
       {
          $this->insertVersionRow( $project_id, $version_id, $type_id );
       }

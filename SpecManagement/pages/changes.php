@@ -17,7 +17,7 @@ if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
 {
    /* old bug */
    $version_old = version_get( $_POST['version_old'] );
-   $version_old_obj = $database_api->getVersionRowByVersionId( $version_old->id );
+   $version_old_obj = $database_api->getPluginVersionRowByVersionId( $version_old->id );
    $p_version_old_id = $version_old_obj[0];
    $work_packages_old = $database_api->getDocumentSpecWorkPackages( $p_version_old_id );
    $relevant_bugs_old = $database_api->getAllBugsFromWorkpackages( $work_packages_old, $p_version_old_id );
@@ -31,7 +31,7 @@ if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
 
    /* act bug */
    $version_act = version_get( $_POST['version_act'] );
-   $version_act_obj = $database_api->getVersionRowByVersionId( $version_act->id );
+   $version_act_obj = $database_api->getPluginVersionRowByVersionId( $version_act->id );
    $p_version_act_id = $version_act_obj[0];
    $work_packages_act = $database_api->getDocumentSpecWorkPackages( $p_version_act_id );
    $relevant_bugs_act = $database_api->getAllBugsFromWorkpackages( $work_packages_act, $p_version_act_id );

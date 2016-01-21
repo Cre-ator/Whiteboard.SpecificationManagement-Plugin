@@ -284,7 +284,7 @@ class SpecManagementPlugin extends MantisPlugin
       if ( !is_null( $target_version ) )
       {
          $version_id = version_get_id( $target_version );
-         $version_obj = $database_api->getVersionRowByVersionId( $version_id );
+         $version_obj = $database_api->getPluginVersionRowByVersionId( $version_id );
          $p_version_id = $version_obj[0];
          $type_id = $database_api->getTypeId( $type );
       }
@@ -334,7 +334,7 @@ class SpecManagementPlugin extends MantisPlugin
          if ( !( is_null( $target_version ) || $target_version == '' ) )
          {
             $version_id = version_get_id( $target_version );
-            $version_obj = $database_api->getVersionRowByVersionId( $version_id );
+            $version_obj = $database_api->getPluginVersionRowByVersionId( $version_id );
             $p_version_id = $version_obj[0];
          }
 
@@ -375,7 +375,7 @@ class SpecManagementPlugin extends MantisPlugin
 
       $version_id = gpc_get_int( 'version_id' );
 
-      $plugin_version_row = $database_api->getVersionRowByVersionId( $version_id );
+      $plugin_version_row = $database_api->getPluginVersionRowByVersionId( $version_id );
       $p_version_id = $plugin_version_row[0];
 
       $database_api->updateSourceVersionSetNull( $p_version_id );

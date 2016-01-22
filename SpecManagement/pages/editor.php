@@ -174,7 +174,6 @@ if ( isset( $_POST['version_id'] ) )
    $version = version_get( $version_id );
    $version_date = $version->date_order;
 
-   /* Letzte Summary vor Versionstermin */
    /**
     * Eintrag #1 Summary geändert
     */
@@ -194,7 +193,6 @@ if ( isset( $_POST['version_id'] ) )
    echo '</td>';
    echo '</tr>';
 
-   /* Letzte Priorität vor Versionstermin */
    /**
     * Eintrag #1 Priorität geändert
     */
@@ -214,7 +212,6 @@ if ( isset( $_POST['version_id'] ) )
    echo '</td>';
    echo '</tr>';
 
-   /* Letzte Produktversion vor Versionstermin */
    /**
     * Eintrag #1 Produktversion geändert
     */
@@ -225,16 +222,11 @@ if ( isset( $_POST['version_id'] ) )
    $product_version_value = null;
    $int_filter_string = 'product_version';
    $product_version_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
-   if ( strlen( $product_version_value ) == 0 )
-   {
-      $product_version_value = bug_get_field( $ex_bug_id, 'version' );
-   }
    echo string_display( $product_version_value );
 
    echo '</td>';
    echo '</tr>';
 
-   /* Letzter Status vor Versionstermin */
    /**
     * Eintrag #1 Status geändert
     */
@@ -254,7 +246,6 @@ if ( isset( $_POST['version_id'] ) )
    echo '</td>';
    echo '</tr>';
 
-   /* Letzte Lösung vor Versionstermin */
    /**
     * Eintrag #1 Lösung geändert
     */
@@ -274,6 +265,212 @@ if ( isset( $_POST['version_id'] ) )
    echo '</td>';
    echo '</tr>';
 
+   /**
+    * Eintrag #1 Bearbeiter geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Bearbeiter: ';
+
+   $handler_value = null;
+   $int_filter_string = 'assigned_to';
+   $handler_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   echo string_display_line( $handler_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Zielversion geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Zielversion: ';
+
+   $target_version_value = null;
+   $int_filter_string = 'target_version';
+   $target_version_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   echo string_display_line( $target_version_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Behoben in Version geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Behoben in Version: ';
+
+   $fixed_in_version_value = null;
+   $int_filter_string = 'fixed_in_version';
+   $fixed_in_version_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   echo string_display_line( $fixed_in_version_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Reproduzierbarkeit geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Reproduzierbarkeit: ';
+
+   $reproducibility_value = null;
+   $int_filter_string = 'reproducibility';
+   $reproducibility_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   if ( strlen( $reproducibility_value ) == 0 )
+   {
+      $reproducibility_value = get_enum_element( 'reproducibility', bug_get_field( $ex_bug_id, 'reproducibility' ) );
+   }
+   echo string_display_line( $reproducibility_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Sichtbarkeit geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Sichtbarkeit: ';
+
+   $view_state_value = null;
+   $int_filter_string = 'view_status';
+   $view_state_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   if ( strlen( $view_state_value ) == 0 )
+   {
+      $view_state_value = get_enum_element( 'view_status', bug_get_field( $ex_bug_id, 'view_state' ) );
+   }
+   echo string_display_line( $view_state_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Auswirkung geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Auswirkung: ';
+
+   $severity_value = null;
+   $int_filter_string = 'severity';
+   $severity_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   if ( strlen( $severity_value ) == 0 )
+   {
+      $severity_value = get_enum_element( 'severity', bug_get_field( $ex_bug_id, 'severity' ) );
+   }
+   echo string_display_line( $severity_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Plattform geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Plattform: ';
+
+   $platform_value = null;
+   $int_filter_string = 'platform';
+   $platform_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   echo string_display_line( $platform_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 OS geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - OS: ';
+
+   $os_value = null;
+   $int_filter_string = 'os';
+   $os_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   echo string_display_line( $os_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 OS Version geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - OS Version: ';
+
+   $os_build_value = null;
+   $int_filter_string = 'os_version';
+   $os_build_value = calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string );
+   echo string_display_line( $os_build_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Beschreibung geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Beschreibung: ';
+
+   $description_value = null;
+   $value_type = 1;
+   $description_value = calculateLastTextfields( $ex_bug_id, $version_date, $value_type );
+   echo string_display_line( $description_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Schritte zur Reproduktion geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Schritte zur Reproduktion: ';
+
+   $steps_to_reproduce_value = null;
+   $value_type = 2;
+   $steps_to_reproduce_value = calculateLastTextfields( $ex_bug_id, $version_date, $value_type );
+   echo string_display_line( $steps_to_reproduce_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Zusätzliche Informationen geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Zusätzliche Informationen: ';
+
+   $additional_information_value = null;
+   $value_type = 3;
+   $additional_information_value = calculateLastTextfields( $ex_bug_id, $version_date, $value_type );
+   echo string_display_line( $additional_information_value );
+
+   echo '</td>';
+   echo '</tr>';
+
+   /**
+    * Eintrag #1 Anzahl Notizen geändert
+    */
+   echo '<tr>';
+   echo '<td>';
+   echo 'Testbetrieb für Issue #1 - Anzahl Notizen: ';
+
+   $bugnote_count_value = null;
+   $bugnote_count_value = calculateLastBugnotes( $ex_bug_id, $version_date );
+   echo string_display_line( $bugnote_count_value );
+
+   echo '</td>';
+   echo '</tr>';
+
 
    echo '</tbody>';
    echo '</table>';
@@ -282,6 +479,22 @@ if ( isset( $_POST['version_id'] ) )
 html_page_bottom1();
 
 /**
+ * Get last change values for:
+ * - Summary
+ * - Priorität
+ * - Produktversion
+ * - Zielversion
+ * - Behoben in Version
+ * - Status
+ * - Lösung
+ * - Reproduzierbarkeit
+ * - Sichtbarkeit
+ * - Auswirkung
+ * - Bearbeiter
+ * - Plattform
+ * - OS
+ * - OS Version
+ *
  * @param $ex_bug_id
  * @param $version_date
  * @param $int_filter_string
@@ -295,8 +508,6 @@ function calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string )
    $min_time_difference = 0;
    $min_time_difference_event_id = 0;
    $bug_history_events = history_get_events_array( $ex_bug_id );
-
-//   var_dump( $bug_history_events );
 
    for ( $event_index = 0; $event_index < count( $bug_history_events ); $event_index++ )
    {
@@ -336,4 +547,101 @@ function calculate_lastChange( $ex_bug_id, $version_date, $int_filter_string )
    }
 
    return $output_value;
+}
+
+/**
+ * Get last change values for:
+ * - Description
+ * - Steps to reproduce
+ * - Additional information
+ *
+ * @param $ex_bug_id
+ * @param $version_date
+ * @param $type_id
+ * @return null
+ */
+function calculateLastTextfields( $ex_bug_id, $version_date, $type_id )
+{
+   $output_value = null;
+   $min_pos_time_difference = 0;
+   $min_pos_time_difference_description = null;
+   $min_neg_time_difference = 0;
+   $min_neg_time_difference_description = null;
+
+   $revision_events = bug_revision_list( $ex_bug_id );
+
+   foreach ( $revision_events as $revision_event )
+   {
+      if ( $revision_event['type'] == $type_id )
+      {
+         $revision_event_timestamp = $revision_event['timestamp'];
+         $local_time_difference = ( $version_date - $revision_event_timestamp );
+
+         if ( $local_time_difference > 0 )
+         {
+            /* initial value */
+            if ( $min_pos_time_difference == 0 )
+            {
+               $min_pos_time_difference = $local_time_difference;
+               $min_pos_time_difference_description = $revision_event['value'];
+            }
+
+            /* overwrite existing if it is closer to event date */
+            if ( $min_pos_time_difference > $local_time_difference )
+            {
+               $min_pos_time_difference = $local_time_difference;
+               $min_pos_time_difference_description = $revision_event['value'];
+            }
+         }
+         else
+         {
+            /* initial value */
+            if ( $min_neg_time_difference == 0 )
+            {
+               $min_neg_time_difference = $local_time_difference;
+               $min_neg_time_difference_description = $revision_event['value'];
+            }
+
+            /* overwrite existing if it is closer to event date */
+            if ( $min_neg_time_difference < $local_time_difference )
+            {
+               $min_neg_time_difference = $local_time_difference;
+               $min_neg_time_difference_description = $revision_event['value'];
+            }
+         }
+      }
+   }
+
+   if ( !is_null( $min_pos_time_difference_description ) )
+   {
+      $output_value = $min_pos_time_difference_description;
+   }
+   else
+   {
+      $output_value = $min_neg_time_difference_description;
+   }
+   return $output_value;
+}
+
+/**
+ * Get last change values for:
+ * - amount of bugotes
+ *
+ * @param $ex_bug_id
+ * @param $version_date
+ * @return int
+ */
+function calculateLastBugnotes( $ex_bug_id, $version_date )
+{
+   $bugnote_count = 0;
+
+   $bugnotes = bugnote_get_all_bugnotes( $ex_bug_id );
+   foreach ( $bugnotes as $bugnote )
+   {
+      if ( $bugnote->date_submitted <= $version_date )
+      {
+         $bugnote_count++;
+      }
+   }
+   return $bugnote_count;
 }

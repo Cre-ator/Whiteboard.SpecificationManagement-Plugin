@@ -77,9 +77,9 @@ class database_api
          $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
       }
 
-      $query = "SELECT COUNT(*) FROM $plugin_vers_table v
-          WHERE v.type_id = " . $type_id;
-
+      $query = "SELECT COUNT(v.id) FROM $plugin_vers_table v, " . $g_database_name . ".mantis_project_version_table w
+          WHERE v.type_id = " . $type_id . " AND v.version_id = w.id";
+   
       $result = $this->mysqli->query( $query );
       if ( 0 != $result->num_rows )
       {
@@ -146,8 +146,8 @@ class database_api
          $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
       }
 
-      $query = "SELECT DISTINCT v.type_id FROM $plugin_vers_table v
-          WHERE v.version_id = " . $version_id;
+      $query = "SELECT DISTINCT v.type_id FROM $plugin_vers_table v, " . $g_database_name . ".mantis_project_version_table w
+          WHERE v.version_id = " . $version_id . " AND v.version_id = w.id";
 
       $result = $this->mysqli->query( $query );
       if ( 0 != $result->num_rows )
@@ -281,8 +281,8 @@ class database_api
       }
       else
       {
-         $query = "SELECT * FROM $plugin_vers_table
-            WHERE version_id = " . $version_id;
+         $query = "SELECT * FROM $plugin_vers_table v, " . $g_database_name . ".mantis_project_version_table w
+            WHERE v.version_id = " . $version_id . " AND v.version_id = w.id";
 
          $result = $this->mysqli->query( $query );
          if ( 0 != $result->num_rows )
@@ -314,8 +314,8 @@ class database_api
          $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
       }
 
-      $query = "SELECT * FROM $plugin_vers_table v
-        WHERE v.id = " . $primary_id;
+      $query = "SELECT * FROM $plugin_vers_table v, " . $g_database_name . ".mantis_project_version_table w
+        WHERE v.id = " . $primary_id . " AND v.version_id = w.id";
 
       $result = $this->mysqli->query( $query );
       if ( 0 != $result->num_rows )
@@ -346,8 +346,8 @@ class database_api
          $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
       }
 
-      $query = "SELECT * FROM $plugin_vers_table v
-        WHERE v.project_id = " . $project_id;
+      $query = "SELECT * FROM $plugin_vers_table v, " . $g_database_name . ".mantis_project_version_table w
+        WHERE v.project_id = " . $project_id . " AND v.version_id = w.id";
 
       $result = $this->mysqli->query( $query );
       if ( 0 != $result->num_rows )
@@ -486,8 +486,8 @@ class database_api
       }
 
       $query = "SELECT DISTINCT v.version_id
-         FROM $plugin_vers_table v
-         WHERE v.type_id = " . $type_id;
+         FROM $plugin_vers_table v, " . $g_database_name . ".mantis_project_version_table w
+         WHERE v.type_id = " . $type_id . " AND v.version_id = w.id";
       if ( $project_id != 0 )
       {
          $query .= " AND v.project_id = " . $project_id;

@@ -9,3 +9,10 @@ a:hover
 {
     text-decoration: underline;
 }
+
+td.selected
+{
+    background-color: #91ffe6;
+    color: #000000;
+    font-weight: bold;
+}

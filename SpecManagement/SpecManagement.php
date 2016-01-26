@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.18';
+      $this->version = '1.1.19';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',

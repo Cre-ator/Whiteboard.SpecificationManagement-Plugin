@@ -1360,10 +1360,10 @@ class database_api
       }
 
       $duration = 0;
-      for ( $bug_index = 0; $bug_index < count( $bug_array ); $bug_index++ )
+      foreach ( $bug_array as $bug )
       {
          $query = "SELECT time FROM $plugin_ptime_table
-            WHERE bug_id = " . $bug_array[$bug_index];
+            WHERE bug_id = " . $bug;
 
          $result = $this->mysqli->query( $query );
          $bug_duration = 0;

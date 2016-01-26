@@ -390,110 +390,20 @@ class print_api
       $act_version = version_get( $version_id );
 
       echo '<table class="width60">';
-
-      echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get( 'head_title' ) . '</td>';
-      echo '<td class="form-title" colspan="3">' . $type_string . ' - ' . version_full_name( $version_id ) . '</td>';
-      echo '</tr>';
-
-      echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get( 'head_version' ) . '</td>';
-      echo '<td class="form-title" colspan="3">' . version_full_name( $version_id ) . '</td>';
-      echo '</tr>';
-
-      echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get( 'head_customer' ) . '</td>';
-      echo '<td class="form-title" colspan="3">' . project_get_name( $parent_project_id ) . '</td>';
-      echo '</tr>';
-
-      echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get( 'head_project' ) . '</td>';
-      echo '<td class="form-title" colspan="3">' . project_get_name( helper_get_current_project() ) . '</td>';
-      echo '</tr>';
-
-      echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get( 'head_date' ) . '</td>';
-      echo '<td class="form-title" colspan="3">' . date( 'j\.m\.Y' ) . '</td>';
-      echo '</tr>';
-
-      echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get( 'head_person_in_charge' ) . '</td>';
-      echo '<td class="form-title" colspan="3">' . user_get_realname( auth_get_current_user_id() ) . '</td>';
-      echo '</tr>';
-
+      $this->print_doc_head_row( 'head_title', $type_string . ' - ' . version_full_name( $version_id ) );
+      $this->print_doc_head_row( 'head_version', version_full_name( $version_id ) );
+      $this->print_doc_head_row( 'head_customer', project_get_name( $parent_project_id ) );
+      $this->print_doc_head_row( 'head_project', project_get_name( helper_get_current_project() ) );
+      $this->print_doc_head_row( 'head_date', date( 'j\.m\.Y' ) );
+      $this->print_doc_head_row( 'head_person_in_charge', $this->calculate_person_in_charge() );
       if ( !is_null( $allRelevantBugs ) )
       {
-         echo '<tr>';
-         echo '<td class="field-container">' . plugin_lang_get( 'head_process' ) . '</td>';
-         echo '<td class="form-title" colspan="3">';
-         $this->print_document_progress( $allRelevantBugs );
-         echo '</td>';
-         echo '</tr>';
+         $this->print_doc_head_row( 'head_process', $this->print_document_progress( $allRelevantBugs ) );
       }
-
-      echo '<tr>';
-      echo '<td class="field-container" colspan="4">' . plugin_lang_get( 'head_versions_past' ) . '</td>';
-      echo '</tr>';
-      foreach ( $versions as $version )
-      {
-         if ( $version['date_order'] < $act_version->date_order )
-         {
-            echo '<tr>';
-            echo '<td/>';
-            echo '<td class="form-title">';
-            echo version_full_name( $version['id'] );
-            echo '</td>';
-            echo '<td>';
-            echo '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">';
-            echo '<input type="hidden" name="version_old" value="' . $version['id'] . '" />';
-            echo '<input type="hidden" name="version_act" value="' . $act_version->id . '" />';
-            echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>';
-            echo '</form>';
-            echo '</td>';
-            echo '<td>';
-            echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
-            echo '<input type="hidden" name="version_id" value="' . $version['id'] . '" />';
-            echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_view' ) . '"/>';
-            echo '</form>';
-            echo '</td>';
-            echo '</tr>';
-         }
-      }
-
-      echo '<tr>';
-      echo '<td class="field-container" colspan="4">' . plugin_lang_get( 'head_versions_future' ) . '</td>';
-      echo '</tr>';
-      foreach ( $versions as $version )
-      {
-         if ( $version['date_order'] > $act_version->date_order )
-         {
-            echo '<tr>';
-            echo '<td/>';
-            echo '<td class="form-title">';
-            echo version_full_name( $version['id'] );
-            echo '</td>';
-            echo '<td>';
-            echo '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">';
-            echo '<input type="hidden" name="version_old" value="' . $act_version->id . '" />';
-            echo '<input type="hidden" name="version_act" value="' . $version['id'] . '" />';
-            echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>';
-            echo '</form>';
-            echo '</td>';
-            echo '<td>';
-            echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
-            echo '<input type="hidden" name="version_id" value="' . $version['id'] . '" />';
-            echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_view' ) . '"/>';
-            echo '</form>';
-            echo '</td>';
-            echo '</tr>';
-         }
-      }
-
+      $this->print_doc_head_versions( $versions, $act_version );
       echo '</table>';
-
       echo '<br />';
    }
-
 
 
    /**
@@ -558,6 +468,12 @@ class print_api
       return $document_process;
    }
 
+   /**
+    * Gets the sum of each planned time for a bunch of issues
+    *
+    * @param $allRelevantBugs
+    * @return array
+    */
    public function calculate_pt_doc_progress( $allRelevantBugs )
    {
       $database_api = new database_api();
@@ -588,9 +504,11 @@ class print_api
     * Prints the process of a document
     *
     * @param $allRelevantBugs
+    * @return string
     */
    public function print_document_progress( $allRelevantBugs )
    {
+      $process_string = '';
       $database_api = new database_api();
       $status_flag = false;
 
@@ -612,9 +530,9 @@ class print_api
             $status_process = $this->calculate_status_doc_progress( $allRelevantBugs );
          }
 
-         echo '<div class="progress400">';
-         echo '<span class="bar" style="width: ' . $status_process . '%;">' . $status_process . '%</span>';
-         echo '</div>';
+         $process_string .= '<div class="progress400">';
+         $process_string .= '<span class="bar" style="width: ' . $status_process . '%;">' . round( $status_process, 2 ) . '%</span>';
+         $process_string .= '</div>';
       }
       else
       {
@@ -628,10 +546,11 @@ class print_api
             $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
          }
 
-         echo '<div class="progress400">';
-         echo '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';
-         echo '</div>';
+         $process_string .= '<div class="progress400">';
+         $process_string .= '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';
+         $process_string .= '</div>';
       }
+      return $process_string;
    }
 
    # List the attachments belonging to the specified bug.  This is used from within
@@ -787,5 +706,89 @@ document.getElementById( span ).style.display = displayType;
       echo '<th colspan="1">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')</th>';
       echo '</tr>';
       echo '</thead>';
+   }
+
+   /**
+    * @param $lang_string
+    * @param $col_data
+    */
+   public function print_doc_head_row( $lang_string, $col_data )
+   {
+      echo '<tr>';
+      echo '<td class="field-container">' . plugin_lang_get( $lang_string ) . '</td>';
+      echo '<td class="form-title" colspan="3">' . $col_data . '</td>';
+      echo '</tr>';
+   }
+
+   /**
+    * Gets the managers of the current selected project
+    *
+    * @return string
+    */
+   public function calculate_person_in_charge()
+   {
+      $person_in_charge = '';
+      $project_related_users = project_get_local_user_rows( helper_get_current_project() );
+      $count = 0;
+      foreach ( $project_related_users as $project_related_user )
+      {
+         if ( $project_related_user['project_id'] == helper_get_current_project()
+            && $project_related_user['access_level'] == 70
+         )
+         {
+            if ( $count > 0 )
+            {
+               $person_in_charge .= ', ';
+            }
+            $person_in_charge .= user_get_realname( $project_related_user['user_id'] );
+            $count++;
+         }
+      }
+      return $person_in_charge;
+   }
+
+   /**
+    * @param $versions
+    * @param $act_version
+    */
+   public function print_doc_head_versions( $versions, $act_version )
+   {
+      foreach ( $versions as $version )
+      {
+         $same_version = $act_version->id == $version['id'];
+         echo '<tr>';
+         $this->print_doc_head_version_col( $same_version, date_is_null( $version['date_order'] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version['date_order'] ) ) );
+         $this->print_doc_head_version_col( $same_version, version_full_name( $version['id'] ) );
+         $change_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">'
+            . '<input type="hidden" name="version_old" value="' . $version['id'] . '" />'
+            . '<input type="hidden" name="version_act" value="' . $act_version->id . '" />'
+            . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>'
+            . '</form>';
+         $this->print_doc_head_version_col( $same_version, $change_button_string );
+         $show_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">'
+            . '<input type="hidden" name="version_id" value="' . $version['id'] . '" />'
+            . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_view' ) . '"/>'
+            . '</form>';
+         $this->print_doc_head_version_col( $same_version, $show_button_string );
+         echo '</tr>';
+      }
+   }
+
+   /**
+    * @param $same_version
+    * @param $data
+    */
+   public function print_doc_head_version_col( $same_version, $data )
+   {
+      if ( $same_version )
+      {
+         echo '<td class="selected">';
+      }
+      else
+      {
+         echo '<td>';
+      }
+      echo $data;
+      echo '</td>';
    }
 }

@@ -19,6 +19,11 @@ $parent_project_id = $database_api->getMainProjectByHierarchy( helper_get_curren
 
 if ( isset( $_POST['version_id'] ) )
 {
+   $print_flag = false;
+   if ( isset( $_POST['print'] ) )
+   {
+      $print_flag = true;
+   }
    $version_id = $_POST['version_id'];
    $version = version_get( $version_id );
    $version_date = $version->date_order;
@@ -39,18 +44,26 @@ if ( isset( $_POST['version_id'] ) )
 
    echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
    html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_full_name( $version_id ) );
-   html_page_top2();
-
-   if ( plugin_is_installed( 'WhiteboardMenu' ) )
+   if ( !$print_flag )
    {
-      $print_api->print_whiteboardplugin_menu();
+      html_page_top2();
+
+      if ( plugin_is_installed( 'WhiteboardMenu' ) )
+      {
+         $print_api->print_whiteboardplugin_menu();
+      }
+      $print_api->print_plugin_menu();
    }
+   print_document_head( $type_string, $version_id, $parent_project_id, $versionSpecBugIds, $print_flag );
 
-   $print_api->print_plugin_menu();
-//   $print_api->print_editor_menu();
-   $print_api->print_document_head( $type_string, $version_id, $parent_project_id, $versionSpecBugIds );
-
-   echo '<table class="width60">';
+   if ( !$print_flag )
+   {
+      echo '<table class="editor">';
+   }
+   else
+   {
+      echo '<table class="editorprint">';
+   }
 
    $chapter_index = 1;
 
@@ -70,7 +83,7 @@ if ( isset( $_POST['version_id'] ) )
 
          $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
          /* print work package */
-         $print_api->print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration );
+         print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration );
          /* get work package assigned bugs */
          $work_package_bug_ids = $database_api->getWorkPackageSpecBugs( $p_version_id, $work_package );
 
@@ -84,7 +97,7 @@ if ( isset( $_POST['version_id'] ) )
                /* bug data */
                $bug_data = calculate_bug_data( $bug_id, $version_date );
                /* print bugs */
-               print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration );
+               print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag );
                /* increment index */
                $sub_chapter_index += 10;
                /* remove bug from version spec bugs */
@@ -101,13 +114,12 @@ if ( isset( $_POST['version_id'] ) )
 
    /*
     * If there are bugs left without work packages, print them too, if it is set in the config
-    * TODO: set config
     */
    if ( true && !is_null( $versionSpecBugIds ) )
    {
       $duration = $database_api->getBugDuration( $versionSpecBugIds );
       /* print work package */
-      $print_api->print_simple_chapter_title( $chapter_index, $option_show_duration, $duration );
+      print_simple_chapter_title( $chapter_index, $option_show_duration, $duration );
 
       $sub_chapter_index = 10;
       foreach ( $versionSpecBugIds as $versionSpecBugId )
@@ -118,7 +130,7 @@ if ( isset( $_POST['version_id'] ) )
             /* bug data */
             $bug_data = calculate_bug_data( $versionSpecBugId, $version_date );
             /* print bugs */
-            print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration );
+            print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag );
             /* increment index */
             $sub_chapter_index += 10;
             /* remove bug from version spec bugs */
@@ -134,24 +146,25 @@ if ( isset( $_POST['version_id'] ) )
 
    if ( $option_show_expenses_overview == '1' )
    {
-      print_expenses_overview( $work_packages, $p_version_id );
+      print_expenses_overview( $work_packages, $p_version_id, $print_flag );
    }
 
 }
-html_page_bottom1();
-
-function proceed_bugs(  )
+if ( !$print_flag )
 {
-
+   html_page_bottom1();
 }
 
-
+/**
+ * Gets and returns relevant data for a given bug and date
+ *
+ * @param $bug_id
+ * @param $version_date
+ * @return array
+ */
 function calculate_bug_data( $bug_id, $version_date )
 {
-   $t_core_path = config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR;
-   require_once( $t_core_path . 'database_api.php' );
    $database_api = new database_api();
-
    /* Initialize bug data array */
    $bug_data = array();
    /* bug object */
@@ -207,7 +220,6 @@ function calculate_bug_data( $bug_id, $version_date )
    return $bug_data;
 }
 
-
 /**
  * Get last change values for:
  * - Summary
@@ -234,7 +246,6 @@ function calculate_lastChange( $bug_id, $version_date, $int_filter_string )
 {
    $output_value = null;
    $spec_filter_string = lang_get( $int_filter_string );
-
    $min_time_difference = 0;
    $min_time_difference_event_id = 0;
    $bug_history_events = history_get_events_array( $bug_id );
@@ -377,6 +388,127 @@ function calculateLastBugnotes( $bug_id, $version_date )
 }
 
 /**
+ * Gets the managers of the current selected project
+ *
+ * @return string
+ */
+function calculate_person_in_charge()
+{
+   $person_in_charge = '';
+   $project_related_users = project_get_local_user_rows( helper_get_current_project() );
+   $count = 0;
+   foreach ( $project_related_users as $project_related_user )
+   {
+      if ( $project_related_user['project_id'] == helper_get_current_project()
+         && $project_related_user['access_level'] == 70
+      )
+      {
+         if ( $count > 0 )
+         {
+            $person_in_charge .= ', ';
+         }
+         $person_in_charge .= user_get_realname( $project_related_user['user_id'] );
+         $count++;
+      }
+   }
+   return $person_in_charge;
+}
+
+/**
+ * Gets the sum of each planned time for a bunch of issues
+ *
+ * @param $allRelevantBugs
+ * @return array
+ */
+function calculate_pt_doc_progress( $allRelevantBugs )
+{
+   $database_api = new database_api();
+   $sum_pt = array();
+   $sum_pt_all = 0;
+   $sum_pt_bug = 0;
+   foreach ( $allRelevantBugs as $bug_id )
+   {
+      $ptime_row = $database_api->getPtimeRow( $bug_id );
+      if ( !is_null( $ptime_row[2] ) || 0 != $ptime_row[2] )
+      {
+         $sum_pt_all += $ptime_row[2];
+         if ( bug_get_field( $bug_id, 'status' ) == PLUGINS_SPECMANAGEMENT_STAT_RESOLVED
+            || bug_get_field( $bug_id, 'status' ) == PLUGINS_SPECMANAGEMENT_STAT_CLOSED
+         )
+         {
+            $sum_pt_bug += $ptime_row[2];
+         }
+      }
+   }
+   array_push( $sum_pt, $sum_pt_all );
+   array_push( $sum_pt, $sum_pt_bug );
+
+   return $sum_pt;
+}
+
+/**
+ * Calculates the process of a document
+ *
+ * @param $allRelevantBugs
+ * @return float
+ */
+function calculate_status_doc_progress( $allRelevantBugs )
+{
+   $segments = count( $allRelevantBugs );
+   if ( $segments == 0 )
+   {
+      $segments++;
+   }
+   $segment_process = 0;
+   $bug_spec_progress = 0;
+
+   for ( $segment = 0; $segment < $segments; $segment++ )
+   {
+      $bug_id = $allRelevantBugs[$segment];
+
+      /**
+       * TODO spezifiziere prozentualen Fortschritt
+       */
+      $bug_status = bug_get_field( $bug_id, 'status' );
+      $bug_resolution = bug_get_field( $bug_id, 'resolution' );
+
+      switch ( $bug_resolution )
+      {
+         case PLUGINS_SPECMANAGEMENT_RES_OPEN:
+            $bug_spec_progress = 0;
+            break;
+         case PLUGINS_SPECMANAGEMENT_RES_FIXED:
+            $bug_spec_progress = 100;
+            break;
+         case PLUGINS_SPECMANAGEMENT_RES_REOPENED:
+            $bug_spec_progress = 0;
+            break;
+         case PLUGINS_SPECMANAGEMENT_RES_UNABLETOREPRODUCE:
+            $bug_spec_progress = 100;
+            break;
+         case PLUGINS_SPECMANAGEMENT_RES_NOTFIXABLE:
+            $bug_spec_progress = 100;
+            break;
+         case PLUGINS_SPECMANAGEMENT_RES_DUPLICATE:
+            $bug_spec_progress = 100;
+            break;
+         case PLUGINS_SPECMANAGEMENT_RES_NOCHANGEREQUIRED:
+            $bug_spec_progress = 100;
+            break;
+         case PLUGINS_SPECMANAGEMENT_RES_SUSPENDED:
+            $bug_spec_progress = 0;
+            break;
+      }
+
+      $segment_process += $bug_spec_progress;
+   }
+
+   $document_process = $segment_process / $segments;
+
+   return $document_process;
+}
+
+/**
  * Prints a specific information of a bug
  *
  * @param $string
@@ -412,10 +544,7 @@ function print_bugnote_note( $bugnote_count_value )
  */
 function print_bug_attachments( $bug_id )
 {
-   $t_core_path = config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR;
-   require_once( $t_core_path . 'print_api.php' );
    $print_api = new print_api();
-
    $attachment_count = file_bug_attachment_count( $bug_id );
    echo '<tr>';
    echo '<td colspan="1" />';
@@ -431,17 +560,27 @@ function print_bug_attachments( $bug_id )
 }
 
 /**
+ * Prints a bug into the document
+ *
  * @param $chapter_index
  * @param $sub_chapter_index
  * @param $bug_data
  * @param $option_show_duration
+ * @param $print_flag
  */
-function print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration )
+function print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
 {
    echo '<tr>';
    echo '<td class="form-title" colspan="1">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
    echo '<td class="form-title" colspan="2">' . string_display( $bug_data[1] ) . ' (';
-   print_bug_link( $bug_data[0], true );
+   if ( !$print_flag )
+   {
+      print_bug_link( $bug_data[0], true );
+   }
+   else
+   {
+      echo bug_format_id( $bug_data[0] );
+   }
    echo ')';
    if ( $option_show_duration == '1' )
    {
@@ -464,19 +603,132 @@ function print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show
 }
 
 /**
+ * Prints the header element of a document
+ *
+ * @param $type_string
+ * @param $version_id
+ * @param $parent_project_id
+ * @param $allRelevantBugs
+ * @param $print_flag
+ */
+function print_document_head( $type_string, $version_id, $parent_project_id, $allRelevantBugs, $print_flag )
+{
+   $versions = version_get_all_rows( helper_get_current_project() );
+   $act_version = version_get( $version_id );
+
+   if ( !$print_flag )
+   {
+      echo '<table class="editor">';
+   }
+   else
+   {
+      echo '<table class="editorprint">';
+   }
+   echo '<tr>';
+   echo '<td class="field-container">' . plugin_lang_get( 'head_title' ) . '</td>';
+   echo '<td class="form-title" colspan="2">' . $type_string . ' - ' . version_full_name( $version_id ) . '</td>';
+   if ( !$print_flag )
+   {
+      echo '<td class="form-title" colspan="1">';
+      echo '<form action="' . plugin_page( 'editor' ) . '" method="post">';
+      echo '<span class="input">';
+      echo '<input type="hidden" name="version_id" value="' . $version_id . '" />';
+      echo '<input type="submit" name="print" class="button" value="' . lang_get( 'print' ) . '"/>';
+      echo '</span>';
+      echo '</form>';
+      echo '</td>';
+   }
+   echo '</tr>';
+
+   print_doc_head_row( 'head_version', version_full_name( $version_id ) );
+   print_doc_head_row( 'head_customer', project_get_name( $parent_project_id ) );
+   print_doc_head_row( 'head_project', project_get_name( helper_get_current_project() ) );
+   print_doc_head_row( 'head_date', date( 'j\.m\.Y' ) );
+   print_doc_head_row( 'head_person_in_charge', calculate_person_in_charge() );
+   if ( !is_null( $allRelevantBugs ) )
+   {
+      print_doc_head_row( 'head_process', print_document_progress( $allRelevantBugs ) );
+   }
+   if ( !$print_flag )
+   {
+      print_doc_head_versions( $versions, $act_version );
+   }
+   echo '</table>';
+   echo '<br />';
+}
+
+/**
+ * Prints a new chapter title element in a document
+ *
+ * @param $chapter_index
+ * @param $option_show_duration
+ * @param $duration
+ */
+function print_simple_chapter_title( $chapter_index, $option_show_duration, $duration )
+{
+   if ( is_null( $duration ) )
+   {
+      $duration = plugin_lang_get( 'editor_work_package_duration_null' );
+   }
+
+   echo '<tr>';
+   echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
+   echo '<td class="form-title" colspan="2">' . plugin_lang_get( 'editor_no_workpackage' );
+   if ( $option_show_duration == '1' )
+   {
+      echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
+   }
+   echo '</td>';
+   echo '</tr>';
+}
+
+/**
+ * Prints a new chapter title element in a document
+ *
+ * @param $chapter_index
+ * @param $work_package
+ * @param $option_show_duration
+ * @param $duration
+ */
+function print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration )
+{
+   if ( is_null( $duration ) )
+   {
+      $duration = plugin_lang_get( 'editor_work_package_duration_null' );
+   }
+
+   echo '<tr>';
+   echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
+   echo '<td class="form-title" colspan="2">' . $work_package;
+   if ( $option_show_duration == '1' )
+   {
+      echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
+   }
+   echo '</td>';
+   echo '</tr>';
+}
+
+/**
+ * Prints the expenses overview area
+ *
  * @param $work_packages
  * @param $p_version_id
+ * @param $print_flag
  */
-function print_expenses_overview( $work_packages, $p_version_id )
+function print_expenses_overview( $work_packages, $p_version_id, $print_flag )
 {
-   $t_core_path = config_get_global( 'plugin_path' ) . plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR;
-   require_once( $t_core_path . 'print_api.php' );
-   require_once( $t_core_path . 'database_api.php' );
-   $print_api = new print_api();
    $database_api = new database_api();
 
-   echo '<br /><table class="width60">';
-   $print_api->print_expenses_overview_head();
+   echo '<br />';
+   if ( !$print_flag )
+   {
+      echo '<table class="editor">';
+   }
+   else
+   {
+      echo '<table class="editorprint">';
+   }
+   print_expenses_overview_head();
 
    echo '<tbody>';
    if ( $work_packages != null )
@@ -507,4 +759,144 @@ function print_expenses_overview( $work_packages, $p_version_id )
    }
    echo '</tbody>';
    echo '</table>';
+}
+
+/**
+ * Prints the head of the expenses overview area
+ */
+function print_expenses_overview_head()
+{
+   echo '<thead>';
+   echo '<tr>';
+   echo '<td class="form-title" colspan="2">' . plugin_lang_get( 'editor_expenses_overview' ) . '</td>';
+   echo '</tr>';
+
+   echo '<tr class="row-category">';
+   echo '<th colspan="1">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</th>';
+   echo '<th colspan="1">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')</th>';
+   echo '</tr>';
+   echo '</thead>';
+}
+
+/**
+ * Prints a row into the document head
+ *
+ * @param $lang_string
+ * @param $col_data
+ */
+function print_doc_head_row( $lang_string, $col_data )
+{
+   echo '<tr>';
+   echo '<td class="field-container">' . plugin_lang_get( $lang_string ) . '</td>';
+   echo '<td class="form-title" colspan="3">' . $col_data . '</td>';
+   echo '</tr>';
+}
+
+/**
+ * Prints all available versions into the document head
+ *
+ * @param $versions
+ * @param $act_version
+ */
+function print_doc_head_versions( $versions, $act_version )
+{
+   foreach ( $versions as $version )
+   {
+      $same_version = $act_version->id == $version['id'];
+      echo '<tr>';
+      print_doc_head_version_col( $same_version, date_is_null( $version['date_order'] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version['date_order'] ) ) );
+      print_doc_head_version_col( $same_version, version_full_name( $version['id'] ) );
+      $change_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">'
+         . '<input type="hidden" name="version_old" value="' . $version['id'] . '" />'
+         . '<input type="hidden" name="version_act" value="' . $act_version->id . '" />'
+         . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>'
+         . '</form>';
+      if ( $same_version )
+      {
+         print_doc_head_version_col( $same_version, '' );
+      }
+      else
+      {
+         print_doc_head_version_col( $same_version, $change_button_string );
+      }
+      $show_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">'
+         . '<input type="hidden" name="version_id" value="' . $version['id'] . '" />'
+         . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_view' ) . '"/>'
+         . '</form>';
+      print_doc_head_version_col( $same_version, $show_button_string );
+      echo '</tr>';
+   }
+}
+
+/**
+ * Prints a column for a version in the document head area
+ *
+ * @param $same_version
+ * @param $data
+ */
+function print_doc_head_version_col( $same_version, $data )
+{
+   if ( $same_version )
+   {
+      echo '<td class="selected">';
+   }
+   else
+   {
+      echo '<td>';
+   }
+   echo $data;
+   echo '</td>';
+}
+
+/**
+ * Prints the process of a document
+ *
+ * @param $allRelevantBugs
+ * @return string
+ */
+function print_document_progress( $allRelevantBugs )
+{
+   $database_api = new database_api();
+   $process_string = '';
+   $status_flag = false;
+
+   foreach ( $allRelevantBugs as $bug_id )
+   {
+      $ptime_row = $database_api->getPtimeRow( $bug_id );
+      if ( is_null( $ptime_row[2] ) || 0 == $ptime_row[2] )
+      {
+         $status_flag = true;
+         break;
+      }
+   }
+
+   if ( $status_flag )
+   {
+      $status_process = 0;
+      if ( !empty( $allRelevantBugs ) )
+      {
+         $status_process = calculate_status_doc_progress( $allRelevantBugs );
+      }
+
+      $process_string .= '<div class="progress400">';
+      $process_string .= '<span class="bar" style="width: ' . $status_process . '%;">' . round( $status_process, 2 ) . '%</span>';
+      $process_string .= '</div>';
+   }
+   else
+   {
+      $sum_pt = calculate_pt_doc_progress( $allRelevantBugs );
+      $sum_pt_all = $sum_pt[0];
+      $sum_pt_bug = $sum_pt[1];
+      $pt_process = 0;
+
+      if ( $sum_pt_all != 0 )
+      {
+         $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
+      }
+
+      $process_string .= '<div class="progress400">';
+      $process_string .= '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';
+      $process_string .= '</div>';
+   }
+   return $process_string;
 }

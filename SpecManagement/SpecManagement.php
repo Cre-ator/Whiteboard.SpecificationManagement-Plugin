@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.19';
+      $this->version = '1.1.20';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -172,20 +172,10 @@ class SpecManagementPlugin extends MantisPlugin
     */
    function bugViewFields( $event )
    {
-      // Get path to core folder
-      $t_core_path = config_get_global( 'plugin_path' )
-         . plugin_get_current()
-         . DIRECTORY_SEPARATOR
-         . 'core'
-         . DIRECTORY_SEPARATOR;
-
-      // Include constants
-      require_once( $t_core_path . 'database_api.php' );
-      require_once( $t_core_path . 'print_api.php' );
-
+      require_once( SPECMANAGEMENT_CORE_URI . 'database_api.php' );
+      require_once( SPECMANAGEMENT_CORE_URI . 'print_api.php' );
       $database_api = new database_api();
       $print_api = new print_api();
-
       $bug_id = null;
       $type = null;
       $work_package = null;
@@ -257,24 +247,12 @@ class SpecManagementPlugin extends MantisPlugin
     */
    function bugUpdateData( $event, BugData $bug )
    {
-      // Get path to core folder
-      $t_core_path = config_get_global( 'plugin_path' )
-         . plugin_get_current()
-         . DIRECTORY_SEPARATOR
-         . 'core'
-         . DIRECTORY_SEPARATOR;
-
-      // Include constants
-      require_once( $t_core_path . 'database_api.php' );
-
+      require_once( SPECMANAGEMENT_CORE_URI . 'database_api.php' );
       $database_api = new database_api();
-
       $version_id = null;
       $type_id = null;
       $p_version_id = null;
-
       $bug_id = $bug->id;
-
       $project_id = helper_get_current_project();
       $ptime = gpc_get_string( 'ptime', '0' );
       $work_package = gpc_get_string( 'work_package', '' );
@@ -314,18 +292,8 @@ class SpecManagementPlugin extends MantisPlugin
     */
    function actiongroupUpdateData( $event, $event_type, $bug_id )
    {
-      // Get path to core folder
-      $t_core_path = config_get_global( 'plugin_path' )
-         . plugin_get_current()
-         . DIRECTORY_SEPARATOR
-         . 'core'
-         . DIRECTORY_SEPARATOR;
-
-      // Include constants
-      require_once( $t_core_path . 'database_api.php' );
-
+      require_once( SPECMANAGEMENT_CORE_URI . 'database_api.php' );
       $database_api = new database_api();
-
       if ( $event_type == 'UP_TARGET_VERSION' )
       {
          $target_version = gpc_get_string( 'target_version', null );
@@ -337,7 +305,6 @@ class SpecManagementPlugin extends MantisPlugin
             $version_obj = $database_api->getPluginVersionRowByVersionId( $version_id );
             $p_version_id = $version_obj[0];
          }
-
          $database_api->updateSourceVersion( $bug_id, $p_version_id );
       }
    }
@@ -361,23 +328,11 @@ class SpecManagementPlugin extends MantisPlugin
     */
    function deleteVersion()
    {
-      // Get path to core folder
-      $t_core_path = config_get_global( 'plugin_path' )
-         . plugin_get_current()
-         . DIRECTORY_SEPARATOR
-         . 'core'
-         . DIRECTORY_SEPARATOR;
-
-      // Include constants
-      require_once( $t_core_path . 'database_api.php' );
-
+      require_once( SPECMANAGEMENT_CORE_URI . 'database_api.php' );
       $database_api = new database_api();
-
       $version_id = gpc_get_int( 'version_id' );
-
       $plugin_version_row = $database_api->getPluginVersionRowByVersionId( $version_id );
       $p_version_id = $plugin_version_row[0];
-
       $database_api->updateSourceVersionSetNull( $p_version_id );
       $database_api->deleteVersionRow( $version_id );
    }
@@ -390,18 +345,8 @@ class SpecManagementPlugin extends MantisPlugin
     */
    function deleteBugReference( $event, $bug_id )
    {
-      // Get path to core folder
-      $t_core_path = config_get_global( 'plugin_path' )
-         . plugin_get_current()
-         . DIRECTORY_SEPARATOR
-         . 'core'
-         . DIRECTORY_SEPARATOR;
-
-      // Include constants
-      require_once( $t_core_path . 'database_api.php' );
-
+      require_once( SPECMANAGEMENT_CORE_URI . 'database_api.php' );
       $database_api = new database_api();
-
       $database_api->deleteSourceRowByBug( $bug_id );
       $database_api->deletePtimeRow( $bug_id );
    }

@@ -31,7 +31,6 @@ html_page_bottom1();
 
 function print_table( $edit_page = false )
 {
-
    $database_api = new database_api();
    $print_api = new print_api();
 

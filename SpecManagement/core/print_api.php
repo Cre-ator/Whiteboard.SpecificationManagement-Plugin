@@ -442,4 +442,66 @@ document.getElementById( span ).style.display = displayType;
          }
       }
    }
+
+   /**
+    * Calculates the process of a document
+    *
+    * @param $allRelevantBugs
+    * @return float
+    */
+   public function calculate_status_doc_progress( $allRelevantBugs )
+   {
+      $segments = count( $allRelevantBugs );
+      if ( $segments == 0 )
+      {
+         $segments++;
+      }
+      $segment_process = 0;
+      $bug_spec_progress = 0;
+
+      for ( $segment = 0; $segment < $segments; $segment++ )
+      {
+         $bug_id = $allRelevantBugs[$segment];
+
+         /**
+          * TODO spezifiziere prozentualen Fortschritt
+          */
+         $bug_status = bug_get_field( $bug_id, 'status' );
+         $bug_resolution = bug_get_field( $bug_id, 'resolution' );
+
+         switch ( $bug_resolution )
+         {
+            case PLUGINS_SPECMANAGEMENT_RES_OPEN:
+               $bug_spec_progress = 0;
+               break;
+            case PLUGINS_SPECMANAGEMENT_RES_FIXED:
+               $bug_spec_progress = 100;
+               break;
+            case PLUGINS_SPECMANAGEMENT_RES_REOPENED:
+               $bug_spec_progress = 0;
+               break;
+            case PLUGINS_SPECMANAGEMENT_RES_UNABLETOREPRODUCE:
+               $bug_spec_progress = 100;
+               break;
+            case PLUGINS_SPECMANAGEMENT_RES_NOTFIXABLE:
+               $bug_spec_progress = 100;
+               break;
+            case PLUGINS_SPECMANAGEMENT_RES_DUPLICATE:
+               $bug_spec_progress = 100;
+               break;
+            case PLUGINS_SPECMANAGEMENT_RES_NOCHANGEREQUIRED:
+               $bug_spec_progress = 100;
+               break;
+            case PLUGINS_SPECMANAGEMENT_RES_SUSPENDED:
+               $bug_spec_progress = 0;
+               break;
+         }
+
+         $segment_process += $bug_spec_progress;
+      }
+
+      $document_process = $segment_process / $segments;
+
+      return $document_process;
+   }
 }

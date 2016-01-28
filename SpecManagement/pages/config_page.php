@@ -127,13 +127,7 @@ echo '<input type="submit" name="reset" class="button" value="' . lang_get( 'res
 echo '</td>';
 echo '</tr>';
 
-echo '</table>';
-
-if ( $print_api->getMantisVersion() != '1.2.' )
-{
-   echo '</div>';
-}
-
+$print_api->printTableFoot();
 echo '</form>';
 
 html_page_bottom1();

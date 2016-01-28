@@ -24,7 +24,7 @@ if ( isset( $_POST['print_flag'] ) )
 /**
  * Page content
  */
-echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
+echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
 html_page_top1( plugin_lang_get( 'select_doc_title' ) );
 
 if ( !$print_flag )
@@ -57,15 +57,7 @@ function print_table( $obsolete_flag, $print_flag )
    $print_api = new print_api();
    $versions = version_get_all_rows_with_subs( helper_get_current_project(), null, $obsolete_flag );
 
-   if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
-   {
-      echo '<table class="width90">';
-   }
-   else
-   {
-      echo '<div class="table-container">';
-      echo '<table>';
-   }
+   $print_api->printTableTop( '90' );
 
    echo '<thead>';
    print_tableheadrow( $obsolete_flag, $print_flag );
@@ -98,12 +90,7 @@ function print_table( $obsolete_flag, $print_flag )
       echo '</tr>';
    }
    echo '</tbody>';
-
-   echo '</table>';
-   if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
-   {
-      echo '</div>';
-   }
+   $print_api->printTableFoot();
 }
 
 function print_tableheadrow( $obsolete_flag, $print_flag )
@@ -229,15 +216,7 @@ function print_graph( $obsolete_flag )
    if ( !empty( $version_hash ) )
    {
       echo '<br/>';
-      if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
-      {
-         echo '<table class="width90">';
-      }
-      else
-      {
-         echo '<div class="table-container">';
-         echo '<table>';
-      }
+      $print_api->printTableTop( '90' );
 
       echo '<thead>';
       $print_api->printFormTitle( null, 'versview_theadgraph' );
@@ -258,11 +237,6 @@ function print_graph( $obsolete_flag )
       echo '</td>';
       echo '</tr>';
       echo '</tbody>';
-
-      echo '</table>';
-      if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
-      {
-         echo '</div>';
-      }
+      $print_api->printTableFoot();
    }
 }

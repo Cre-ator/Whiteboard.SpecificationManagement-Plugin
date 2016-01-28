@@ -15,7 +15,7 @@ if ( isset( $_POST['edit'] ) )
 /**
  * Page content
  */
-echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
+echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
 html_page_top1( plugin_lang_get( 'manversions_title' ) );
 html_page_top2();
 if ( plugin_is_installed( 'WhiteboardMenu' ) )
@@ -38,17 +38,7 @@ function print_table( $edit_page = false )
    {
       echo '<form action="' . plugin_page( 'manage_versions_update' ) . '" method="post">';
    }
-
-   if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
-   {
-      echo '<table class="width100" cellspacing="1" cellpadding="0">';
-   }
-   else
-   {
-      echo '<div class="table-container">';
-      echo '<table cellspacing="1" cellpadding="0">';
-   }
-
+   $print_api->printTableTop( '100' );
    print_tablehead( $edit_page );
 
    echo '<tbody>';
@@ -80,11 +70,7 @@ function print_table( $edit_page = false )
       print_tablefooter();
    }
    echo '</tbody>';
-   echo '</table>';
-   if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
-   {
-      echo '</div>';
-   }
+   $print_api->printTableFoot();
    echo '</form>';
 }
 

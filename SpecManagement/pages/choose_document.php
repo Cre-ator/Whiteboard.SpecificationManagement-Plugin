@@ -21,7 +21,7 @@ if ( isset( $_POST['types'] ) )
    $post = true;
 }
 
-echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
+echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
 html_page_top1( plugin_lang_get( 'select_doc_title' ) );
 html_page_top2();
 
@@ -34,17 +34,8 @@ $print_api->print_plugin_menu();
 
 echo '<div align="center">';
 echo '<hr size="1" width="50%" />';
-if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
-{
-   echo '<table class="width50" cellspacing="1" cellpadding="0">';
-}
-else
-{
-   echo '<div class="table-container">';
-   echo '<table width="50%">';
-}
+$print_api->printTableTop( '50' );
 $print_api->printFormTitle( 2, 'select_doc' );
-
 $print_api->printCategoryField( 1, 1, 'select_type' );
 echo '<td>';
 echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
@@ -72,6 +63,6 @@ echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_la
 echo '</td>';
 echo '</tr>';
 echo '</form>';
-echo '</table>';
 
+$print_api->printTableFoot();
 html_page_bottom1();

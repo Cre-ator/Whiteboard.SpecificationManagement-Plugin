@@ -28,6 +28,36 @@ class print_api
    }
 
    /**
+    * Prints top element(s) of the table
+    *
+    * @param $table_width
+    */
+   public function printTableTop( $table_width )
+   {
+      if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
+      {
+         echo '<table class="width' . $table_width . '">';
+      }
+      else
+      {
+         echo '<div class="table-container">';
+         echo '<table>';
+      }
+   }
+
+   /**
+    * Prints foot element(s) of the table
+    */
+   public function printTableFoot()
+   {
+      echo '</table>';
+      if ( substr( MANTIS_VERSION, 0, 4 ) != '1.2.' )
+      {
+         echo '</div>';
+      }
+   }
+
+   /**
     * Starts a new row in a table
     */
    public function printRow()

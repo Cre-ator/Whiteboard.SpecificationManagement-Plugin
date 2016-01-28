@@ -42,7 +42,7 @@ if ( isset( $_POST['version_id'] ) )
    $work_packages = $database_api->getDocumentSpecWorkPackages( $p_version_id );
    $versionSpecBugIds = $database_api->getVersionSpecBugs( version_full_name( $version_id ) );
 
-   echo '<link rel="stylesheet" href="plugins' . DIRECTORY_SEPARATOR . plugin_get_current() . DIRECTORY_SEPARATOR . 'files/specmanagement.css">';
+   echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
    html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_full_name( $version_id ) );
    if ( !$print_flag )
    {

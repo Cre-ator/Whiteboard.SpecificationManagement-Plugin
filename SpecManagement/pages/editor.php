@@ -55,21 +55,8 @@ if ( isset( $_POST['version_id'] ) )
       $print_api->print_plugin_menu();
    }
    print_document_head( $type_string, $version_id, $parent_project_id, $versionSpecBugIds, $print_flag );
-
-   if ( !$print_flag )
-   {
-      echo '<table class="editor">';
-   }
-   else
-   {
-      echo '<table class="editorprint">';
-   }
-
+   print_editor_table_head( $print_flag );
    $chapter_index = 1;
-
-   /**
-    * Generate work packages first
-    */
    if ( $work_packages != null )
    {
       /* for each work package */
@@ -167,154 +154,89 @@ function calculate_bug_data( $bug_id, $version_date )
    $database_api = new database_api();
    /* Initialize bug data array */
    $bug_data = array();
-   /* bug object */
-   $bug = bug_get( $bug_id );
-
    /* ID */
    $bug_data[0] = $bug_id;
-
    /* Summary */
-   $int_filter_string = 'summary';
-   $summary_value = $database_api->calculate_lastChange( $bug_id, $version_date, $int_filter_string );
-   if ( strlen( $summary_value ) == 0 )
-   {
-      $summary_value = bug_get_field( $bug_id, 'summary' );
-   }
-   $bug_data[1] = $summary_value;
-
+   $bug_data[1] = get_bug_summary( $bug_id, $version_date );
    /* Description */
-   $description_value = null;
-   $value_type = 1;
-   $description_value = calculateLastTextfields( $bug_id, $version_date, $value_type );
-   if ( strlen( $description_value ) == 0 )
-   {
-      $description_value = $bug->description;
-   }
-   $bug_data[2] = $description_value;
-
+   $bug_data[2] = get_bug_description( $bug_id, $version_date );
    /* Steps to reproduce */
-   $steps_to_reproduce_value = null;
-   $value_type = 2;
-   $steps_to_reproduce_value = calculateLastTextfields( $bug_id, $version_date, $value_type );
-   $bug_data[3] = $steps_to_reproduce_value;
-
+   $bug_data[3] = get_bug_stepstoreproduce( $bug_id, $version_date );
    /* Additional information */
-   $additional_information_value = null;
-   $value_type = 3;
-   $additional_information_value = calculateLastTextfields( $bug_id, $version_date, $value_type );
-   $bug_data[4] = $additional_information_value;
-
+   $bug_data[4] = get_bug_additionalinformation( $bug_id, $version_date );
    /* Attached files */
-   $bug_attachments = bug_get_attachments( $bug_id );
-   $bug_data[5] = $bug_attachments;
-
+   $bug_data[5] = bug_get_attachments( $bug_id );
    /* Notes */
-   $bugnote_count_value = null;
-   $bugnote_count_value = calculateLastBugnotes( $bug_id, $version_date );
-   $bug_data[6] = $bugnote_count_value;
-
+   $bug_data[6] = $database_api->calculateLastBugnotes( $bug_id, $version_date );
    /* planned duration for each bug */
-   $ptime = $database_api->getPtimeRow( $bug_id )[2];
-   $bug_data[7] = $ptime;
+   $bug_data[7] = $database_api->getPtimeRow( $bug_id )[2];
 
    return $bug_data;
 }
 
 /**
- * Get last change values for:
- * - Description
- * - Steps to reproduce
- * - Additional information
- *
  * @param $bug_id
  * @param $version_date
- * @param $type_id
  * @return null
  */
-function calculateLastTextfields( $bug_id, $version_date, $type_id )
+function get_bug_additionalinformation( $bug_id, $version_date )
 {
-   $output_value = null;
-   $min_pos_time_difference = 0;
-   $min_pos_time_difference_description = null;
-   $min_neg_time_difference = 0;
-   $min_neg_time_difference_description = null;
-
-   $revision_events = bug_revision_list( $bug_id );
-
-   foreach ( $revision_events as $revision_event )
-   {
-      if ( $revision_event['type'] == $type_id )
-      {
-         $revision_event_timestamp = $revision_event['timestamp'];
-         $local_time_difference = ( $version_date - $revision_event_timestamp );
-
-         if ( $local_time_difference > 0 )
-         {
-            /* initial value */
-            if ( $min_pos_time_difference == 0 )
-            {
-               $min_pos_time_difference = $local_time_difference;
-               $min_pos_time_difference_description = $revision_event['value'];
-            }
-
-            /* overwrite existing if it is closer to event date */
-            if ( $min_pos_time_difference > $local_time_difference )
-            {
-               $min_pos_time_difference = $local_time_difference;
-               $min_pos_time_difference_description = $revision_event['value'];
-            }
-         }
-         else
-         {
-            /* initial value */
-            if ( $min_neg_time_difference == 0 )
-            {
-               $min_neg_time_difference = $local_time_difference;
-               $min_neg_time_difference_description = $revision_event['value'];
-            }
-
-            /* overwrite existing if it is closer to event date */
-            if ( $min_neg_time_difference < $local_time_difference )
-            {
-               $min_neg_time_difference = $local_time_difference;
-               $min_neg_time_difference_description = $revision_event['value'];
-            }
-         }
-      }
-   }
-
-   if ( !is_null( $min_pos_time_difference_description ) )
-   {
-      $output_value = $min_pos_time_difference_description;
-   }
-   else
-   {
-      $output_value = $min_neg_time_difference_description;
-   }
-   return $output_value;
+   $database_api = new database_api();
+   $additional_information_value = null;
+   $value_type = 3;
+   $additional_information_value = $database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   return $additional_information_value;
 }
 
 /**
- * Get last change values for:
- * - amount of bugotes
- *
  * @param $bug_id
  * @param $version_date
- * @return int
+ * @return array
  */
-function calculateLastBugnotes( $bug_id, $version_date )
+function get_bug_stepstoreproduce( $bug_id, $version_date )
 {
-   $bugnote_count = 0;
+   $database_api = new database_api();
+   $steps_to_reproduce_value = null;
+   $value_type = 2;
+   $steps_to_reproduce_value = $database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   return $steps_to_reproduce_value;
+}
 
-   $bugnotes = bugnote_get_all_bugnotes( $bug_id );
-   foreach ( $bugnotes as $bugnote )
+/**
+ * @param $bug_id
+ * @param $version_date
+ * @return array
+ */
+function get_bug_description( $bug_id, $version_date )
+{
+   $database_api = new database_api();
+   $description_value = null;
+   $bug = bug_get( $bug_id );
+   $value_type = 1;
+   $description_value = $database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   if ( strlen( $description_value ) == 0 )
    {
-      if ( $bugnote->date_submitted <= $version_date )
-      {
-         $bugnote_count++;
-      }
+      $description_value = $bug->description;
    }
-   return $bugnote_count;
+   return $description_value;
+}
+
+/**
+ * @param $bug_id
+ * @param $version_date
+ * @return string
+ */
+function get_bug_summary( $bug_id, $version_date )
+{
+   $database_api = new database_api();
+   $int_filter_string = 'summary';
+   $summary_value = $database_api->calculate_lastChange( $bug_id, $version_date, $int_filter_string );
+   if ( strlen( $summary_value ) == 0 )
+   {
+      $summary_value = bug_get_field( $bug_id, 'summary' );
+      return $summary_value;
+   }
+   return $summary_value;
 }
 
 /**
@@ -438,6 +360,29 @@ function print_bug_attachments( $bug_id )
  */
 function print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
 {
+   print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag );
+   print_bug_infos( string_display_links( $bug_data[2] ) );
+   print_bug_infos( string_display_links( $bug_data[3] ) );
+   print_bug_infos( string_display_links( $bug_data[4] ) );
+   if ( !empty( $bug_data[5] ) )
+   {
+      print_bug_attachments( $bug_data[0] );
+   }
+   if ( !is_null( $bug_data[6] ) && $bug_data[6] != 0 )
+   {
+      print_bugnote_note( $bug_data[6] );
+   }
+}
+
+/**
+ * @param $chapter_index
+ * @param $sub_chapter_index
+ * @param $bug_data
+ * @param $option_show_duration
+ * @param $print_flag
+ */
+function print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
+{
    echo '<tr>';
    echo '<td class="form-title" colspan="1">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
    echo '<td class="form-title" colspan="2">' . string_display( $bug_data[1] ) . ' (';
@@ -456,18 +401,6 @@ function print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show
    }
    echo '</td>';
    echo '</tr>';
-
-   print_bug_infos( string_display_links( $bug_data[2] ) );
-   print_bug_infos( string_display_links( $bug_data[3] ) );
-   print_bug_infos( string_display_links( $bug_data[4] ) );
-   if ( !empty( $bug_data[5] ) )
-   {
-      print_bug_attachments( $bug_data[0] );
-   }
-   if ( !is_null( $bug_data[6] ) && $bug_data[6] != 0 )
-   {
-      print_bugnote_note( $bug_data[6] );
-   }
 }
 
 /**
@@ -484,14 +417,32 @@ function print_document_head( $type_string, $version_id, $parent_project_id, $al
    $versions = version_get_all_rows( helper_get_current_project() );
    $act_version = version_get( $version_id );
 
+   print_editor_table_head( $print_flag );
+   print_editor_table_title( $type_string, $version_id, $print_flag );
+   print_doc_head_row( 'head_version', version_full_name( $version_id ) );
+   print_doc_head_row( 'head_customer', project_get_name( $parent_project_id ) );
+   print_doc_head_row( 'head_project', project_get_name( helper_get_current_project() ) );
+   print_doc_head_row( 'head_date', date( 'j\.m\.Y' ) );
+   print_doc_head_row( 'head_person_in_charge', calculate_person_in_charge() );
+   if ( !is_null( $allRelevantBugs ) )
+   {
+      print_doc_head_row( 'head_process', get_process_string( $allRelevantBugs ) );
+   }
    if ( !$print_flag )
    {
-      echo '<table class="editor">';
+      print_doc_head_versions( $versions, $act_version );
    }
-   else
-   {
-      echo '<table class="editorprint">';
-   }
+   echo '</table>';
+   echo '<br />';
+}
+
+/**
+ * @param $type_string
+ * @param $version_id
+ * @param $print_flag
+ */
+function print_editor_table_title( $type_string, $version_id, $print_flag )
+{
    echo '<tr>';
    echo '<td class="field-container">' . plugin_lang_get( 'head_title' ) . '</td>';
    echo '<td class="form-title" colspan="2">' . $type_string . ' - ' . version_full_name( $version_id ) . '</td>';
@@ -507,22 +458,6 @@ function print_document_head( $type_string, $version_id, $parent_project_id, $al
       echo '</td>';
    }
    echo '</tr>';
-
-   print_doc_head_row( 'head_version', version_full_name( $version_id ) );
-   print_doc_head_row( 'head_customer', project_get_name( $parent_project_id ) );
-   print_doc_head_row( 'head_project', project_get_name( helper_get_current_project() ) );
-   print_doc_head_row( 'head_date', date( 'j\.m\.Y' ) );
-   print_doc_head_row( 'head_person_in_charge', calculate_person_in_charge() );
-   if ( !is_null( $allRelevantBugs ) )
-   {
-      print_doc_head_row( 'head_process', print_document_progress( $allRelevantBugs ) );
-   }
-   if ( !$print_flag )
-   {
-      print_doc_head_versions( $versions, $act_version );
-   }
-   echo '</table>';
-   echo '<br />';
 }
 
 /**
@@ -588,14 +523,7 @@ function print_expenses_overview( $work_packages, $p_version_id, $print_flag )
    $database_api = new database_api();
 
    echo '<br />';
-   if ( !$print_flag )
-   {
-      echo '<table class="editor">';
-   }
-   else
-   {
-      echo '<table class="editorprint">';
-   }
+   print_editor_table_head( $print_flag );
    print_expenses_overview_head();
 
    echo '<tbody>';
@@ -609,7 +537,6 @@ function print_expenses_overview( $work_packages, $p_version_id, $print_flag )
          {
             continue;
          }
-
          $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
          $document_duration += $duration;
          echo '<tr>';
@@ -658,6 +585,21 @@ function print_doc_head_row( $lang_string, $col_data )
    echo '<td class="field-container">' . plugin_lang_get( $lang_string ) . '</td>';
    echo '<td class="form-title" colspan="3">' . $col_data . '</td>';
    echo '</tr>';
+}
+
+/**
+ * @param $print_flag
+ */
+function print_editor_table_head( $print_flag )
+{
+   if ( !$print_flag )
+   {
+      echo '<table class="editor">';
+   }
+   else
+   {
+      echo '<table class="editorprint">';
+   }
 }
 
 /**
@@ -717,28 +659,14 @@ function print_doc_head_version_col( $same_version, $data )
 }
 
 /**
- * Prints the process of a document
- *
  * @param $allRelevantBugs
  * @return string
  */
-function print_document_progress( $allRelevantBugs )
+function get_process_string( $allRelevantBugs )
 {
-   $database_api = new database_api();
    $print_api = new print_api();
    $process_string = '';
-   $status_flag = false;
-
-   foreach ( $allRelevantBugs as $bug_id )
-   {
-      $ptime_row = $database_api->getPtimeRow( $bug_id );
-      if ( is_null( $ptime_row[2] ) || 0 == $ptime_row[2] )
-      {
-         $status_flag = true;
-         break;
-      }
-   }
-
+   $status_flag = check_status_flag( $allRelevantBugs );
    if ( $status_flag )
    {
       $status_process = 0;
@@ -746,10 +674,10 @@ function print_document_progress( $allRelevantBugs )
       {
          $status_process = $print_api->calculate_status_doc_progress( $allRelevantBugs );
       }
-
       $process_string .= '<div class="progress400">';
       $process_string .= '<span class="bar" style="width: ' . $status_process . '%;">' . round( $status_process, 2 ) . '%</span>';
       $process_string .= '</div>';
+      return $process_string;
    }
    else
    {
@@ -762,10 +690,29 @@ function print_document_progress( $allRelevantBugs )
       {
          $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
       }
-
       $process_string .= '<div class="progress400">';
       $process_string .= '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';
       $process_string .= '</div>';
+      return $process_string;
    }
-   return $process_string;
+}
+
+/**
+ * @param $allRelevantBugs
+ * @return bool
+ */
+function check_status_flag( $allRelevantBugs )
+{
+   $database_api = new database_api();
+   $status_flag = false;
+   foreach ( $allRelevantBugs as $bug_id )
+   {
+      $ptime_row = $database_api->getPtimeRow( $bug_id );
+      if ( is_null( $ptime_row[2] ) || 0 == $ptime_row[2] )
+      {
+         $status_flag = true;
+         break;
+      }
+   }
+   return $status_flag;
 }

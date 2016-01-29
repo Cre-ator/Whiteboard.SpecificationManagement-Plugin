@@ -1530,4 +1530,101 @@ class database_api
 
       return $output_value;
    }
+
+   /**
+    * Get last change values for:
+    * - Description
+    * - Steps to reproduce
+    * - Additional information
+    *
+    * @param $bug_id
+    * @param $version_date
+    * @param $type_id
+    * @return null
+    */
+   public function calculateLastTextfields( $bug_id, $version_date, $type_id )
+   {
+      $output_value = null;
+      $min_pos_time_difference = 0;
+      $min_pos_time_difference_description = null;
+      $min_neg_time_difference = 0;
+      $min_neg_time_difference_description = null;
+
+      $revision_events = bug_revision_list( $bug_id );
+
+      foreach ( $revision_events as $revision_event )
+      {
+         if ( $revision_event['type'] == $type_id )
+         {
+            $revision_event_timestamp = $revision_event['timestamp'];
+            $local_time_difference = ( $version_date - $revision_event_timestamp );
+
+            if ( $local_time_difference > 0 )
+            {
+               /* initial value */
+               if ( $min_pos_time_difference == 0 )
+               {
+                  $min_pos_time_difference = $local_time_difference;
+                  $min_pos_time_difference_description = $revision_event['value'];
+               }
+
+               /* overwrite existing if it is closer to event date */
+               if ( $min_pos_time_difference > $local_time_difference )
+               {
+                  $min_pos_time_difference = $local_time_difference;
+                  $min_pos_time_difference_description = $revision_event['value'];
+               }
+            }
+            else
+            {
+               /* initial value */
+               if ( $min_neg_time_difference == 0 )
+               {
+                  $min_neg_time_difference = $local_time_difference;
+                  $min_neg_time_difference_description = $revision_event['value'];
+               }
+
+               /* overwrite existing if it is closer to event date */
+               if ( $min_neg_time_difference < $local_time_difference )
+               {
+                  $min_neg_time_difference = $local_time_difference;
+                  $min_neg_time_difference_description = $revision_event['value'];
+               }
+            }
+         }
+      }
+
+      if ( !is_null( $min_pos_time_difference_description ) )
+      {
+         $output_value = $min_pos_time_difference_description;
+      }
+      else
+      {
+         $output_value = $min_neg_time_difference_description;
+      }
+      return $output_value;
+   }
+
+   /**
+    * Get last change values for:
+    * - amount of bugotes
+    *
+    * @param $bug_id
+    * @param $version_date
+    * @return int
+    */
+   public function calculateLastBugnotes( $bug_id, $version_date )
+   {
+      $bugnote_count = 0;
+
+      $bugnotes = bugnote_get_all_bugnotes( $bug_id );
+      foreach ( $bugnotes as $bugnote )
+      {
+         if ( $bugnote->date_submitted <= $version_date )
+         {
+            $bugnote_count++;
+         }
+      }
+      return $bugnote_count;
+   }
 }

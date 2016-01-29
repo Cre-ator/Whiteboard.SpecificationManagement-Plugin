@@ -23,7 +23,7 @@ function calculate_changes()
    $old_version = $specified_versions[0];
    $new_version = $specified_versions[1];
 
-   print_page_top( $old_version, $new_version );
+   $print_api->print_page_head( plugin_lang_get( 'changes_title' ) . ': ' . $old_version->version . ' / ' . $new_version->version );
    $print_api->printTableTop( '60' );
    print_changes_table_head( $old_version, $new_version );
    print_changes_table_body( $old_version, $new_version );
@@ -61,24 +61,27 @@ function print_changes_table_body( $old_version, $new_version )
 {
    $old_version_data = get_version_data( $old_version );
    $new_version_data = get_version_data( $new_version );
-   $all_bugs = initialize_bug_array( $old_version_data[0], $new_version_data[0] );
+   $all_issues = initialize_bug_array( $old_version_data[0], $new_version_data[0] );
 
    echo '<tbody>';
-   foreach ( $all_bugs as $bug )
+   foreach ( $all_issues as $issue )
    {
       echo '<tr>';
       echo '<td colspan="4">';
-      if ( check_inserted( $bug, $old_version_data[0], $new_version_data[0] ) )
+      if ( check_inserted( $issue, $old_version_data[0], $new_version_data[0] ) )
       {
-         echo '+ ' . bug_format_id( $bug ) . ' (' . plugin_lang_get( 'changes_inserted' ) . ')';
+         echo '+ ';
+         echo print_bug_link( $issue, true ) . ' (' . plugin_lang_get( 'changes_inserted' ) . ')';
       }
-      if ( check_removed( $bug, $old_version_data[0], $new_version_data[0] ) )
+      if ( check_removed( $issue, $old_version_data[0], $new_version_data[0] ) )
       {
-         echo '- ' . bug_format_id( $bug ) . ' (' . plugin_lang_get( 'changes_removed' ) . ')';
+         echo '- ';
+         echo print_bug_link( $issue, true ) . ' (' . plugin_lang_get( 'changes_removed' ) . ')';
       }
-      if ( check_edited( $bug, $old_version_data[0], $new_version_data[0] ) )
+      if ( check_edited( $issue, $old_version_data[0], $new_version_data[0] ) )
       {
-         echo '# ' . bug_format_id( $bug ) . ' (' . plugin_lang_get( 'changes_edited' ) . ')';
+         echo '# ';
+         echo print_bug_link( $issue, true ) . ' (' . plugin_lang_get( 'changes_edited' ) . ')';
       }
       echo '</td>';
       echo '</tr>';
@@ -93,41 +96,41 @@ function print_changes_table_body( $old_version, $new_version )
  */
 function initialize_bug_array( $old_version_data, $new_version_data )
 {
-   $all_bugs = array();
-   foreach ( $old_version_data as $old_bug )
+   $all_issues = array();
+   foreach ( $old_version_data as $old_issue )
    {
-      array_push( $all_bugs, $old_bug );
+      array_push( $all_issues, $old_issue );
    }
-   foreach ( $new_version_data as $new_bug )
+   foreach ( $new_version_data as $new_issue )
    {
       /**
        * ist ein Issue in beiden Arrays enthalten
        * => wurde es geändert
        * => muss dennoch nicht zwei Mal gelistet werden!
        */
-      if ( in_array( $new_bug, $all_bugs ) )
+      if ( in_array( $new_issue, $all_issues ) )
       {
          continue;
       }
       else
       {
-         array_push( $all_bugs, $new_bug );
+         array_push( $all_issues, $new_issue );
       }
    }
-   sort( $all_bugs );
+   sort( $all_issues );
 
-   return $all_bugs;
+   return $all_issues;
 }
 
 /**
- * @param $bug
- * @param $old_bugs
- * @param $new_bugs
+ * @param $issue
+ * @param $old_issues
+ * @param $new_issues
  * @return bool
  */
-function check_inserted( $bug, $old_bugs, $new_bugs )
+function check_inserted( $issue, $old_issues, $new_issues )
 {
-   if ( !in_array( $bug, $old_bugs ) && in_array( $bug, $new_bugs ) )
+   if ( !in_array( $issue, $old_issues ) && in_array( $issue, $new_issues ) )
    {
       return true;
    }
@@ -138,14 +141,14 @@ function check_inserted( $bug, $old_bugs, $new_bugs )
 }
 
 /**
- * @param $bug
- * @param $old_bugs
- * @param $new_bugs
+ * @param $issue
+ * @param $old_issues
+ * @param $new_issues
  * @return bool
  */
-function check_removed( $bug, $old_bugs, $new_bugs )
+function check_removed( $issue, $old_issues, $new_issues )
 {
-   if ( in_array( $bug, $old_bugs ) && !in_array( $bug, $new_bugs ) )
+   if ( in_array( $issue, $old_issues ) && !in_array( $issue, $new_issues ) )
    {
       return true;
    }
@@ -156,14 +159,14 @@ function check_removed( $bug, $old_bugs, $new_bugs )
 }
 
 /**
- * @param $bug
- * @param $old_bugs
- * @param $new_bugs
+ * @param $issue
+ * @param $old_issues
+ * @param $new_issues
  * @return bool
  */
-function check_edited( $bug, $old_bugs, $new_bugs )
+function check_edited( $issue, $old_issues, $new_issues )
 {
-   if ( in_array( $bug, $old_bugs ) && in_array( $bug, $new_bugs ) )
+   if ( in_array( $issue, $old_issues ) && in_array( $issue, $new_issues ) )
    {
       return true;
    }
@@ -174,24 +177,7 @@ function check_edited( $bug, $old_bugs, $new_bugs )
 }
 
 /**
- * @param $old_version
- * @param $act_version
- */
-function print_page_top( $old_version, $act_version )
-{
-   $print_api = new print_api();
-   echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
-   html_page_top1( plugin_lang_get( 'changes_title' ) . ': ' . $old_version->version . ' / ' . $act_version->version );
-   html_page_top2();
-   if ( plugin_is_installed( 'WhiteboardMenu' ) )
-   {
-      $print_api->print_whiteboardplugin_menu();
-   }
-   $print_api->print_plugin_menu();
-}
-
-/**
- * Get bug data for specific versions
+ * Get issue data for specific versions
  *
  * @param $version
  * @return array
@@ -237,26 +223,26 @@ function calculate_status( $relevant_issue_ids )
 
 /**
  * @param $version
- * @param $reachable_bug_ids
+ * @param $reachable_issue_ids
  */
-function calculate_relevant_issues( $version, $reachable_bug_ids )
+function calculate_relevant_issues( $version, $reachable_issue_ids )
 {
    $database_api = new database_api();
    $version_date = $version->date_order;
    $int_filter_string = 'target_version';
    /* Prüfen ob Bug zum gegebenen Zeitpunkt dieser Zielversion zugeordnet war */
-   foreach ( $reachable_bug_ids as $reachable_bug_id )
+   foreach ( $reachable_issue_ids as $reachable_issue_id )
    {
-      $target_version = $database_api->calculate_lastChange( $reachable_bug_id, $version_date, $int_filter_string );
+      $target_version = $database_api->calculate_lastChange( $reachable_issue_id, $version_date, $int_filter_string );
       if ( $target_version != $version->version )
       {
-         if ( ( $key = array_search( $reachable_bug_id, $reachable_bug_ids ) ) !== false )
+         if ( ( $key = array_search( $reachable_issue_id, $reachable_issue_ids ) ) !== false )
          {
-            unset( $reachable_bug_ids[$key] );
+            unset( $reachable_issue_ids[$key] );
          }
       }
    }
-   return $reachable_bug_ids;
+   return $reachable_issue_ids;
 }
 
 /**
@@ -266,16 +252,16 @@ function calculate_relevant_issues( $version, $reachable_bug_ids )
 function prepare_relevant_issues( $project_ids )
 {
    $database_api = new database_api();
-   $reachable_bug_ids = array();
+   $reachable_issue_ids = array();
    foreach ( $project_ids as $project_id )
    {
-      $project_related_bug_ids = $database_api->getBugsByProject( $project_id );
-      foreach ( $project_related_bug_ids as $project_related_bug_id )
+      $project_related_issue_ids = $database_api->getBugsByProject( $project_id );
+      foreach ( $project_related_issue_ids as $project_related_issue_id )
       {
-         array_push( $reachable_bug_ids, $project_related_bug_id );
+         array_push( $reachable_issue_ids, $project_related_issue_id );
       }
    }
-   return $reachable_bug_ids;
+   return $reachable_issue_ids;
 }
 
 /**
@@ -327,16 +313,16 @@ function print_changes_table_head( $old_version, $act_version )
 }
 
 /**
- * @param $relevant_bugs_duration
+ * @param $relevant_issues_duration
  * @param $status_process
  */
-function print_version_progress( $relevant_bugs_duration, $status_process )
+function print_version_progress( $relevant_issues_duration, $status_process )
 {
    echo '<td>';
    echo plugin_lang_get( 'versview_progress' );
    echo '</td>';
    echo '<td>';
-   if ( $relevant_bugs_duration > 0 )
+   if ( $relevant_issues_duration > 0 )
    {
       echo $status_process . '%';
    }

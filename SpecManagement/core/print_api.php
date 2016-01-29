@@ -13,6 +13,22 @@ class print_api
    }
 
    /**
+    * Prints head elements of a page
+    * @param $string
+    */
+   public function print_page_head( $string )
+   {
+      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
+      html_page_top1( $string );
+      html_page_top2();
+      if ( plugin_is_installed( 'WhiteboardMenu' ) )
+      {
+         $this->print_whiteboardplugin_menu();
+      }
+      $this->print_plugin_menu();
+   }
+
+   /**
     * Prints a header row in a table
     *
     * @param $colspan

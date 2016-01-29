@@ -15,14 +15,7 @@ if ( isset( $_POST['edit'] ) )
 /**
  * Page content
  */
-echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
-html_page_top1( plugin_lang_get( 'manversions_title' ) );
-html_page_top2();
-if ( plugin_is_installed( 'WhiteboardMenu' ) )
-{
-   $print_api->print_whiteboardplugin_menu();
-}
-$print_api->print_plugin_menu();
+$print_api->print_page_head( plugin_lang_get( 'manversions_title' ) );
 echo '<div align="center">';
 echo '<hr size="1" width="100%" />';
 print_table( $edit_page );
@@ -31,7 +24,6 @@ html_page_bottom1();
 
 function print_table( $edit_page = false )
 {
-   $database_api = new database_api();
    $print_api = new print_api();
 
    if ( $edit_page )
@@ -40,10 +32,38 @@ function print_table( $edit_page = false )
    }
    $print_api->printTableTop( '100' );
    print_tablehead( $edit_page );
+   print_tablebody( $edit_page );
+   $print_api->printTableFoot();
+   echo '</form>';
+}
 
+/**
+ * @param $edit_page
+ */
+function print_tablebody( $edit_page )
+{
    echo '<tbody>';
-   $versions = version_get_all_rows( helper_get_current_project(), null, null );
+   print_versions( $edit_page );
+   if ( $edit_page )
+   {
+      print_editbuttons();
+   }
+   else
+   {
+      print_tablefooter();
+   }
+   echo '</tbody>';
+}
 
+/**
+ * @param $edit_page
+ */
+function print_versions( $edit_page )
+{
+   $database_api = new database_api();
+   $print_api = new print_api();
+
+   $versions = version_get_all_rows( helper_get_current_project(), null, null );
    for ( $version_index = 0; $version_index < count( $versions ); $version_index++ )
    {
       $version = $versions[$version_index];
@@ -60,18 +80,6 @@ function print_table( $edit_page = false )
       print_action( $edit_page, $version );
       echo '</tr>';
    }
-
-   if ( $edit_page )
-   {
-      print_editbuttons();
-   }
-   else
-   {
-      print_tablefooter();
-   }
-   echo '</tbody>';
-   $print_api->printTableFoot();
-   echo '</form>';
 }
 
 function print_tablefooter()

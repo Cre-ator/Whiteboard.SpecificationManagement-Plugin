@@ -3,7 +3,6 @@ require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
 require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
 define( 'COLS', 6 );
-$print_api = new print_api();
 
 $obsolete_flag = false;
 if ( isset( $_POST['obsolete_flag'] ) )
@@ -24,45 +23,65 @@ if ( isset( $_POST['print_flag'] ) )
 /**
  * Page content
  */
-echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
-html_page_top1( plugin_lang_get( 'select_doc_title' ) );
+calculate_page_content( $print_flag, $obsolete_flag );
 
-if ( !$print_flag )
+/**
+ * @param $print_flag
+ * @param $obsolete_flag
+ */
+function calculate_page_content( $print_flag, $obsolete_flag )
 {
-   html_page_top2();
-   if ( plugin_is_installed( 'WhiteboardMenu' ) )
+   $print_api = new print_api();
+
+   echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
+   html_page_top1( plugin_lang_get( 'select_doc_title' ) );
+   if ( !$print_flag )
    {
-      $print_api->print_whiteboardplugin_menu();
+      html_page_top2();
+      if ( plugin_is_installed( 'WhiteboardMenu' ) )
+      {
+         $print_api->print_whiteboardplugin_menu();
+      }
+      $print_api->print_plugin_menu();
+      echo '<div align="center">';
+      echo '<hr size="1" width="100%" />';
    }
-   $print_api->print_plugin_menu();
-   echo '<div align="center">';
-   echo '<hr size="1" width="100%" />';
+
+   print_table( $obsolete_flag, $print_flag );
+   if ( helper_get_current_project() != 0 )
+   {
+      print_graph( $obsolete_flag );
+   }
+
+   if ( !$print_flag )
+   {
+      html_page_bottom1();
+   }
 }
 
-print_table( $obsolete_flag, $print_flag );
-if ( helper_get_current_project() != 0 )
-{
-   print_graph( $obsolete_flag );
-}
-
-if ( !$print_flag )
-{
-   html_page_bottom1();
-}
-/* **************************** */
-
+/**
+ * @param $obsolete_flag
+ * @param $print_flag
+ */
 function print_table( $obsolete_flag, $print_flag )
 {
-   $database_api = new database_api();
    $print_api = new print_api();
    $versions = version_get_all_rows_with_subs( helper_get_current_project(), null, $obsolete_flag );
 
    $print_api->printTableTop( '90' );
+   print_tablehead( $obsolete_flag, $print_flag );
+   print_tablebody( $print_flag, $versions );
+   $print_api->printTableFoot();
+}
 
-   echo '<thead>';
-   print_tableheadrow( $obsolete_flag, $print_flag );
-   print_tablehead();
-   echo '</thead>';
+/**
+ * @param $print_flag
+ * @param $versions
+ */
+function print_tablebody( $print_flag, $versions )
+{
+   $database_api = new database_api();
+   $print_api = new print_api();
 
    echo '<tbody>';
    for ( $version_index = 0; $version_index < count( $versions ); $version_index++ )
@@ -90,7 +109,6 @@ function print_table( $obsolete_flag, $print_flag )
       echo '</tr>';
    }
    echo '</tbody>';
-   $print_api->printTableFoot();
 }
 
 function print_tableheadrow( $obsolete_flag, $print_flag )
@@ -135,8 +153,10 @@ function print_amount( $print_flag, $version_spec_bug_count, $version )
    echo '</td>';
 }
 
-function print_tablehead()
+function print_tablehead( $obsolete_flag, $print_flag )
 {
+   echo '<thead>';
+   print_tableheadrow( $obsolete_flag, $print_flag );
    $col_width = 100 / COLS;
    echo '<tr class="row-category2">';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'version' ) . '</th>';
@@ -146,6 +166,7 @@ function print_tablehead()
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_progress' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_information' ) . '</th>';
    echo '</tr>';
+   echo '</thead>';
 }
 
 function print_information( $version, $version_spec_bugs_finished_date, $version_spec_bug_duration )

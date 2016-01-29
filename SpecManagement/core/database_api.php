@@ -1425,4 +1425,109 @@ class database_api
 
       return $relationship;
    }
+
+   /**
+    * Get bugs related to given project id
+    *
+    * @param $project_id
+    * @return array|null
+    */
+   public function getBugsByProject( $project_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $bug_table = db_get_table( 'mantis_bug_table' );
+      }
+      else
+      {
+         $bug_table = db_get_table( 'bug' );
+      }
+
+      $query = "SELECT id FROM $bug_table
+          WHERE project_id = " . $project_id;
+
+      $result = $this->mysqli->query( $query );
+
+      $bugs = array();
+      if ( 0 != $result->num_rows )
+      {
+         while ( $row = $result->fetch_row() )
+         {
+            $bugs[] = $row[0];
+         }
+         return $bugs;
+      }
+
+      return null;
+   }
+
+   /**
+    * Get last change values for:
+    * - Summary
+    * - Priorität
+    * - Produktversion
+    * - Zielversion
+    * - Behoben in Version
+    * - Status
+    * - Lösung
+    * - Reproduzierbarkeit
+    * - Sichtbarkeit
+    * - Auswirkung
+    * - Bearbeiter
+    * - Plattform
+    * - OS
+    * - OS Version
+    *
+    * @param $bug_id
+    * @param $version_date
+    * @param $int_filter_string
+    * @return array
+    */
+   public function calculate_lastChange( $bug_id, $version_date, $int_filter_string )
+   {
+      $output_value = null;
+      $spec_filter_string = lang_get( $int_filter_string );
+      $min_time_difference = 0;
+      $min_time_difference_event_id = 0;
+      $bug_history_events = history_get_events_array( $bug_id );
+
+      for ( $event_index = 0; $event_index < count( $bug_history_events ); $event_index++ )
+      {
+         $bug_history_event = $bug_history_events[$event_index];
+
+         if ( $bug_history_event['note'] == $spec_filter_string )
+         {
+            $bug_history_event_date = strtotime( $bug_history_event['date'] );
+            $local_time_difference = ( $version_date - $bug_history_event_date );
+
+            /* initial value */
+            if ( $min_time_difference == 0 )
+            {
+               $min_time_difference = $local_time_difference;
+               $min_time_difference_event_id = $event_index;
+            }
+
+            /* overwrite existing if it is closer to event date */
+            if ( $min_time_difference > $local_time_difference )
+            {
+               $min_time_difference = $local_time_difference;
+               $min_time_difference_event_id = $event_index;
+            }
+         }
+      }
+
+      $output_change = $bug_history_events[$min_time_difference_event_id]['change'];
+      $output_values = explode( ' => ', $output_change );
+
+      if ( $min_time_difference <= 0 )
+      {
+         $output_value = $output_values[0];
+      }
+      else
+      {
+         $output_value = $output_values[1];
+      }
+
+      return $output_value;
+   }
 }

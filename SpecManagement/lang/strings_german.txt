@@ -61,6 +61,10 @@ $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Summe';
 
 /* Changes Area */
 $s_plugin_SpecManagement_changes_title = 'Änderungsprotokoll';
+$s_plugin_SpecManagement_changes_inserted = 'Eintrag wurde hinzugefügt';
+$s_plugin_SpecManagement_changes_removed = 'Eintrag wurde entfernt';
+$s_plugin_SpecManagement_changes_edited = 'Einträg wurde geändert';
+
 
 /* Version Manager Area */
 $s_plugin_SpecManagement_manversions_title = 'Dokument-Versionsverwaltung';

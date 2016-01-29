@@ -175,7 +175,7 @@ function calculate_bug_data( $bug_id, $version_date )
 
    /* Summary */
    $int_filter_string = 'summary';
-   $summary_value = calculate_lastChange( $bug_id, $version_date, $int_filter_string );
+   $summary_value = $database_api->calculate_lastChange( $bug_id, $version_date, $int_filter_string );
    if ( strlen( $summary_value ) == 0 )
    {
       $summary_value = bug_get_field( $bug_id, 'summary' );
@@ -218,76 +218,6 @@ function calculate_bug_data( $bug_id, $version_date )
    $bug_data[7] = $ptime;
 
    return $bug_data;
-}
-
-/**
- * Get last change values for:
- * - Summary
- * - Priorität
- * - Produktversion
- * - Zielversion
- * - Behoben in Version
- * - Status
- * - Lösung
- * - Reproduzierbarkeit
- * - Sichtbarkeit
- * - Auswirkung
- * - Bearbeiter
- * - Plattform
- * - OS
- * - OS Version
- *
- * @param $bug_id
- * @param $version_date
- * @param $int_filter_string
- * @return array
- */
-function calculate_lastChange( $bug_id, $version_date, $int_filter_string )
-{
-   $output_value = null;
-   $spec_filter_string = lang_get( $int_filter_string );
-   $min_time_difference = 0;
-   $min_time_difference_event_id = 0;
-   $bug_history_events = history_get_events_array( $bug_id );
-
-   for ( $event_index = 0; $event_index < count( $bug_history_events ); $event_index++ )
-   {
-      $bug_history_event = $bug_history_events[$event_index];
-
-      if ( $bug_history_event['note'] == $spec_filter_string )
-      {
-         $bug_history_event_date = strtotime( $bug_history_event['date'] );
-         $local_time_difference = ( $version_date - $bug_history_event_date );
-
-         /* initial value */
-         if ( $min_time_difference == 0 )
-         {
-            $min_time_difference = $local_time_difference;
-            $min_time_difference_event_id = $event_index;
-         }
-
-         /* overwrite existing if it is closer to event date */
-         if ( $min_time_difference > $local_time_difference )
-         {
-            $min_time_difference = $local_time_difference;
-            $min_time_difference_event_id = $event_index;
-         }
-      }
-   }
-
-   $output_change = $bug_history_events[$min_time_difference_event_id]['change'];
-   $output_values = explode( ' => ', $output_change );
-
-   if ( $min_time_difference <= 0 )
-   {
-      $output_value = $output_values[0];
-   }
-   else
-   {
-      $output_value = $output_values[1];
-   }
-
-   return $output_value;
 }
 
 /**
@@ -745,8 +675,8 @@ function print_doc_head_versions( $versions, $act_version )
       print_doc_head_version_col( $same_version, date_is_null( $version['date_order'] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version['date_order'] ) ) );
       print_doc_head_version_col( $same_version, version_full_name( $version['id'] ) );
       $change_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">'
-         . '<input type="hidden" name="version_old" value="' . $version['id'] . '" />'
-         . '<input type="hidden" name="version_act" value="' . $act_version->id . '" />'
+         . '<input type="hidden" name="version_other" value="' . $version['id'] . '" />'
+         . '<input type="hidden" name="version_my" value="' . $act_version->id . '" />'
          . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>'
          . '</form>';
       if ( $same_version )

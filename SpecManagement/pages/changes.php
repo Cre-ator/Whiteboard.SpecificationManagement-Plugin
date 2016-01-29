@@ -2,72 +2,175 @@
 require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
 require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
-
-/* TODO:
- * - Alle Bugs beider Versionen sammeln
- * - Prüfen, ob Bugs in beiden Versionen enthalten -> Meldung, wenn Bug neu bzw. weg
- * - Für jeden Bug, der in beiden Versionen enthalten ist prüfen, ob irgendwo eine
- *   Änderung vorgenommen wurde -> Meldung über Änderung mit entspr. Details
- */
-if ( isset( $_POST['version_old'] ) && isset( $_POST['version_act'] ) )
+if ( isset( $_POST['version_other'] ) && isset( $_POST['version_my'] ) )
 {
-   if ( $_POST['version_old'] != $_POST['version_act'] )
+   if ( $_POST['version_other'] != $_POST['version_my'] )
    {
       calculate_changes();
    }
 }
 
 /**
+ * Calculate page content
  */
 function calculate_changes()
 {
    $print_api = new print_api();
-   /* old bug */
-   $old_version = version_get( $_POST['version_old'] );
-   $old_version_data = get_version_data( $old_version );
-   /* act bug */
-   $act_version = version_get( $_POST['version_act'] );
-   $act_version_data = get_version_data( $act_version );
 
-   print_page_top( $old_version, $act_version );
+   $other_version = version_get( $_POST['version_other'] );
+   $my_version = version_get( $_POST['version_my'] );
+   $specified_versions = specify_version( $my_version, $other_version );
+   $old_version = $specified_versions[0];
+   $new_version = $specified_versions[1];
+
+   print_page_top( $old_version, $new_version );
    $print_api->printTableTop( '60' );
-   print_changes_table_head( $old_version, $act_version, $old_version_data, $act_version_data );
-
-   echo '<tbody>';
-   echo '<tr>';
-
-   /* old bugs */
-   print_bug_table( $old_version_data );
-   /* end old bugs */
-
-   /* act bugs */
-   print_bug_table( $act_version_data );
-   /* end act bugs */
-
-   echo '</tr>';
-   echo '</tbody>';
-
+   print_changes_table_head( $old_version, $new_version );
+   print_changes_table_body( $old_version, $new_version );
    $print_api->printTableFoot();
    html_page_bottom1();
 }
 
 /**
- * @param $version_data
+ * @param $my_version
+ * @param $other_version
+ * @return array
  */
-function print_bug_table( $version_data )
+function specify_version( $my_version, $other_version )
 {
-   echo '<td colspan="2">';
-   echo '<table>';
-   foreach ( $version_data[0] as $bug )
+   $version_array = array();
+   if ( $my_version->date_order < $other_version->date_order )
+   {
+      $version_array[0] = $my_version;
+      $version_array[1] = $other_version;
+   }
+   else
+   {
+      $version_array[0] = $other_version;
+      $version_array[1] = $my_version;
+   }
+
+   return $version_array;
+}
+
+/**
+ * @param $old_version
+ * @param $new_version
+ */
+function print_changes_table_body( $old_version, $new_version )
+{
+   $old_version_data = get_version_data( $old_version );
+   $new_version_data = get_version_data( $new_version );
+   $all_bugs = initialize_bug_array( $old_version_data[0], $new_version_data[0] );
+
+   echo '<tbody>';
+   foreach ( $all_bugs as $bug )
    {
       echo '<tr>';
-      echo '<td>';
-      echo bug_format_id( $bug );
+      echo '<td colspan="4">';
+      if ( check_inserted( $bug, $old_version_data[0], $new_version_data[0] ) )
+      {
+         echo '+ ' . bug_format_id( $bug ) . ' (' . plugin_lang_get( 'changes_inserted' ) . ')';
+      }
+      if ( check_removed( $bug, $old_version_data[0], $new_version_data[0] ) )
+      {
+         echo '- ' . bug_format_id( $bug ) . ' (' . plugin_lang_get( 'changes_removed' ) . ')';
+      }
+      if ( check_edited( $bug, $old_version_data[0], $new_version_data[0] ) )
+      {
+         echo '# ' . bug_format_id( $bug ) . ' (' . plugin_lang_get( 'changes_edited' ) . ')';
+      }
       echo '</td>';
       echo '</tr>';
    }
-   echo '</table>';
-   echo '</td>';
+   echo '</tbody>';
+}
+
+/**
+ * @param $old_version_data
+ * @param $new_version_data
+ * @return mixed
+ */
+function initialize_bug_array( $old_version_data, $new_version_data )
+{
+   $all_bugs = array();
+   foreach ( $old_version_data as $old_bug )
+   {
+      array_push( $all_bugs, $old_bug );
+   }
+   foreach ( $new_version_data as $new_bug )
+   {
+      /**
+       * ist ein Issue in beiden Arrays enthalten
+       * => wurde es geändert
+       * => muss dennoch nicht zwei Mal gelistet werden!
+       */
+      if ( in_array( $new_bug, $all_bugs ) )
+      {
+         continue;
+      }
+      else
+      {
+         array_push( $all_bugs, $new_bug );
+      }
+   }
+   sort( $all_bugs );
+
+   return $all_bugs;
+}
+
+/**
+ * @param $bug
+ * @param $old_bugs
+ * @param $new_bugs
+ * @return bool
+ */
+function check_inserted( $bug, $old_bugs, $new_bugs )
+{
+   if ( !in_array( $bug, $old_bugs ) && in_array( $bug, $new_bugs ) )
+   {
+      return true;
+   }
+   else
+   {
+      return false;
+   }
+}
+
+/**
+ * @param $bug
+ * @param $old_bugs
+ * @param $new_bugs
+ * @return bool
+ */
+function check_removed( $bug, $old_bugs, $new_bugs )
+{
+   if ( in_array( $bug, $old_bugs ) && !in_array( $bug, $new_bugs ) )
+   {
+      return true;
+   }
+   else
+   {
+      return false;
+   }
+}
+
+/**
+ * @param $bug
+ * @param $old_bugs
+ * @param $new_bugs
+ * @return bool
+ */
+function check_edited( $bug, $old_bugs, $new_bugs )
+{
+   if ( in_array( $bug, $old_bugs ) && in_array( $bug, $new_bugs ) )
+   {
+      return true;
+   }
+   else
+   {
+      return false;
+   }
 }
 
 /**
@@ -96,32 +199,109 @@ function print_page_top( $old_version, $act_version )
 function get_version_data( $version )
 {
    $database_api = new database_api();
-   $print_api = new print_api();
    $version_data = array();
 
-   $relevant_bugs = $database_api->getVersionSpecBugs( $version->version );
-   $relevant_bugs_duration = $database_api->getBugDuration( $relevant_bugs );
-   $status_process = null;
-   if ( count( $relevant_bugs ) > 0 )
-   {
-      $status_process = $print_api->calculate_status_doc_progress( $relevant_bugs );
-   }
-
-   $version_data[0] = $relevant_bugs;
-   $version_data[1] = $relevant_bugs_duration;
+   /* Prjekte sammeln */
+   $project_ids = prepare_relevant_projects();
+   /* Issues sammeln */
+   $reachable_issue_ids = prepare_relevant_issues( $project_ids );
+   /* Unpassende Issues aussortieren */
+   $relevant_issue_ids = calculate_relevant_issues( $version, $reachable_issue_ids );
+   /* Dauer für relevante Issues berechnen */
+   $relevant_issues_duration = $database_api->getBugDuration( $relevant_issue_ids );
+   /* Fortschritt berechnen */
+   $status_process = calculate_status( $relevant_issue_ids );
+   /* Daten sammeln */
+   $version_data[0] = $relevant_issue_ids;
+   $version_data[1] = $relevant_issues_duration;
    $version_data[2] = $status_process;
 
    return $version_data;
 }
 
 /**
+ * @param $relevant_issue_ids
+ * @return array
+ */
+function calculate_status( $relevant_issue_ids )
+{
+   $print_api = new print_api();
+   $status_process = null;
+   if ( count( $relevant_issue_ids ) > 0 )
+   {
+      $relevant_issue_ids = array_merge( $relevant_issue_ids );
+      $status_process = $print_api->calculate_status_doc_progress( $relevant_issue_ids );
+   }
+   return $status_process;
+}
+
+/**
+ * @param $version
+ * @param $reachable_bug_ids
+ */
+function calculate_relevant_issues( $version, $reachable_bug_ids )
+{
+   $database_api = new database_api();
+   $version_date = $version->date_order;
+   $int_filter_string = 'target_version';
+   /* Prüfen ob Bug zum gegebenen Zeitpunkt dieser Zielversion zugeordnet war */
+   foreach ( $reachable_bug_ids as $reachable_bug_id )
+   {
+      $target_version = $database_api->calculate_lastChange( $reachable_bug_id, $version_date, $int_filter_string );
+      if ( $target_version != $version->version )
+      {
+         if ( ( $key = array_search( $reachable_bug_id, $reachable_bug_ids ) ) !== false )
+         {
+            unset( $reachable_bug_ids[$key] );
+         }
+      }
+   }
+   return $reachable_bug_ids;
+}
+
+/**
+ * @param $project_ids
+ * @return mixed
+ */
+function prepare_relevant_issues( $project_ids )
+{
+   $database_api = new database_api();
+   $reachable_bug_ids = array();
+   foreach ( $project_ids as $project_id )
+   {
+      $project_related_bug_ids = $database_api->getBugsByProject( $project_id );
+      foreach ( $project_related_bug_ids as $project_related_bug_id )
+      {
+         array_push( $reachable_bug_ids, $project_related_bug_id );
+      }
+   }
+   return $reachable_bug_ids;
+}
+
+/**
+ * @return array
+ */
+function prepare_relevant_projects()
+{
+   $project_ids = array();
+   $project_id = helper_get_current_project();
+   $sub_project_ids = project_hierarchy_get_all_subprojects( $project_id );
+   array_push( $project_ids, $project_id );
+   foreach ( $sub_project_ids as $sub_project_id )
+   {
+      array_push( $project_ids, $sub_project_id );
+   }
+   return $project_ids;
+}
+
+/**
  * @param $old_version
  * @param $act_version
- * @param $old_version_data
- * @param $act_version_data
  */
-function print_changes_table_head( $old_version, $act_version, $old_version_data, $act_version_data )
+function print_changes_table_head( $old_version, $act_version )
 {
+   $old_version_data = get_version_data( $old_version );
+   $act_version_data = get_version_data( $act_version );
    echo '<thead>';
    echo '<tr>';
    echo '<th colspan="2" class="center">' . $old_version->version . '</th>';

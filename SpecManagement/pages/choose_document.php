@@ -58,6 +58,7 @@ function print_document_selection( $types )
          echo $type_string . " - " . $version_string;
          echo '</option>';
       }
+
    }
    echo '</select>';
 }

@@ -40,10 +40,10 @@ if ( isset( $_POST['version_id'] ) )
    $option_show_expenses_overview = $type_options[1];
 
    $work_packages = $database_api->getDocumentSpecWorkPackages( $p_version_id );
-   $versionSpecBugIds = $database_api->getVersionSpecBugs( version_full_name( $version_id ) );
+   $versionSpecBugIds = $database_api->getVersionSpecBugs( version_get_field( $version_id, 'version' ) );
 
    echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
-   html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_full_name( $version_id ) );
+   html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_get_field( $version_id, 'version' ) );
    if ( !$print_flag )
    {
       html_page_top2();
@@ -136,10 +136,14 @@ if ( isset( $_POST['version_id'] ) )
       print_expenses_overview( $work_packages, $p_version_id, $print_flag );
    }
 
+   if ( !$print_flag )
+   {
+      html_page_bottom1();
+   }
 }
-if ( !$print_flag )
+else
 {
-   html_page_bottom1();
+   print_successful_redirect( 'plugin.php?page=SpecManagement/choose_document' );
 }
 
 /**
@@ -242,16 +246,22 @@ function get_bug_summary( $bug_id, $version_date )
 /**
  * Gets the managers of the current selected project
  *
+ * @param $version_id
  * @return string
  */
-function calculate_person_in_charge()
+function calculate_person_in_charge( $version_id )
 {
    $person_in_charge = '';
-   $project_related_users = project_get_local_user_rows( helper_get_current_project() );
+   $project_id = helper_get_current_project();
+   if ( $project_id == 0 )
+   {
+      $project_id = version_get_field( $version_id, 'project_id' );
+   }
+   $project_related_users = project_get_local_user_rows( $project_id );
    $count = 0;
    foreach ( $project_related_users as $project_related_user )
    {
-      if ( $project_related_user['project_id'] == helper_get_current_project()
+      if ( $project_related_user['project_id'] == $project_id
          && $project_related_user['access_level'] == 70
       )
       {
@@ -414,16 +424,22 @@ function print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_
  */
 function print_document_head( $type_string, $version_id, $parent_project_id, $allRelevantBugs, $print_flag )
 {
-   $versions = version_get_all_rows( helper_get_current_project() );
+   $project_id = helper_get_current_project();
+   $versions = version_get_all_rows( $project_id );
    $act_version = version_get( $version_id );
-
+   $head_project_id = $project_id;
+   if ( $parent_project_id == 0 )
+   {
+      $parent_project_id = version_get_field( $version_id, 'project_id' );
+      $head_project_id = version_get_field( $version_id, 'project_id' );
+   }
    print_editor_table_head( $print_flag );
    print_editor_table_title( $type_string, $version_id, $print_flag );
-   print_doc_head_row( 'head_version', version_full_name( $version_id ) );
+   print_doc_head_row( 'head_version', version_get_field( $version_id, 'version' ) );
    print_doc_head_row( 'head_customer', project_get_name( $parent_project_id ) );
-   print_doc_head_row( 'head_project', project_get_name( helper_get_current_project() ) );
+   print_doc_head_row( 'head_project', project_get_name( $head_project_id ) );
    print_doc_head_row( 'head_date', date( 'j\.m\.Y' ) );
-   print_doc_head_row( 'head_person_in_charge', calculate_person_in_charge() );
+   print_doc_head_row( 'head_person_in_charge', calculate_person_in_charge( $version_id ) );
    if ( !is_null( $allRelevantBugs ) )
    {
       print_doc_head_row( 'head_process', get_process_string( $allRelevantBugs ) );
@@ -445,7 +461,7 @@ function print_editor_table_title( $type_string, $version_id, $print_flag )
 {
    echo '<tr>';
    echo '<td class="field-container">' . plugin_lang_get( 'head_title' ) . '</td>';
-   echo '<td class="form-title" colspan="2">' . $type_string . ' - ' . version_full_name( $version_id ) . '</td>';
+   echo '<td class="form-title" colspan="2">' . $type_string . ' - ' . version_get_field( $version_id, 'version' ) . '</td>';
    if ( !$print_flag )
    {
       echo '<td class="form-title" colspan="1">';

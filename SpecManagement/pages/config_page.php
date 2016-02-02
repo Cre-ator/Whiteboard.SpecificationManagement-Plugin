@@ -28,12 +28,12 @@ else
    echo '<table>';
 }
 
-$print_api->printFormTitle( 3, 'config_caption' );
+$print_api->printFormTitle( 2, 'config_caption' );
 $print_api->printRow();
-echo '<td class="category" width="30%">';
+echo '<td class="category" width="30%" colspan="1">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_accesslevel' );
 echo '</td>';
-echo '<td width="200px">';
+echo '<td width="200px" colspan="1">';
 echo '<select name="AccessLevel">';
 print_enum_string_option_list( 'access_levels', plugin_config_get( 'AccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
 echo '</select>';
@@ -41,10 +41,10 @@ echo '</td>';
 echo '</tr>';
 
 $print_api->printRow();
-echo '<td class="category" width="30%">';
+echo '<td class="category" width="30%" colspan="1">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_readlevel' );
 echo '</td>';
-echo '<td width="200px">';
+echo '<td width="200px" colspan="1">';
 echo '<select name="ReadAccessLevel">';
 print_enum_string_option_list( 'access_levels', plugin_config_get( 'ReadAccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
 echo '</select>';
@@ -52,10 +52,10 @@ echo '</td>';
 echo '</tr>';
 
 $print_api->printRow();
-echo '<td class="category" width="30%">';
+echo '<td class="category" width="30%" colspan="1">';
 echo '<span class="required">*</span>' . plugin_lang_get( 'config_writelevel' );
 echo '</td>';
-echo '<td width="200px">';
+echo '<td width="200px" colspan="1">';
 echo '<select name="WriteAccessLevel">';
 print_enum_string_option_list( 'access_levels', plugin_config_get( 'WriteAccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT ) );
 echo '</select>';
@@ -77,13 +77,13 @@ $print_api->printCategoryField( 1, 1, 'config_footer' );
 $print_api->printRadioButton( 1, 'ShowInFooter' );
 echo '</tr>';
 
-$print_api->printSpacer( 3 );
+$print_api->printSpacer( 2 );
 
-$print_api->printFormTitle( 3, 'config_document' );
+$print_api->printFormTitle( 2, 'config_document' );
 $print_api->printRow();
 $print_api->printCategoryField( 1, 1, 'config_typeadd' );
 $type = gpc_get_string( 'type', '' );
-echo '<td>';
+echo '<td colspan="1">';
 echo '<input type="text" id="type" name="type" size="15" maxlength="128" value="', $type, '">&nbsp';
 echo '<input type="submit" name="addtype" class="button" value="' . plugin_lang_get( 'config_add' ) . '">';
 echo '</td>';
@@ -91,8 +91,7 @@ echo '</tr>';
 
 $print_api->printRow();
 $print_api->printCategoryField( 1, 1, 'config_types' );
-echo '<td>';
-
+echo '<td colspan="1">';
 
 $types_rows = $database_api->getFullTypes();
 foreach ( $types_rows as $types_row )
@@ -118,10 +117,41 @@ echo '<input type="submit" name="changetype" class="button" value="' . plugin_la
 echo '</td>';
 echo '</tr>';
 
-$print_api->printSpacer( 3 );
+$print_api->printSpacer( 2 );
+
+$print_api->printFormTitle( 2, 'config_version' );
+$print_api->printRow();
+$print_api->printCategoryField( 1, 1, 'config_showspecissuestatus' );
+$print_api->printRadioButton( 1, 'ShowSpecStatCols' );
+echo '</tr>';
+if ( plugin_config_get( 'ShowSpecStatCols' ) == ON )
+{
+   $print_api->printRow();
+   $print_api->printCategoryField( 1, 1, 'config_amountcols' );
+   echo '<td width="100px" colspan="1" rowspan="1">';
+   ?>
+   <label><input type="number" name="CAmount"
+                 value="<?php echo plugin_config_get( 'CAmount', PLUGINS_SPECMANAGEMENT_COLUMN_AMOUNT ); ?>" min="1"
+                 max="<?php echo PLUGINS_SPECMANAGEMENT_MAX_COLUMNS; ?>"/></label>
+   <?php
+   echo '</td>';
+   echo '</tr>';
+   for ( $columnIndex = 1; $columnIndex <= plugin_config_get( 'CAmount' ); $columnIndex++ )
+   {
+      $print_api->printRow();
+      echo '<td class="category" colspan="1" rowspan="1">';
+      echo plugin_lang_get( 'config_statuscol' ) . ' ' . $columnIndex . ':';
+      echo '</td>';
+      echo '<td valign="top" width="100px" colspan="1" rowspan="1">';
+      echo '<select name="CStatSelect' . $columnIndex . '">';
+      print_enum_string_option_list( 'status', plugin_config_get( 'CStatSelect' . $columnIndex ) );
+      echo '</select>';
+      echo '</tr>';
+   }
+}
 
 echo '<tr>';
-echo '<td class="center" colspan="3">';
+echo '<td class="center" colspan="2">';
 echo '<input type="submit" name="change" class="button" value="' . lang_get( 'update_prefs_button' ) . '"/>&nbsp';
 echo '<input type="submit" name="reset" class="button" value="' . lang_get( 'reset_prefs_button' ) . '"/>';
 echo '</td>';

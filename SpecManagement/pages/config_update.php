@@ -28,6 +28,18 @@ if ( $option_change )
    $config_api->updateButton( 'ShowInFooter' );
    $config_api->updateButton( 'ShowFields' );
    $config_api->updateButton( 'ShowMenu' );
+   $config_api->updateButton( 'ShowSpecStatCols' );
+
+   $col_amount = gpc_get_int( 'CAmount', PLUGINS_SPECMANAGEMENT_COLUMN_AMOUNT );
+   if ( plugin_config_get( 'CAmount' ) != $col_amount && plugin_config_get( 'CAmount' ) != '' && $col_amount <= PLUGINS_SPECMANAGEMENT_MAX_COLUMNS )
+   {
+      plugin_config_set( 'CAmount', $col_amount );
+   }
+   elseif ( plugin_config_get( 'CAmount' ) == '' )
+   {
+      plugin_config_set( 'CAmount', PLUGINS_SPECMANAGEMENT_COLUMN_AMOUNT );
+   }
+   $config_api->updateDynamicValues( 'CStatSelect', PLUGINS_SPECMANAGEMENT_COLUMN_STAT_DEFAULT );
 }
 
 /**

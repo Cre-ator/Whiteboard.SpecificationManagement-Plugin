@@ -2,7 +2,7 @@
 require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
 require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
-define( 'COLS', 6 );
+define( 'COLS', 7 );
 
 $obsolete_flag = false;
 if ( isset( $_POST['obsolete_flag'] ) )
@@ -67,18 +67,24 @@ function print_table( $obsolete_flag, $print_flag )
 {
    $print_api = new print_api();
    $versions = version_get_all_rows_with_subs( helper_get_current_project(), null, $obsolete_flag );
+   $amount_stat_columns = plugin_config_get( 'CAmount' );
+   if ( $amount_stat_columns > PLUGINS_SPECMANAGEMENT_MAX_COLUMNS )
+   {
+      $amount_stat_columns = PLUGINS_SPECMANAGEMENT_MAX_COLUMNS;
+   }
 
    $print_api->printTableTop( '90' );
-   print_tablehead( $obsolete_flag, $print_flag );
-   print_tablebody( $print_flag, $versions );
+   print_tablehead( $amount_stat_columns, $obsolete_flag, $print_flag );
+   print_tablebody( $amount_stat_columns, $print_flag, $versions );
    $print_api->printTableFoot();
 }
 
 /**
+ * @param $amount_stat_columns
  * @param $print_flag
  * @param $versions
  */
-function print_tablebody( $print_flag, $versions )
+function print_tablebody( $amount_stat_columns, $print_flag, $versions )
 {
    $database_api = new database_api();
    $print_api = new print_api();
@@ -88,27 +94,62 @@ function print_tablebody( $print_flag, $versions )
    {
       $version = $versions[$version_index];
       $version_deadline = date_is_null( $version['date_order'] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version['date_order'] ) );
+      $timeleft = time() - $version['date_order'];
       $version_spec_bugs = $database_api->getVersionSpecBugs( $version['version'] );
-      $version_spec_bug_count = count( $version_spec_bugs );
       $version_spec_bug_duration = $database_api->getBugDuration( $version_spec_bugs );
       $version_spec_bugs_finished_date = time() + ( $version_spec_bug_duration * 3600 );
       $status_process = null;
-
       if ( !is_null( $version_spec_bugs ) )
       {
          $status_process = $print_api->calculate_status_doc_progress( $version_spec_bugs );
       }
-
       $print_api->printRow();
       print_version( $version );
       print_date( $version_deadline );
-      print_amount( $print_flag, $version_spec_bug_count, $version );
+      print_timeleft( $timeleft );
+      print_issue_amount( $amount_stat_columns, $print_flag, $version, $version_spec_bugs );
       print_duration( $version_spec_bug_duration );
       print_process( $version_spec_bug_duration, $status_process );
       print_information( $version, $version_spec_bugs_finished_date, $version_spec_bug_duration );
       echo '</tr>';
    }
    echo '</tbody>';
+}
+
+/**
+ * @param $amount_stat_columns
+ * @param $print_flag
+ * @param $version
+ * @param $version_spec_bugs
+ */
+function print_issue_amount( $amount_stat_columns, $print_flag, $version, $version_spec_bugs )
+{
+   if ( plugin_config_get( 'ShowSpecStatCols' ) == ON )
+   {
+      for ( $column_index = 1; $column_index <= $amount_stat_columns; $column_index++ )
+      {
+         $column_spec_status = plugin_config_get( 'CStatSelect' . $column_index );
+         $column_spec_bug_count = 0;
+         foreach ( $version_spec_bugs as $version_spec_bug )
+         {
+            if ( bug_get_field( $version_spec_bug, 'status' ) == $column_spec_status )
+            {
+               $column_spec_bug_count++;
+            }
+         }
+
+         echo '<td bgcolor="' . get_status_color( $column_spec_status ) . '">';
+         print_amount( $print_flag, $column_spec_bug_count, $version );
+         echo '</td>';
+      }
+   }
+   else
+   {
+      $version_spec_bug_count = count( $version_spec_bugs );
+      echo '<td>';
+      print_amount( $print_flag, $version_spec_bug_count, $version );
+      echo '</td>';
+   }
 }
 
 function print_tableheadrow( $obsolete_flag, $print_flag )
@@ -139,7 +180,6 @@ function print_tableheadrow( $obsolete_flag, $print_flag )
 
 function print_amount( $print_flag, $version_spec_bug_count, $version )
 {
-   echo '<td>';
    if ( $version_spec_bug_count > 0 && !$version['obsolete'] && !$print_flag )
    {
       echo '<a href="search.php?project_id=' . helper_get_current_project() . '&target_version=' . $version['version'] .
@@ -150,10 +190,9 @@ function print_amount( $print_flag, $version_spec_bug_count, $version )
    {
       echo '</a>';
    }
-   echo '</td>';
 }
 
-function print_tablehead( $obsolete_flag, $print_flag )
+function print_tablehead( $amount_stat_columns, $obsolete_flag, $print_flag )
 {
    echo '<thead>';
    print_tableheadrow( $obsolete_flag, $print_flag );
@@ -161,7 +200,15 @@ function print_tablehead( $obsolete_flag, $print_flag )
    echo '<tr class="row-category2">';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'version' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_deadline' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_amount' ) . '</th>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_timeleft' ) . '</th>';
+   if ( plugin_config_get( 'ShowSpecStatCols' ) == ON )
+   {
+      echo '<th class="form-title" colspan="' . $amount_stat_columns . '" width="' . $col_width . '">' . plugin_lang_get( 'versview_amount' ) . '</th>';
+   }
+   else
+   {
+      echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_amount' ) . '</th>';
+   }
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_duration' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_progress' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_information' ) . '</th>';
@@ -207,6 +254,27 @@ function print_date( $version_deadline )
    echo '</td>';
 }
 
+function print_timeleft( $timeleft )
+{
+   $minutes = $timeleft / 60;
+   $hours = $minutes / 60;
+   $days = floor( $hours / 24 );
+   $hours_left = round( $hours - ( $days * 24 ), 0 );
+
+   echo '<td>';
+   if ( $timeleft >= 0 )
+   {
+      echo plugin_lang_get( 'versview_timeleft_pos' ) . ' ';
+   }
+   else
+   {
+      echo plugin_lang_get( 'versview_timeleft_neg' ) . ' ';
+   }
+   echo $days . ' ' . plugin_lang_get( 'versview_timeleft_d' ) . ' ' . $hours_left . ' '
+      . plugin_lang_get( 'versview_timeleft_h' );
+   echo '</td>';
+}
+
 function print_version( $version )
 {
    echo '<td>';
@@ -217,20 +285,16 @@ function print_version( $version )
 function print_graph( $obsolete_flag )
 {
    $print_api = new print_api();
-
    $project_id = helper_get_current_project();
    $versions = version_get_all_rows_with_subs( $project_id, null, $obsolete_flag );
-
    $version_hash = array();
 
    for ( $version_index = count( $versions ) - 1; $version_index >= 0; $version_index-- )
    {
       $version = $versions[$version_index];
-
       $version_record = array();
       array_push( $version_record, $version['id'] );
       array_push( $version_record, $version['date_order'] );
-
       array_push( $version_hash, $version_record );
    }
 
@@ -238,26 +302,41 @@ function print_graph( $obsolete_flag )
    {
       echo '<br/>';
       $print_api->printTableTop( '90' );
-
-      echo '<thead>';
-      $print_api->printFormTitle( null, 'versview_theadgraph' );
-      echo '</thead>';
-
-      echo '<tbody>';
-      echo '<tr>';
-      echo '<td class="center">';
-
-      foreach ( $version_hash as $version_value )
-      {
-         $version_id = $version_value[0];
-         $version_name = version_get_field( $version_id, 'version' );
-         $version_date = date_is_null( $version_value[1] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version_value[1] ) );
-         echo ' <img border="0" src="' . SPECMANAGEMENT_PLUGIN_URL . 'files/rel_next_version.png"/> ' . $version_name . ' [' . $version_date . ']';
-      }
-
-      echo '</td>';
-      echo '</tr>';
-      echo '</tbody>';
+      print_graph_tablehead();
+      print_graph_tablebody( $version_hash );
       $print_api->printTableFoot();
    }
+}
+
+/**
+ *
+ */
+function print_graph_tablehead()
+{
+   $print_api = new print_api();
+   echo '<thead>';
+   $print_api->printFormTitle( null, 'versview_theadgraph' );
+   echo '</thead>';
+}
+
+/**
+ * @param $version_hash
+ */
+function print_graph_tablebody( $version_hash )
+{
+   echo '<tbody>';
+   echo '<tr>';
+   echo '<td class="center">';
+
+   foreach ( $version_hash as $version_value )
+   {
+      $version_id = $version_value[0];
+      $version_name = version_get_field( $version_id, 'version' );
+      $version_date = date_is_null( $version_value[1] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version_value[1] ) );
+      echo ' <img border="0" src="' . SPECMANAGEMENT_PLUGIN_URL . 'files/rel_next_version.png"/> ' . $version_name . ' [' . $version_date . ']';
+   }
+
+   echo '</td>';
+   echo '</tr>';
+   echo '</tbody>';
 }

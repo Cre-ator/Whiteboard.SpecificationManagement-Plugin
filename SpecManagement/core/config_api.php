@@ -42,4 +42,20 @@ class config_api
          plugin_config_set( $config, $button );
       }
    }
+
+   /**
+    * @param $value
+    * @param $constant
+    */
+   public function updateDynamicValues( $value, $constant )
+   {
+      $column_amount = plugin_config_get( 'CAmount' );
+
+      for ( $columnIndex = 1; $columnIndex <= $column_amount; $columnIndex++ )
+      {
+         $act_value = $value . $columnIndex;
+
+         $this->updateValue( $act_value, $constant );
+      }
+   }
 }

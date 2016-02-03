@@ -1360,7 +1360,7 @@ class database_api
     * @param $bug_array
     * @return int
     */
-   public function getBugDuration( $bug_array )
+   public function getBugArrayDuration( $bug_array )
    {
       if ( $this->getMantisVersion() == '1.2.' )
       {
@@ -1389,6 +1389,37 @@ class database_api
       }
 
       return $duration;
+   }
+
+   /**
+    * Get the duration of a bug array
+    *
+    * @param $bug_id
+    * @return int
+    */
+   public function getBugDuration( $bug_id )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
+      }
+      else
+      {
+         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
+      }
+
+      $bug_duration = 0;
+      $query = "SELECT time FROM $plugin_ptime_table
+            WHERE bug_id = " . $bug_id;
+
+      $result = $this->mysqli->query( $query );
+      if ( 0 != $result->num_rows )
+      {
+         $row = $result->fetch_row();
+         $bug_duration = $row[0];
+      }
+
+      return $bug_duration;
    }
 
    /**

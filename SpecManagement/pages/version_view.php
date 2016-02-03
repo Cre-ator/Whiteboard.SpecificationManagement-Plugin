@@ -7,11 +7,21 @@ define( 'COLS', 7 );
 $obsolete_flag = false;
 if ( isset( $_POST['obsolete_flag'] ) )
 {
-   $obsolete_flag = null;
+   $obsolete_flag = true;
 }
 if ( isset( $_POST['non_obsolete_flag'] ) )
 {
    $obsolete_flag = false;
+}
+
+$show_zero_issues = false;
+if ( isset( $_POST['show_zero_issues'] ) )
+{
+   $show_zero_issues = true;
+}
+if ( isset( $_POST['non_show_zero_issues'] ) )
+{
+   $show_zero_issues = false;
 }
 
 $print_flag = false;
@@ -23,13 +33,14 @@ if ( isset( $_POST['print_flag'] ) )
 /**
  * Page content
  */
-calculate_page_content( $print_flag, $obsolete_flag );
+calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues );
 
 /**
  * @param $print_flag
  * @param $obsolete_flag
+ * @param $show_zero_issues
  */
-function calculate_page_content( $print_flag, $obsolete_flag )
+function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues )
 {
    $print_api = new print_api();
 
@@ -47,7 +58,7 @@ function calculate_page_content( $print_flag, $obsolete_flag )
       echo '<hr size="1" width="100%" />';
    }
 
-   print_table( $obsolete_flag, $print_flag );
+   print_table( $obsolete_flag, $show_zero_issues, $print_flag );
    if ( helper_get_current_project() != 0 )
    {
       print_graph( $obsolete_flag );
@@ -61,12 +72,18 @@ function calculate_page_content( $print_flag, $obsolete_flag )
 
 /**
  * @param $obsolete_flag
+ * @param $show_zero_issues
  * @param $print_flag
  */
-function print_table( $obsolete_flag, $print_flag )
+function print_table( $obsolete_flag, $show_zero_issues, $print_flag )
 {
    $print_api = new print_api();
-   $versions = version_get_all_rows_with_subs( helper_get_current_project(), null, $obsolete_flag );
+   $obsolote = false;
+   if ( $obsolete_flag )
+   {
+      $obsolote = null;
+   }
+   $versions = version_get_all_rows_with_subs( helper_get_current_project(), null, $obsolote );
    $amount_stat_columns = plugin_config_get( 'CAmount' );
    if ( $amount_stat_columns > PLUGINS_SPECMANAGEMENT_MAX_COLUMNS )
    {
@@ -74,17 +91,18 @@ function print_table( $obsolete_flag, $print_flag )
    }
 
    $print_api->printTableTop( '90' );
-   print_tablehead( $amount_stat_columns, $obsolete_flag, $print_flag );
-   print_tablebody( $amount_stat_columns, $print_flag, $versions );
+   print_tablehead( $amount_stat_columns, $obsolete_flag, $show_zero_issues, $print_flag );
+   print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, $versions );
    $print_api->printTableFoot();
 }
 
 /**
  * @param $amount_stat_columns
  * @param $print_flag
+ * @param $show_zero_issues
  * @param $versions
  */
-function print_tablebody( $amount_stat_columns, $print_flag, $versions )
+function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, $versions )
 {
    $database_api = new database_api();
    $print_api = new print_api();
@@ -93,27 +111,81 @@ function print_tablebody( $amount_stat_columns, $print_flag, $versions )
    for ( $version_index = 0; $version_index < count( $versions ); $version_index++ )
    {
       $version = $versions[$version_index];
+      $version_spec_bug_ids = $database_api->getVersionSpecBugs( $version['version'] );
+      if ( is_null( $version_spec_bug_ids ) && !$show_zero_issues )
+      {
+         continue;
+      }
       $version_deadline = date_is_null( $version['date_order'] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version['date_order'] ) );
       $timeleft = time() - $version['date_order'];
-      $version_spec_bugs = $database_api->getVersionSpecBugs( $version['version'] );
-      $version_spec_bug_duration = $database_api->getBugDuration( $version_spec_bugs );
-      $version_spec_bugs_finished_date = time() + ( $version_spec_bug_duration * 3600 );
+
+      $unsolved_bug_duration = null;
       $status_process = null;
-      if ( !is_null( $version_spec_bugs ) )
+      $uncertainty_bug_ids = array();
+      $uncertainty_status_process = null;
+      $unsolved_bug_finished_date = null;
+      $null_issues_flag = true;
+
+      if ( !is_null( $version_spec_bug_ids ) )
       {
-         $status_process = $print_api->calculate_status_doc_progress( $version_spec_bugs );
+         $unsolveld_bug_ids = get_unsolved_issues( $version_spec_bug_ids );
+         $unsolved_bug_duration = $database_api->getBugArrayDuration( $unsolveld_bug_ids );
+         $unsolved_bug_finished_date = time() + ( $unsolved_bug_duration * 3600 );
+
+         $status_process = 100 * round( 1 - ( count( $unsolveld_bug_ids ) ) / ( count( $version_spec_bug_ids ) ), 2 );
+
+         $uncertainty_bug_ids = get_uncertainty_issues( $unsolveld_bug_ids );
+         $uncertainty_status_process = 100 * round( ( count( $uncertainty_bug_ids ) ) / ( count( $version_spec_bug_ids ) ), 2 );
+
+         $null_issues_flag = false;
       }
+
       $print_api->printRow();
       print_version( $version );
-      print_date( $version_deadline );
-      print_timeleft( $timeleft );
-      print_issue_amount( $amount_stat_columns, $print_flag, $version, $version_spec_bugs );
-      print_duration( $version_spec_bug_duration );
-      print_process( $version_spec_bug_duration, $status_process );
-      print_information( $version, $version_spec_bugs_finished_date, $version_spec_bug_duration );
+      print_date( $version_deadline, $timeleft );
+      print_issue_amount( $amount_stat_columns, $print_flag, $version, $version_spec_bug_ids, $null_issues_flag );
+      print_process( $status_process, $null_issues_flag );
+      print_duration( $unsolved_bug_duration, $null_issues_flag );
+      print_uncertainty( $uncertainty_bug_ids, $uncertainty_status_process, $null_issues_flag );
+      print_information( $version, $unsolved_bug_finished_date, $unsolved_bug_duration, $null_issues_flag );
       echo '</tr>';
    }
    echo '</tbody>';
+}
+
+/**
+ * @param $unsolveld_bug_ids
+ * @return array
+ */
+function get_uncertainty_issues( $unsolveld_bug_ids )
+{
+   $database_api = new database_api();
+   $uncertainty_bug_ids = array();
+   foreach ( $unsolveld_bug_ids as $unsolveld_bug_id )
+   {
+      if ( $database_api->getBugDuration( $unsolveld_bug_id ) == 0 )
+      {
+         array_push( $uncertainty_bug_ids, $unsolveld_bug_id );
+      }
+   }
+   return $uncertainty_bug_ids;
+}
+
+/**
+ * @param $version_spec_bug_ids
+ * @return mixed
+ */
+function get_unsolved_issues( $version_spec_bug_ids )
+{
+   $unsolveld_bug_ids = array();
+   foreach ( $version_spec_bug_ids as $version_spec_bug_id )
+   {
+      if ( !( ( bug_get_field( $version_spec_bug_id, 'status' ) == 80 || bug_get_field( $version_spec_bug_id, 'status' ) == 90 ) ) )
+      {
+         array_push( $unsolveld_bug_ids, $version_spec_bug_id );
+      }
+   }
+   return $unsolveld_bug_ids;
 }
 
 /**
@@ -121,8 +193,9 @@ function print_tablebody( $amount_stat_columns, $print_flag, $versions )
  * @param $print_flag
  * @param $version
  * @param $version_spec_bugs
+ * @param $null_issues_flag
  */
-function print_issue_amount( $amount_stat_columns, $print_flag, $version, $version_spec_bugs )
+function print_issue_amount( $amount_stat_columns, $print_flag, $version, $version_spec_bugs, $null_issues_flag )
 {
    if ( plugin_config_get( 'ShowSpecStatCols' ) == ON )
    {
@@ -130,44 +203,40 @@ function print_issue_amount( $amount_stat_columns, $print_flag, $version, $versi
       {
          $column_spec_status = plugin_config_get( 'CStatSelect' . $column_index );
          $column_spec_bug_count = 0;
-         foreach ( $version_spec_bugs as $version_spec_bug )
+         if ( !$null_issues_flag )
          {
-            if ( bug_get_field( $version_spec_bug, 'status' ) == $column_spec_status )
+            foreach ( $version_spec_bugs as $version_spec_bug )
             {
-               $column_spec_bug_count++;
+               if ( bug_get_field( $version_spec_bug, 'status' ) == $column_spec_status )
+               {
+                  $column_spec_bug_count++;
+               }
             }
+            echo '<td bgcolor="' . get_status_color( $column_spec_status ) . '">';
+            print_amount( $print_flag, $column_spec_bug_count, $version );
          }
-
-         echo '<td bgcolor="' . get_status_color( $column_spec_status ) . '">';
-         print_amount( $print_flag, $column_spec_bug_count, $version );
+         else
+         {
+            echo '<td bgcolor="' . get_status_color( $column_spec_status ) . '">0';
+         }
          echo '</td>';
       }
    }
-   else
-   {
-      $version_spec_bug_count = count( $version_spec_bugs );
-      echo '<td>';
-      print_amount( $print_flag, $version_spec_bug_count, $version );
-      echo '</td>';
-   }
+   $version_spec_bug_count = count( $version_spec_bugs );
+   echo '<td>';
+   print_amount( $print_flag, $version_spec_bug_count, $version );
+   echo '</td>';
 }
 
-function print_tableheadrow( $obsolete_flag, $print_flag )
+function print_thead_headrow( $obsolete_flag, $show_zero_issues, $print_flag, $amount_stat_columns )
 {
    echo '<tr>';
    if ( !$print_flag )
    {
-      echo '<td class="form-title" colspan="' . ( COLS - 1 ) . '">' . plugin_lang_get( 'versview_thead' ) . '</td>';
-      echo '<td colspan="1"><form action="' . plugin_page( 'version_view' ) . '" method="post">';
-      if ( $obsolete_flag === false )
-      {
-         echo '<input type="submit" name="obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_obsolete_flag' ) . '"/>';
-      }
-      elseif ( is_null( $obsolete_flag ) )
-      {
-         echo '<input type="submit" name="non_obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_non_obsolete_flag' ) . '"/>';
-      }
-
+      echo '<td class="form-title" colspan="' . ( COLS + $amount_stat_columns - 5 ) . '">' . plugin_lang_get( 'versview_thead' ) . '</td>';
+      echo '<td colspan="4"><form action="' . plugin_page( 'version_view' ) . '" method="post">';
+      print_thead_headrow_obsoletebutton( $obsolete_flag );
+      print_thead_headrow_showzeroissuebutton( $show_zero_issues );
       echo '&nbsp<input type="submit" name="print_flag" class="button" value="' . lang_get( 'print' ) . '"/>';
       echo '</form></td>';
    }
@@ -176,6 +245,36 @@ function print_tableheadrow( $obsolete_flag, $print_flag )
       echo '<td class="center" colspan="' . COLS . '">' . plugin_lang_get( 'versview_thead' ) . '</td>';
    }
    echo '</tr>';
+}
+
+/**
+ * @param $show_zero_issues
+ */
+function print_thead_headrow_showzeroissuebutton( $show_zero_issues )
+{
+   if ( $show_zero_issues === false )
+   {
+      echo '&nbsp<input type="submit" name="show_zero_issues" class="button" value="' . plugin_lang_get( 'versview_show_zero_issues' ) . '"/>';
+   }
+   else
+   {
+      echo '&nbsp<input type="submit" name="non_show_zero_issues" class="button" value="' . plugin_lang_get( 'versview_non_show_zero_issues' ) . '"/>';
+   }
+}
+
+/**
+ * @param $obsolete_flag
+ */
+function print_thead_headrow_obsoletebutton( $obsolete_flag )
+{
+   if ( $obsolete_flag === false )
+   {
+      echo '<input type="submit" name="obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_obsolete_flag' ) . '"/>';
+   }
+   else
+   {
+      echo '<input type="submit" name="non_obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_non_obsolete_flag' ) . '"/>';
+   }
 }
 
 function print_amount( $print_flag, $version_spec_bug_count, $version )
@@ -192,33 +291,43 @@ function print_amount( $print_flag, $version_spec_bug_count, $version )
    }
 }
 
-function print_tablehead( $amount_stat_columns, $obsolete_flag, $print_flag )
+function print_tablehead( $amount_stat_columns, $obsolete_flag, $show_zero_issues, $print_flag )
 {
    echo '<thead>';
-   print_tableheadrow( $obsolete_flag, $print_flag );
+   print_thead_headrow( $obsolete_flag, $show_zero_issues, $print_flag, $amount_stat_columns );
    $col_width = 100 / COLS;
    echo '<tr class="row-category2">';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . lang_get( 'version' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_deadline' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_timeleft' ) . '</th>';
+   print_thead_col( $col_width, 'versview_scheduled' );
    if ( plugin_config_get( 'ShowSpecStatCols' ) == ON )
    {
-      echo '<th class="form-title" colspan="' . $amount_stat_columns . '" width="' . $col_width . '">' . plugin_lang_get( 'versview_amount' ) . '</th>';
+      echo '<th class="form-title" colspan="' . ( $amount_stat_columns ) . '" width="' . $col_width . '">' . plugin_lang_get( 'versview_amount' ) . '</th>';
+      echo '<th class="form-title" colspan="1" width="' . $col_width . '">&#931</th>';
    }
    else
    {
-      echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_amount' ) . '</th>';
+      print_thead_col( $col_width, 'versview_amount' );
    }
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_duration' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_progress' ) . '</th>';
-   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'versview_information' ) . '</th>';
+   print_thead_col( $col_width, 'versview_progress' );
+   print_thead_col( $col_width, 'versview_duration' );
+   print_thead_col( $col_width, 'versview_uncertainty' );
+   print_thead_col( $col_width, 'versview_information' );
    echo '</tr>';
    echo '</thead>';
 }
 
-function print_information( $version, $version_spec_bugs_finished_date, $version_spec_bug_duration )
+/**
+ * @param $col_width
+ * @param $lang_string
+ */
+function print_thead_col( $col_width, $lang_string )
 {
-   echo '<td>';
+   echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( $lang_string ) . '</th>';
+}
+
+function print_information( $version, $version_spec_bugs_finished_date, $version_spec_bug_duration, $null_issues_flag )
+{
+   echo '<td style="white-space:nowrap">';
    if ( $version['date_order'] < $version_spec_bugs_finished_date && $version_spec_bug_duration != 0 )
    {
       echo plugin_lang_get( 'versview_deadline_n' ) . '<br/>';
@@ -227,34 +336,46 @@ function print_information( $version, $version_spec_bugs_finished_date, $version
    {
       echo plugin_lang_get( 'versview_obsolete' ) . '<br/>';
    }
+   if ( $null_issues_flag )
+   {
+      echo plugin_lang_get( 'versview_zero_issues' ) . '<br/>';
+   }
    echo '</td>';
 }
 
-function print_process( $version_spec_bug_duration, $status_process )
+function print_process( $status_process, $null_issues_flag )
 {
    echo '<td>';
-   if ( $version_spec_bug_duration > 0 )
+   if ( !$null_issues_flag )
    {
       echo $status_process . '%';
    }
    echo '</td>';
 }
 
-function print_duration( $version_spec_bug_duration )
+function print_uncertainty( $uncertainty_bug_ids, $uncertainty_status_process, $null_issues_flag )
 {
    echo '<td>';
-   echo string_display( $version_spec_bug_duration );
+   if ( !$null_issues_flag )
+   {
+      echo plugin_lang_get( 'versview_uncertainty_string1' ) . ' '
+         . count( $uncertainty_bug_ids ) . '  ' . plugin_lang_get( 'versview_uncertainty_string2' )
+         . ' (' . $uncertainty_status_process . plugin_lang_get( 'versview_uncertainty_string3' ) . ').';
+   }
    echo '</td>';
 }
 
-function print_date( $version_deadline )
+function print_duration( $version_spec_bug_duration, $null_issues_flag )
 {
    echo '<td>';
-   echo $version_deadline;
+   if ( !$null_issues_flag )
+   {
+      echo string_display( $version_spec_bug_duration );
+   }
    echo '</td>';
 }
 
-function print_timeleft( $timeleft )
+function print_date( $version_deadline, $timeleft )
 {
    $minutes = $timeleft / 60;
    $hours = $minutes / 60;
@@ -262,6 +383,7 @@ function print_timeleft( $timeleft )
    $hours_left = round( $hours - ( $days * 24 ), 0 );
 
    echo '<td>';
+   echo $version_deadline . ' - ';
    if ( $timeleft >= 0 )
    {
       echo plugin_lang_get( 'versview_timeleft_pos' ) . ' ';
@@ -286,7 +408,12 @@ function print_graph( $obsolete_flag )
 {
    $print_api = new print_api();
    $project_id = helper_get_current_project();
-   $versions = version_get_all_rows_with_subs( $project_id, null, $obsolete_flag );
+   $obsolete = false;
+   if ( $obsolete_flag )
+   {
+      $obsolete = null;
+   }
+   $versions = version_get_all_rows_with_subs( $project_id, null, $obsolete );
    $version_hash = array();
 
    for ( $version_index = count( $versions ) - 1; $version_index >= 0; $version_index-- )
@@ -308,9 +435,6 @@ function print_graph( $obsolete_flag )
    }
 }
 
-/**
- *
- */
 function print_graph_tablehead()
 {
    $print_api = new print_api();

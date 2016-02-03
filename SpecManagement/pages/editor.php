@@ -104,7 +104,7 @@ if ( isset( $_POST['version_id'] ) )
     */
    if ( true && !is_null( $versionSpecBugIds ) )
    {
-      $duration = $database_api->getBugDuration( $versionSpecBugIds );
+      $duration = $database_api->getBugArrayDuration( $versionSpecBugIds );
       /* print work package */
       print_simple_chapter_title( $chapter_index, $option_show_duration, $duration );
 

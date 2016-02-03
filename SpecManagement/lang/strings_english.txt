@@ -88,18 +88,24 @@ $s_plugin_SpecManagement_mantypes_show_directory = 'Show Directory in Editor / D
 $s_plugin_SpecManagement_versview_thead = 'Version Overview';
 $s_plugin_SpecManagement_versview_obsolete_flag = 'Show obsolete versions';
 $s_plugin_SpecManagement_versview_non_obsolete_flag = 'Hide obsolete versions';
-$s_plugin_SpecManagement_versview_deadline = 'Deadline';
-$s_plugin_SpecManagement_versview_timeleft = 'Time Left';
+$s_plugin_SpecManagement_versview_show_zero_issues = 'Show Versions with 0 Issues';
+$s_plugin_SpecManagement_versview_non_show_zero_issues = 'Hide Versions with 0 Issues';
+$s_plugin_SpecManagement_versview_scheduled = 'Scheduled';
 $s_plugin_SpecManagement_versview_timeleft_pos = 'Exceeded Appointment to';
 $s_plugin_SpecManagement_versview_timeleft_neg = 'Time to Deadline: ';
 $s_plugin_SpecManagement_versview_timeleft_d = 'Days and';
 $s_plugin_SpecManagement_versview_timeleft_h = 'Hours';
 $s_plugin_SpecManagement_versview_amount = 'Amount of Issues';
-$s_plugin_SpecManagement_versview_duration = 'Duration';
+$s_plugin_SpecManagement_versview_duration = 'Remaining Duration';
 $s_plugin_SpecManagement_versview_progress = 'Progress';
+$s_plugin_SpecManagement_versview_uncertainty = 'Uncertainty';
+$s_plugin_SpecManagement_versview_uncertainty_string1 = 'Duration not detected for';
+$s_plugin_SpecManagement_versview_uncertainty_string2 = 'Issues';
+$s_plugin_SpecManagement_versview_uncertainty_string3 = '% of the rest of Progress';
 $s_plugin_SpecManagement_versview_information = 'Information';
 $s_plugin_SpecManagement_versview_deadline_n = 'Deadline endangered!';
 $s_plugin_SpecManagement_versview_obsolete = 'Version is obsolete!';
+$s_plugin_SpecManagement_versview_zero_issues = '0 Issues!';
 $s_plugin_SpecManagement_versview_theadgraph = 'Version Graph';
 
 /* head area of document */

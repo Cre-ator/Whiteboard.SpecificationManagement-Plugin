@@ -194,7 +194,7 @@ function get_version_data( $version )
    /* Unpassende Issues aussortieren */
    $relevant_issue_ids = calculate_relevant_issues( $version, $reachable_issue_ids );
    /* Dauer für relevante Issues berechnen */
-   $relevant_issues_duration = $database_api->getBugDuration( $relevant_issue_ids );
+   $relevant_issues_duration = $database_api->getBugArrayDuration( $relevant_issue_ids );
    /* Fortschritt berechnen */
    $status_process = calculate_status( $relevant_issue_ids );
    /* Daten sammeln */

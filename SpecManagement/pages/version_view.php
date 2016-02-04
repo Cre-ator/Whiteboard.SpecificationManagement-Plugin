@@ -120,8 +120,10 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
       $timeleft = time() - $version['date_order'];
 
       $unsolved_bug_duration = null;
+      $add_rel_duration = 0;
       $status_process = null;
       $uncertainty_bug_ids = array();
+      $add_rel_uncertainty_bug_ids = array();
       $uncertainty_status_process = null;
       $unsolved_bug_finished_date = null;
       $null_issues_flag = true;
@@ -130,13 +132,13 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
       {
          $unsolveld_bug_ids = get_unsolved_issues( $version_spec_bug_ids );
          $unsolved_bug_duration = $database_api->getBugArrayDuration( $unsolveld_bug_ids );
+         $rel_based_data = calculate_rel_based_data( $unsolveld_bug_ids );
+         $add_rel_duration = $rel_based_data[0];
+         $add_rel_uncertainty_bug_ids = $rel_based_data[1];
          $unsolved_bug_finished_date = time() + ( $unsolved_bug_duration * 3600 );
-
          $status_process = 100 * round( 1 - ( count( $unsolveld_bug_ids ) ) / ( count( $version_spec_bug_ids ) ), 2 );
-
          $uncertainty_bug_ids = get_uncertainty_issues( $unsolveld_bug_ids );
          $uncertainty_status_process = 100 * round( ( count( $uncertainty_bug_ids ) ) / ( count( $version_spec_bug_ids ) ), 2 );
-
          $null_issues_flag = false;
       }
 
@@ -145,12 +147,49 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
       print_date( $version_deadline, $timeleft );
       print_issue_amount( $amount_stat_columns, $print_flag, $version, $version_spec_bug_ids, $null_issues_flag );
       print_process( $status_process, $null_issues_flag );
-      print_duration( $unsolved_bug_duration, $null_issues_flag );
-      print_uncertainty( $uncertainty_bug_ids, $uncertainty_status_process, $null_issues_flag );
+      print_duration( $unsolved_bug_duration, $add_rel_duration, $null_issues_flag );
+      print_uncertainty( $uncertainty_bug_ids, $add_rel_uncertainty_bug_ids, $uncertainty_status_process, $null_issues_flag );
       print_information( $version, $unsolved_bug_finished_date, $unsolved_bug_duration, $null_issues_flag );
       echo '</tr>';
    }
    echo '</tbody>';
+}
+
+/**
+ * @param $unsolveld_bug_ids
+ * @return mixed
+ */
+function calculate_rel_based_data( $unsolveld_bug_ids )
+{
+   $database_api = new database_api();
+   $rel_based_data = array();
+   $add_rel_duration = 0;
+   $add_rel_uncertainty_bug_ids = array();
+
+   foreach ( $unsolveld_bug_ids as $unsolveld_bug_id )
+   {
+      $bug_src_rels = relationship_get_all_src( $unsolveld_bug_id );
+      foreach ( $bug_src_rels as $bug_src_rel )
+      {
+         if ( $bug_src_rel->src_bug_id == $unsolveld_bug_id )
+         {
+            $blocking_bug_id = $bug_src_rel->dest_bug_id;
+            $blocking_bug_status = bug_get_field( $blocking_bug_id, 'status' );
+            $blocking_bug_duration = $database_api->getBugDuration( $blocking_bug_id );
+            if ( ( $blocking_bug_duration > 0 || !is_null( $blocking_bug_duration ) )
+               && !( $blocking_bug_status == 80 || $blocking_bug_status == 90 )
+            )
+            {
+               array_push( $add_rel_uncertainty_bug_ids, $blocking_bug_id );
+               $add_rel_duration += $blocking_bug_duration;
+            }
+         }
+      }
+   }
+   $rel_based_data[0] = $add_rel_duration;
+   $rel_based_data[1] = $add_rel_uncertainty_bug_ids;
+
+   return $rel_based_data;
 }
 
 /**
@@ -353,24 +392,40 @@ function print_process( $status_process, $null_issues_flag )
    echo '</td>';
 }
 
-function print_uncertainty( $uncertainty_bug_ids, $uncertainty_status_process, $null_issues_flag )
+function print_uncertainty( $uncertainty_bug_ids, $add_rel_uncertainty_bug_ids, $uncertainty_status_process, $null_issues_flag )
 {
+   $add_rel_uncertainty_bug_count = count( $add_rel_uncertainty_bug_ids );
    echo '<td>';
    if ( !$null_issues_flag )
    {
       echo plugin_lang_get( 'versview_uncertainty_string1' ) . ' '
-         . count( $uncertainty_bug_ids ) . '  ' . plugin_lang_get( 'versview_uncertainty_string2' )
-         . ' (' . $uncertainty_status_process . plugin_lang_get( 'versview_uncertainty_string3' ) . ').';
+         . count( $uncertainty_bug_ids ) . '  '
+         . plugin_lang_get( 'versview_uncertainty_string2' )
+         . ' (' . $uncertainty_status_process
+         . plugin_lang_get( 'versview_uncertainty_string3' ) . ').<br/>';
+      if ( $add_rel_uncertainty_bug_count > 0 )
+      {
+         echo plugin_lang_get( 'versview_uncertainty_string4' ) . ' '
+            . string_display( $add_rel_uncertainty_bug_count ) . ' '
+            . plugin_lang_get( 'versview_uncertainty_string2' ) . ' '
+            . plugin_lang_get( 'versview_duration1' );
+      }
    }
    echo '</td>';
 }
 
-function print_duration( $version_spec_bug_duration, $null_issues_flag )
+function print_duration( $unsolved_bug_duration, $add_rel_duration, $null_issues_flag )
 {
-   echo '<td>';
+   $sum_duration = $unsolved_bug_duration + $add_rel_duration;
+   echo '<td style="white-space:nowrap">';
    if ( !$null_issues_flag )
    {
-      echo string_display( $version_spec_bug_duration );
+      echo string_display( $sum_duration );
+      if ( $add_rel_duration > 0 )
+      {
+         echo ' (' . plugin_lang_get( 'versview_duration0' ) . ' ' . string_display( $add_rel_duration ) . ' '
+            . plugin_lang_get( 'versview_duration1' ) . ')';
+      }
    }
    echo '</td>';
 }

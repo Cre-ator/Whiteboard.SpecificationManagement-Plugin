@@ -107,6 +107,7 @@ $s_plugin_SpecManagement_versview_uncertainty_string2 = 'Einträge';
 $s_plugin_SpecManagement_versview_uncertainty_string3 = '% des Restfortschritts';
 $s_plugin_SpecManagement_versview_uncertainty_string4 = '=> Weitere';
 $s_plugin_SpecManagement_versview_information = 'Hinweis';
+$s_plugin_SpecManagement_versview_deadline = 'Termin';
 $s_plugin_SpecManagement_versview_deadline_n = 'Termineinhaltung gefährdet!';
 $s_plugin_SpecManagement_versview_obsolete = 'Version veraltet!';
 $s_plugin_SpecManagement_versview_zero_issues = '0 Einträge!';

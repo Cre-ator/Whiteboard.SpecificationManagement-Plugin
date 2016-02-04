@@ -106,6 +106,7 @@ $s_plugin_SpecManagement_versview_uncertainty_string2 = 'Issues';
 $s_plugin_SpecManagement_versview_uncertainty_string3 = '% of the rest of Progress';
 $s_plugin_SpecManagement_versview_uncertainty_string4 = '=> Additional';
 $s_plugin_SpecManagement_versview_information = 'Information';
+$s_plugin_SpecManagement_versview_deadline = 'Deadline';
 $s_plugin_SpecManagement_versview_deadline_n = 'Deadline endangered!';
 $s_plugin_SpecManagement_versview_obsolete = 'Version is obsolete!';
 $s_plugin_SpecManagement_versview_zero_issues = '0 Issues!';

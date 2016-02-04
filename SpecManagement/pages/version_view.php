@@ -61,7 +61,7 @@ function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues 
    print_table( $obsolete_flag, $show_zero_issues, $print_flag );
    if ( helper_get_current_project() != 0 )
    {
-      print_graph( $obsolete_flag );
+//      print_graph( $obsolete_flag );
    }
 
    if ( !$print_flag )

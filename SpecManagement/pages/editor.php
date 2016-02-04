@@ -41,6 +41,7 @@ if ( isset( $_POST['version_id'] ) )
 
    $work_packages = $database_api->getDocumentSpecWorkPackages( $p_version_id );
    $versionSpecBugIds = $database_api->getVersionSpecBugs( version_get_field( $version_id, 'version' ) );
+   $no_workpackage_bug_ids = array();
 
    echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
    html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_get_field( $version_id, 'version' ) );
@@ -98,11 +99,12 @@ if ( isset( $_POST['version_id'] ) )
          $chapter_index++;
       }
    }
+   echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
 
    /*
     * If there are bugs left without work packages, print them too, if it is set in the config
     */
-   if ( true && !is_null( $versionSpecBugIds ) )
+   if ( count( $versionSpecBugIds ) > 0 )
    {
       $duration = $database_api->getBugArrayDuration( $versionSpecBugIds );
       /* print work package */
@@ -123,6 +125,7 @@ if ( isset( $_POST['version_id'] ) )
             /* remove bug from version spec bugs */
             if ( ( $key = array_search( $versionSpecBugId, $versionSpecBugIds ) ) !== false )
             {
+               array_push( $no_workpackage_bug_ids, $versionSpecBugId );
                unset( $versionSpecBugIds[$key] );
             }
          }
@@ -133,7 +136,7 @@ if ( isset( $_POST['version_id'] ) )
 
    if ( $option_show_expenses_overview == '1' )
    {
-      print_expenses_overview( $work_packages, $p_version_id, $print_flag );
+      print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_workpackage_bug_ids );
    }
 
    if ( !$print_flag )
@@ -318,7 +321,7 @@ function print_bug_infos( $string )
    if ( !is_null( $string ) )
    {
       echo '<tr>';
-      echo '<td colspan="1" />';
+      echo '<td />';
       echo '<td colspan="2">' . $string . '</td>';
       echo '</tr>';
    }
@@ -332,7 +335,7 @@ function print_bug_infos( $string )
 function print_bugnote_note( $bugnote_count_value )
 {
    echo '<tr>';
-   echo '<td colspan="1" />';
+   echo '<td />';
    echo '<td class="infohead" colspan="2">' . plugin_lang_get( 'editor_bug_notes_note' ) . ' (' . $bugnote_count_value . ')</td>';
    echo '</tr>';
 }
@@ -347,12 +350,12 @@ function print_bug_attachments( $bug_id )
    $print_api = new print_api();
    $attachment_count = file_bug_attachment_count( $bug_id );
    echo '<tr>';
-   echo '<td colspan="1" />';
+   echo '<td />';
    echo '<td class="infohead" colspan="2">' . plugin_lang_get( 'editor_bug_attachments' ) . ' (' . $attachment_count . ')</td>';
    echo '</tr>';
 
    echo '<tr id="attachments">';
-   echo '<td colspan="1" />';
+   echo '<td />';
    echo '<td class="bug-attachments" colspan="2">';
    $print_api->print_bug_attachments_list( $bug_id );
    echo '</td>';
@@ -371,9 +374,9 @@ function print_bug_attachments( $bug_id )
 function print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
 {
    print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag );
-   print_bug_infos( string_display_links( $bug_data[2] ) );
-   print_bug_infos( string_display_links( $bug_data[3] ) );
-   print_bug_infos( string_display_links( $bug_data[4] ) );
+   print_bug_infos( string_display_links( trim( $bug_data[2] ) ) );
+   print_bug_infos( string_display_links( trim( $bug_data[3] ) ) );
+   print_bug_infos( string_display_links( trim( $bug_data[4] ) ) );
    if ( !empty( $bug_data[5] ) )
    {
       print_bug_attachments( $bug_data[0] );
@@ -394,8 +397,8 @@ function print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show
 function print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
 {
    echo '<tr>';
-   echo '<td class="form-title" colspan="1">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
-   echo '<td class="form-title" colspan="2">' . string_display( $bug_data[1] ) . ' (';
+   echo '<td class="form-title">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
+   echo '<td class="form-title">' . string_display( $bug_data[1] ) . ' (';
    if ( !$print_flag )
    {
       print_bug_link( $bug_data[0], true );
@@ -405,9 +408,11 @@ function print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_
       echo bug_format_id( $bug_data[0] );
    }
    echo ')';
-   if ( $option_show_duration == '1' )
+   echo '</td>';
+   echo '<td class="duration_title">';
+   if ( $option_show_duration == '1' && !( $bug_data[7] == 0 || is_null( $bug_data[7] ) ) )
    {
-      echo ', ' . plugin_lang_get( 'editor_bug_duration' ) . ': ' . $bug_data[7] . ' ' . plugin_lang_get( 'editor_duration_unit' );
+      echo plugin_lang_get( 'editor_bug_duration' ) . ': ' . $bug_data[7] . ' ' . plugin_lang_get( 'editor_duration_unit' );
    }
    echo '</td>';
    echo '</tr>';
@@ -438,7 +443,7 @@ function print_document_head( $type_string, $version_id, $parent_project_id, $al
    print_doc_head_row( 'head_version', version_get_field( $version_id, 'version' ) );
    print_doc_head_row( 'head_customer', project_get_name( $parent_project_id ) );
    print_doc_head_row( 'head_project', project_get_name( $head_project_id ) );
-   print_doc_head_row( 'head_date', date( 'j\.m\.Y' ) );
+   print_doc_head_row( 'head_date', date( 'd\.m\.Y' ) );
    print_doc_head_row( 'head_person_in_charge', calculate_person_in_charge( $version_id ) );
    if ( !is_null( $allRelevantBugs ) )
    {
@@ -464,7 +469,7 @@ function print_editor_table_title( $type_string, $version_id, $print_flag )
    echo '<td class="form-title" colspan="2">' . $type_string . ' - ' . version_get_field( $version_id, 'version' ) . '</td>';
    if ( !$print_flag )
    {
-      echo '<td class="form-title" colspan="1">';
+      echo '<td class="form-title">';
       echo '<form action="' . plugin_page( 'editor' ) . '" method="post">';
       echo '<span class="input">';
       echo '<input type="hidden" name="version_id" value="' . $version_id . '" />';
@@ -485,20 +490,18 @@ function print_editor_table_title( $type_string, $version_id, $print_flag )
  */
 function print_simple_chapter_title( $chapter_index, $option_show_duration, $duration )
 {
-   if ( is_null( $duration ) )
-   {
-      $duration = plugin_lang_get( 'editor_work_package_duration_null' );
-   }
-
    echo '<tr>';
-   echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
-   echo '<td class="form-title" colspan="2">' . plugin_lang_get( 'editor_no_workpackage' );
-   if ( $option_show_duration == '1' )
+   echo '<td class="form-title">' . $chapter_index . '</td>';
+   echo '<td class="form-title">' . plugin_lang_get( 'editor_no_workpackage' );
+   echo '</td>';
+   echo '<td class="duration_title">';
+   if ( $option_show_duration == '1' && !( $duration == 0 || is_null( $duration ) ) )
    {
-      echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
+      echo '[' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
    }
    echo '</td>';
    echo '</tr>';
+   echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
 }
 
 /**
@@ -511,20 +514,18 @@ function print_simple_chapter_title( $chapter_index, $option_show_duration, $dur
  */
 function print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration )
 {
-   if ( is_null( $duration ) )
-   {
-      $duration = plugin_lang_get( 'editor_work_package_duration_null' );
-   }
-
    echo '<tr>';
-   echo '<td class="form-title" colspan="1">' . $chapter_index . '</td>';
-   echo '<td class="form-title" colspan="2">' . $work_package;
-   if ( $option_show_duration == '1' )
+   echo '<td class="form-title">' . $chapter_index . '</td>';
+   echo '<td class="form-title">' . $work_package;
+   echo '</td>';
+   echo '<td class="duration_title">';
+   if ( $option_show_duration == '1' && !( $duration == 0 || is_null( $duration ) ) )
    {
-      echo ' [' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
+      echo '[' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
    }
    echo '</td>';
    echo '</tr>';
+   echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
 }
 
 /**
@@ -533,10 +534,12 @@ function print_chapter_title( $chapter_index, $work_package, $option_show_durati
  * @param $work_packages
  * @param $p_version_id
  * @param $print_flag
+ * @param $no_workpackage_bug_ids
  */
-function print_expenses_overview( $work_packages, $p_version_id, $print_flag )
+function print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_workpackage_bug_ids )
 {
    $database_api = new database_api();
+   $document_duration = 0;
 
    echo '<br />';
    print_editor_table_head( $print_flag );
@@ -556,18 +559,39 @@ function print_expenses_overview( $work_packages, $p_version_id, $print_flag )
          $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
          $document_duration += $duration;
          echo '<tr>';
-         echo '<td colspan="1">' . $work_package . '</td>';
-         echo '<td colspan="1">' . $duration . '</td>';
+         echo '<td>' . $work_package . '</td>';
+         echo '<td class="duration">' . $duration . '</td>';
          echo '</tr>';
       }
+   }
+   if ( count( $no_workpackage_bug_ids ) > 0 )
+   {
+      $sum_no_work_package_bug_duration = 0;
+
+      foreach ( $no_workpackage_bug_ids as $no_workpackage_bug_id )
+      {
+         $no_work_package_bug_duration = $database_api->getBugDuration( $no_workpackage_bug_id );
+         if ( !is_null( $no_work_package_bug_duration ) )
+         {
+            $sum_no_work_package_bug_duration += $no_work_package_bug_duration;
+         }
+      }
+
+      $document_duration += $sum_no_work_package_bug_duration;
       echo '<tr>';
-      echo '<td colspan="2"><hr width="100%" align="center" /></td>';
-      echo '</tr>';
-      echo '<tr>';
-      echo '<td />';
-      echo '<td>' . plugin_lang_get( 'editor_expenses_overview_sum' ) . ': ' . $document_duration . '</td>';
+      echo '<td>' . plugin_lang_get( 'editor_no_workpackage' ) . '</td>';
+      echo '<td class="duration">' . $sum_no_work_package_bug_duration . '</td>';
       echo '</tr>';
    }
+   echo '<tr>';
+   echo '<td colspan="2"><hr width="100%" align="center" /></td>';
+   echo '</tr>';
+   echo '<tr>';
+   echo '<td>';
+   echo plugin_lang_get( 'editor_expenses_overview_sum' ) . ':';
+   echo '</td>';
+   echo '<td class="duration">' . $document_duration . '</td>';
+   echo '</tr>';
    echo '</tbody>';
    echo '</table>';
 }
@@ -583,8 +607,8 @@ function print_expenses_overview_head()
    echo '</tr>';
 
    echo '<tr class="row-category">';
-   echo '<th colspan="1">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</th>';
-   echo '<th colspan="1">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')</th>';
+   echo '<th>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</th>';
+   echo '<th class="duration">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')</th>';
    echo '</tr>';
    echo '</thead>';
 }

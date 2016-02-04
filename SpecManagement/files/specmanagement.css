@@ -1,24 +1,35 @@
-a
-{
+a {
     color: black;
     background: transparent;
     text-decoration: none;
 }
 
-a:hover
-{
+a:hover {
     text-decoration: underline;
 }
 
-td.selected
-{
+td.selected {
     background-color: #91ffe6;
     color: #000000;
     font-weight: bold;
 }
 
-table.editor
-{
+td.duration {
+    text-align: right;
+}
+
+td.duration_title {
+    background-color: #ffffff;
+    color: #000000;
+    font-weight: bold;
+    text-align: right;
+}
+
+th.duration {
+    text-align: right;
+}
+
+table.editor {
     width: 60%;
     margin-left: 20%;
     margin-right: 20%;
@@ -26,8 +37,7 @@ table.editor
     text-align: justify;
 }
 
-table.editorprint
-{
+table.editorprint {
     width: 95%;
     margin-left: 3%;
     margin-right: 3%;

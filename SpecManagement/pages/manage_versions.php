@@ -3,7 +3,7 @@ require_once SPECMANAGEMENT_CORE_URI . 'authorization_api.php';
 require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
 require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
 
-define( 'COLS', 6 );
+define( 'COLS', 7 );
 $print_api = new print_api();
 
 $edit_page = false;

@@ -650,31 +650,36 @@ function print_editor_table_head( $print_flag )
  */
 function print_doc_head_versions( $versions, $act_version )
 {
+   $database_api = new database_api();
    foreach ( $versions as $version )
    {
-      $same_version = $act_version->id == $version['id'];
-      echo '<tr>';
-      print_doc_head_version_col( $same_version, date_is_null( $version['date_order'] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version['date_order'] ) ) );
-      print_doc_head_version_col( $same_version, version_full_name( $version['id'] ) );
-      $change_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">'
-         . '<input type="hidden" name="version_other" value="' . $version['id'] . '" />'
-         . '<input type="hidden" name="version_my" value="' . $act_version->id . '" />'
-         . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>'
-         . '</form>';
-      if ( $same_version )
+      $type_string = $database_api->getTypeString( $database_api->getTypeByVersion( $version['id'] ) );
+      if ( strlen( $type_string ) > 0 )
       {
-         print_doc_head_version_col( $same_version, '' );
+         $same_version = $act_version->id == $version['id'];
+         echo '<tr>';
+         print_doc_head_version_col( $same_version, date_is_null( $version['date_order'] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version['date_order'] ) ) );
+         print_doc_head_version_col( $same_version, version_full_name( $version['id'] ) );
+         $change_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'changes' ) . '">'
+            . '<input type="hidden" name="version_other" value="' . $version['id'] . '" />'
+            . '<input type="hidden" name="version_my" value="' . $act_version->id . '" />'
+            . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_changes' ) . '"/>'
+            . '</form>';
+         if ( $same_version )
+         {
+            print_doc_head_version_col( $same_version, '' );
+         }
+         else
+         {
+            print_doc_head_version_col( $same_version, $change_button_string );
+         }
+         $show_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">'
+            . '<input type="hidden" name="version_id" value="' . $version['id'] . '" />'
+            . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_view' ) . '"/>'
+            . '</form>';
+         print_doc_head_version_col( $same_version, $show_button_string );
+         echo '</tr>';
       }
-      else
-      {
-         print_doc_head_version_col( $same_version, $change_button_string );
-      }
-      $show_button_string = '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">'
-         . '<input type="hidden" name="version_id" value="' . $version['id'] . '" />'
-         . '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'head_view' ) . '"/>'
-         . '</form>';
-      print_doc_head_version_col( $same_version, $show_button_string );
-      echo '</tr>';
    }
 }
 

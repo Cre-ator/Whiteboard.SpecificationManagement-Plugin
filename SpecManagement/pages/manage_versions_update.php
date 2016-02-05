@@ -32,11 +32,7 @@ if ( $update && isset( $_POST['version_ids'] ) )
    $type = $_POST['type'];
    $description = $_POST['description'];
 
-   var_dump( $version_ids );
-   var_dump( $versions );
-   var_dump( $date_order );
    var_dump( $type );
-   var_dump( $description );
 
    for ( $version_id = 0; $version_id < count( $version_ids ); $version_id++ )
    {
@@ -88,8 +84,15 @@ if ( $update && isset( $_POST['version_ids'] ) )
       if ( !is_null( $type ) )
       {
          $new_type = $type[$version_id];
-         $new_type_id = $database_api->getTypeId( $new_type );
-         $database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], $new_type_id );
+         if ( strlen( $new_type ) > 0 )
+         {
+            $new_type_id = $database_api->getTypeId( $new_type );
+            $database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], $new_type_id );
+         }
+         else
+         {
+            $database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], 9999 );
+         }
       }
 
       if ( !is_null( $description ) )

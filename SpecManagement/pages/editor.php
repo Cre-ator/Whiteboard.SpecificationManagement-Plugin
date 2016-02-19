@@ -51,7 +51,9 @@ if ( isset( $_POST['version_id'] ) )
 
       if ( plugin_is_installed( 'WhiteboardMenu' ) )
       {
-         $print_api->print_whiteboardplugin_menu();
+         require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
+         $whiteboard_print_api = new whiteboard_print_api();
+         $whiteboard_print_api->printWhiteboardMenu();
       }
       $print_api->print_plugin_menu();
    }

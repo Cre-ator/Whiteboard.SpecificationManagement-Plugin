@@ -51,7 +51,9 @@ function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues 
       html_page_top2();
       if ( plugin_is_installed( 'WhiteboardMenu' ) )
       {
-         $print_api->print_whiteboardplugin_menu();
+         require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
+         $whiteboard_print_api = new whiteboard_print_api();
+         $whiteboard_print_api->printWhiteboardMenu();
       }
       $print_api->print_plugin_menu();
       echo '<div align="center">';

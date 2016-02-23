@@ -1,9 +1,9 @@
 <?php
 auth_reauthenticate();
 
-require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
 
-$database_api = new database_api();
+$specmanagement_database_api = new specmanagement_database_api();
 $update = gpc_get_bool( 'update', false );
 $addversion = gpc_get_bool( 'addversion', false );
 
@@ -31,8 +31,6 @@ if ( $update && isset( $_POST['version_ids'] ) )
    $date_order = $_POST['date_order'];
    $type = $_POST['type'];
    $description = $_POST['description'];
-
-   var_dump( $type );
 
    for ( $version_id = 0; $version_id < count( $version_ids ); $version_id++ )
    {
@@ -86,12 +84,12 @@ if ( $update && isset( $_POST['version_ids'] ) )
          $new_type = $type[$version_id];
          if ( strlen( $new_type ) > 0 )
          {
-            $new_type_id = $database_api->getTypeId( $new_type );
-            $database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], $new_type_id );
+            $new_type_id = $specmanagement_database_api->getTypeId( $new_type );
+            $specmanagement_database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], $new_type_id );
          }
          else
          {
-            $database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], 9999 );
+            $specmanagement_database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], 9999 );
          }
       }
 

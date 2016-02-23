@@ -1,10 +1,10 @@
 <?php
-require_once SPECMANAGEMENT_CORE_URI . 'authorization_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_authorization_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
 
 define( 'COLS', 4 );
-$print_api = new print_api();
+$specmanagement_print_api = new specmanagement_print_api();
 
 $edit_page = false;
 if ( isset( $_POST['edit'] ) )
@@ -15,7 +15,7 @@ if ( isset( $_POST['edit'] ) )
 /**
  * Page content
  */
-$print_api->print_page_head( plugin_lang_get( 'mantypes_title' ) );
+$specmanagement_print_api->print_page_head( plugin_lang_get( 'mantypes_title' ) );
 echo '<div align="center">';
 echo '<hr size="1" width="100%" />';
 print_table( $edit_page );
@@ -24,16 +24,16 @@ html_page_bottom1();
 
 function print_table( $edit_page = false )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
    if ( $edit_page )
    {
       echo '<form action="' . plugin_page( 'manage_types_update' ) . '" method="post">';
    }
-   $print_api->printTableTop( '100' );
+   $specmanagement_print_api->printTableTop( '100' );
    print_tablehead();
    print_tablebody( $edit_page );
-   $print_api->printTableFoot();
+   $specmanagement_print_api->printTableFoot();
    echo '</form>';
 }
 
@@ -60,10 +60,10 @@ function print_tablebody( $edit_page )
  */
 function print_types( $edit_page )
 {
-   $database_api = new database_api();
-   $print_api = new print_api();
+   $specmanagement_database_api = new specmanagement_database_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
-   $types = $database_api->getFullTypes();
+   $types = $specmanagement_database_api->getFullTypes();
    for ( $type_index = 0; $type_index < count( $types ); $type_index++ )
    {
       $type = $types[$type_index];
@@ -78,7 +78,7 @@ function print_types( $edit_page )
       $option_show_expenses_overview = $type_options[1];
       $option_show_directory = $type_options[2];
 
-      $print_api->printRow();
+      $specmanagement_print_api->printRow();
       echo '<input type="hidden" name="type_ids[]" value="' . $type_id . '"/>';
 
       print_name( $type_string );
@@ -91,9 +91,9 @@ function print_types( $edit_page )
 
 function print_tablefooter()
 {
-   $authorization_api = new authorization_api();
+   $specmanagement_authorization_api = new specmanagement_authorization_api();
 
-   if ( $authorization_api->userHasGlobalLevel() || $authorization_api->userHasWriteLevel() )
+   if ( $specmanagement_authorization_api->userHasGlobalLevel() || $specmanagement_authorization_api->userHasWriteLevel() )
    {
       echo '<tr>';
       echo '<td colspan="' . COLS . '" class="center">';
@@ -191,11 +191,11 @@ function print_name( $type_string )
 
 function print_tablehead()
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
    $col_width = 100 / COLS;
    echo '<thead>';
-   $print_api->printFormTitle( COLS, 'mantypes_thead' );
+   $specmanagement_print_api->printFormTitle( COLS, 'mantypes_thead' );
    echo '<tr class="row-category2">';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'manversions_thdoctype' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="' . $col_width . '">' . plugin_lang_get( 'mantypes_show_print_duration' ) . '</th>';

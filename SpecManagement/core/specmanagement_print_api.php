@@ -1,6 +1,6 @@
 <?php
 
-class print_api
+class specmanagement_print_api
 {
    /**
     * Get suffix of mantis version
@@ -185,8 +185,8 @@ class print_api
     */
    public function printBugUpdateFields( $type, $work_package, $ptime )
    {
-      $database_api = new database_api();
-      $work_packages = $database_api->getProjectSpecWorkPackages();
+      $specmanagement_database_api = new specmanagement_database_api();
+      $work_packages = $specmanagement_database_api->getProjectSpecWorkPackages();
 
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
@@ -248,8 +248,8 @@ class print_api
     */
    public function printBugReportFields()
    {
-      $database_api = new database_api();
-      $work_packages = $database_api->getProjectSpecWorkPackages();
+      $specmanagement_database_api = new specmanagement_database_api();
+      $work_packages = $specmanagement_database_api->getProjectSpecWorkPackages();
 
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {

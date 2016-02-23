@@ -40,6 +40,62 @@ if ( isset( $_POST['version_id'] ) )
    $option_show_expenses_overview = $type_options[1];
 
    $work_packages = $specmanagement_database_api->getDocumentSpecWorkPackages( $p_version_id );
+
+
+   /** ************************************************************************************************************** */
+
+//   var_dump( $work_packages );
+
+   /**
+    * calculate main chapters
+    */
+   $initial_chapters = array();
+   $sub_chapter_depth = 0;
+   foreach ( $work_packages as $work_package )
+   {
+      $order = explode( '/', $work_package );
+      $depth = count( $order );
+      if ( $depth > $sub_chapter_depth )
+      {
+         $sub_chapter_depth = $depth;
+      }
+      if ( array_search( $order[0], $initial_chapters ) === false )
+      {
+         $initial_chapters[] = $order[0];
+      }
+   }
+
+   /**
+    * calculate sub chapters
+    */
+   $chapter_hash_array = array();
+   foreach ( $initial_chapters as $initial_chapter )
+   {
+      if ( strlen( $initial_chapter ) > 0 )
+      {
+         $chapter_hash = array();
+         foreach ( $work_packages as $work_package )
+         {
+            $order = explode( '/', $work_package );
+            $order_depth = count( $order );
+            if ( $order[0] == $initial_chapter && $order_depth > 1 )
+            {
+               if ( array_search( $order[1], $chapter_hash ) === false )
+               {
+                  array_push( $chapter_hash, $order[1] );
+               }
+            }
+         }
+
+         $chapter_hash_array[$initial_chapter] = $chapter_hash;
+      }
+   }
+
+   var_dump( $chapter_hash_array );
+
+
+   /** ************************************************************************************************************** */
+
    $versionSpecBugIds = $specmanagement_database_api->getVersionSpecBugs( version_get_field( $version_id, 'version' ) );
    $no_workpackage_bug_ids = array();
 
@@ -103,7 +159,7 @@ if ( isset( $_POST['version_id'] ) )
    }
    echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
 
-   /*
+   /**
     * If there are bugs left without work packages, print them too, if it is set in the config
     */
    if ( count( $versionSpecBugIds ) > 0 )
@@ -268,6 +324,7 @@ function calculate_person_in_charge( $version_id )
    {
       if ( $project_related_user['project_id'] == $project_id
          && $project_related_user['access_level'] == 70
+         && user_is_enabled( $project_related_user['user_id'] )
       )
       {
          if ( $count > 0 )

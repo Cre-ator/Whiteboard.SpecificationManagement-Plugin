@@ -144,7 +144,7 @@ class specmanagement_print_api
    public function print_plugin_menu()
    {
       echo '<table align="center">';
-      echo '<tr><td colspan="4" class="center" ><font color="#8b0000" size="5">*** Plugin befindet sich in Entwicklungsphase ***</font></td></tr>';
+      echo '<tr><td colspan="3" class="center" ><font color="#8b0000" size="5">*** Plugin befindet sich in Entwicklungsphase ***</font></td></tr>';
 
       echo '<tr>';
 
@@ -157,12 +157,6 @@ class specmanagement_print_api
       echo '<td>';
       echo '[ <a href="' . plugin_page( 'manage_versions' ) . '">';
       echo plugin_lang_get( 'menu_manversions' );
-      echo '</a> ]';
-      echo '</td>';
-
-      echo '<td>';
-      echo '[ <a href="' . plugin_page( 'manage_types' ) . '">';
-      echo plugin_lang_get( 'menu_mantypes' );
       echo '</a> ]';
       echo '</td>';
 

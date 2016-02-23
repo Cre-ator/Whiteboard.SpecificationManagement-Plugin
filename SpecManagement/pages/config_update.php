@@ -15,6 +15,7 @@ $option_reset = gpc_get_bool( 'reset', false );
 $option_addtype = gpc_get_bool( 'addtype', false );
 $option_deltype = gpc_get_bool( 'deletetype', false );
 $option_changetype = gpc_get_bool( 'changetype', false );
+$option_manage_doc_types = gpc_get_bool( 'manage_doc_types', false );
 
 /**
  * Submit configuration changes
@@ -94,6 +95,14 @@ if ( $option_changetype )
 
       $specmanagement_database_api->updateTypeRow( $type_id, $new_type_string );
    }
+}
+
+/**
+ *
+ */
+if ( $option_manage_doc_types )
+{
+   print_successful_redirect( plugin_page( 'manage_types', true ) );
 }
 
 form_security_purge( 'plugin_SpecManagement_config_update' );

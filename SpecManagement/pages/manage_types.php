@@ -15,7 +15,10 @@ if ( isset( $_POST['edit'] ) )
 /**
  * Page content
  */
-$specmanagement_print_api->print_page_head( plugin_lang_get( 'mantypes_title' ) );
+echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
+html_page_top1( plugin_lang_get( 'mantypes_title' ) );
+html_page_top2();
+print_manage_menu();
 echo '<div align="center">';
 echo '<hr size="1" width="100%" />';
 print_table( $edit_page );

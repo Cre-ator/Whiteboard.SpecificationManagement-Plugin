@@ -1,6 +1,6 @@
 <?php
-require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
 
 if ( isset( $_POST['version_other'] ) && isset( $_POST['version_my'] ) )
 {
@@ -15,7 +15,7 @@ if ( isset( $_POST['version_other'] ) && isset( $_POST['version_my'] ) )
  */
 function calculate_changes()
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
    $other_version = version_get( $_POST['version_other'] );
    $my_version = version_get( $_POST['version_my'] );
@@ -23,11 +23,11 @@ function calculate_changes()
    $old_version = $specified_versions[0];
    $new_version = $specified_versions[1];
 
-   $print_api->print_page_head( plugin_lang_get( 'changes_title' ) . ': ' . $old_version->version . ' / ' . $new_version->version );
-   $print_api->printTableTop( '60' );
+   $specmanagement_print_api->print_page_head( plugin_lang_get( 'changes_title' ) . ': ' . $old_version->version . ' / ' . $new_version->version );
+   $specmanagement_print_api->printTableTop( '60' );
    print_changes_table_head( $old_version, $new_version );
    print_changes_table_body( $old_version, $new_version );
-   $print_api->printTableFoot();
+   $specmanagement_print_api->printTableFoot();
    html_page_bottom1();
 }
 
@@ -184,7 +184,7 @@ function check_edited( $issue, $old_issues, $new_issues )
  */
 function get_version_data( $version )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $version_data = array();
 
    /* Prjekte sammeln */
@@ -194,7 +194,7 @@ function get_version_data( $version )
    /* Unpassende Issues aussortieren */
    $relevant_issue_ids = calculate_relevant_issues( $version, $reachable_issue_ids );
    /* Dauer für relevante Issues berechnen */
-   $relevant_issues_duration = $database_api->getBugArrayDuration( $relevant_issue_ids );
+   $relevant_issues_duration = $specmanagement_database_api->getBugArrayDuration( $relevant_issue_ids );
    /* Fortschritt berechnen */
    $status_process = calculate_status( $relevant_issue_ids );
    /* Daten sammeln */
@@ -211,12 +211,12 @@ function get_version_data( $version )
  */
 function calculate_status( $relevant_issue_ids )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
    $status_process = null;
    if ( count( $relevant_issue_ids ) > 0 )
    {
       $relevant_issue_ids = array_merge( $relevant_issue_ids );
-      $status_process = $print_api->calculate_status_doc_progress( $relevant_issue_ids );
+      $status_process = $specmanagement_print_api->calculate_status_doc_progress( $relevant_issue_ids );
    }
    return $status_process;
 }
@@ -227,13 +227,13 @@ function calculate_status( $relevant_issue_ids )
  */
 function calculate_relevant_issues( $version, $reachable_issue_ids )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $version_date = $version->date_order;
    $int_filter_string = 'target_version';
    /* Prüfen ob Bug zum gegebenen Zeitpunkt dieser Zielversion zugeordnet war */
    foreach ( $reachable_issue_ids as $reachable_issue_id )
    {
-      $target_version = $database_api->calculate_lastChange( $reachable_issue_id, $version_date, $int_filter_string );
+      $target_version = $specmanagement_database_api->calculate_lastChange( $reachable_issue_id, $version_date, $int_filter_string );
       if ( $target_version != $version->version )
       {
          if ( ( $key = array_search( $reachable_issue_id, $reachable_issue_ids ) ) !== false )
@@ -251,11 +251,11 @@ function calculate_relevant_issues( $version, $reachable_issue_ids )
  */
 function prepare_relevant_issues( $project_ids )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $reachable_issue_ids = array();
    foreach ( $project_ids as $project_id )
    {
-      $project_related_issue_ids = $database_api->getBugsByProject( $project_id );
+      $project_related_issue_ids = $specmanagement_database_api->getBugsByProject( $project_id );
       foreach ( $project_related_issue_ids as $project_related_issue_id )
       {
          array_push( $reachable_issue_ids, $project_related_issue_id );

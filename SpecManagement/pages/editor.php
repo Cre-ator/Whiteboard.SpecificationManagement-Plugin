@@ -1,9 +1,9 @@
 <?php
-require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
 
-$database_api = new database_api();
-$print_api = new print_api();
+$specmanagement_database_api = new specmanagement_database_api();
+$specmanagement_print_api = new specmanagement_print_api();
 
 $type_string = null;
 /* initialize version */
@@ -15,7 +15,7 @@ $work_packages = array();
 /* initialize bug ids assigned to work package */
 $work_package_bug_ids = array();
 /* initialize parent project */
-$parent_project_id = $database_api->getMainProjectByHierarchy( helper_get_current_project() );
+$parent_project_id = $specmanagement_database_api->getMainProjectByHierarchy( helper_get_current_project() );
 
 if ( isset( $_POST['version_id'] ) )
 {
@@ -27,11 +27,11 @@ if ( isset( $_POST['version_id'] ) )
    $version_id = $_POST['version_id'];
    $version = version_get( $version_id );
    $version_date = $version->date_order;
-   $plugin_version_obj = $database_api->getPluginVersionRowByVersionId( $version_id );
+   $plugin_version_obj = $specmanagement_database_api->getPluginVersionRowByVersionId( $version_id );
    $p_version_id = $plugin_version_obj[0];
-   $type_string = $database_api->getTypeString( $database_api->getTypeByVersion( $version_id ) );
-   $type_id = $database_api->getTypeId( $type_string );
-   $type_row = $database_api->getTypeRow( $type_id );
+   $type_string = $specmanagement_database_api->getTypeString( $specmanagement_database_api->getTypeByVersion( $version_id ) );
+   $type_id = $specmanagement_database_api->getTypeId( $type_string );
+   $type_row = $specmanagement_database_api->getTypeRow( $type_id );
 
    $type_options_set = $type_row[2];
    $type_options = explode( ';', $type_options_set );
@@ -39,8 +39,8 @@ if ( isset( $_POST['version_id'] ) )
    $option_show_duration = $type_options[0];
    $option_show_expenses_overview = $type_options[1];
 
-   $work_packages = $database_api->getDocumentSpecWorkPackages( $p_version_id );
-   $versionSpecBugIds = $database_api->getVersionSpecBugs( version_get_field( $version_id, 'version' ) );
+   $work_packages = $specmanagement_database_api->getDocumentSpecWorkPackages( $p_version_id );
+   $versionSpecBugIds = $specmanagement_database_api->getVersionSpecBugs( version_get_field( $version_id, 'version' ) );
    $no_workpackage_bug_ids = array();
 
    echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
@@ -55,7 +55,7 @@ if ( isset( $_POST['version_id'] ) )
          $whiteboard_print_api = new whiteboard_print_api();
          $whiteboard_print_api->printWhiteboardMenu();
       }
-      $print_api->print_plugin_menu();
+      $specmanagement_print_api->print_plugin_menu();
    }
    print_document_head( $type_string, $version_id, $parent_project_id, $versionSpecBugIds, $print_flag );
    print_editor_table_head( $print_flag );
@@ -71,11 +71,11 @@ if ( isset( $_POST['version_id'] ) )
             continue;
          }
 
-         $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
+         $duration = $specmanagement_database_api->getWorkpackageDuration( $p_version_id, $work_package );
          /* print work package */
          print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration );
          /* get work package assigned bugs */
-         $work_package_bug_ids = $database_api->getWorkPackageSpecBugs( $p_version_id, $work_package );
+         $work_package_bug_ids = $specmanagement_database_api->getWorkPackageSpecBugs( $p_version_id, $work_package );
 
          $sub_chapter_index = 10;
          /* for each bug in selected work package */
@@ -108,7 +108,7 @@ if ( isset( $_POST['version_id'] ) )
     */
    if ( count( $versionSpecBugIds ) > 0 )
    {
-      $duration = $database_api->getBugArrayDuration( $versionSpecBugIds );
+      $duration = $specmanagement_database_api->getBugArrayDuration( $versionSpecBugIds );
       /* print work package */
       print_simple_chapter_title( $chapter_index, $option_show_duration, $duration );
 
@@ -160,7 +160,7 @@ else
  */
 function calculate_bug_data( $bug_id, $version_date )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    /* Initialize bug data array */
    $bug_data = array();
    /* ID */
@@ -176,9 +176,9 @@ function calculate_bug_data( $bug_id, $version_date )
    /* Attached files */
    $bug_data[5] = bug_get_attachments( $bug_id );
    /* Notes */
-   $bug_data[6] = $database_api->calculateLastBugnotes( $bug_id, $version_date );
+   $bug_data[6] = $specmanagement_database_api->calculateLastBugnotes( $bug_id, $version_date );
    /* planned duration for each bug */
-   $bug_data[7] = $database_api->getPtimeRow( $bug_id )[2];
+   $bug_data[7] = $specmanagement_database_api->getPtimeRow( $bug_id )[2];
 
    return $bug_data;
 }
@@ -190,10 +190,10 @@ function calculate_bug_data( $bug_id, $version_date )
  */
 function get_bug_additionalinformation( $bug_id, $version_date )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $additional_information_value = null;
    $value_type = 3;
-   $additional_information_value = $database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   $additional_information_value = $specmanagement_database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
    return $additional_information_value;
 }
 
@@ -204,10 +204,10 @@ function get_bug_additionalinformation( $bug_id, $version_date )
  */
 function get_bug_stepstoreproduce( $bug_id, $version_date )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $steps_to_reproduce_value = null;
    $value_type = 2;
-   $steps_to_reproduce_value = $database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   $steps_to_reproduce_value = $specmanagement_database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
    return $steps_to_reproduce_value;
 }
 
@@ -218,11 +218,11 @@ function get_bug_stepstoreproduce( $bug_id, $version_date )
  */
 function get_bug_description( $bug_id, $version_date )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $description_value = null;
    $bug = bug_get( $bug_id );
    $value_type = 1;
-   $description_value = $database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   $description_value = $specmanagement_database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
    if ( strlen( $description_value ) == 0 )
    {
       $description_value = $bug->description;
@@ -237,9 +237,9 @@ function get_bug_description( $bug_id, $version_date )
  */
 function get_bug_summary( $bug_id, $version_date )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $int_filter_string = 'summary';
-   $summary_value = $database_api->calculate_lastChange( $bug_id, $version_date, $int_filter_string );
+   $summary_value = $specmanagement_database_api->calculate_lastChange( $bug_id, $version_date, $int_filter_string );
    if ( strlen( $summary_value ) == 0 )
    {
       $summary_value = bug_get_field( $bug_id, 'summary' );
@@ -289,13 +289,13 @@ function calculate_person_in_charge( $version_id )
  */
 function calculate_pt_doc_progress( $allRelevantBugs )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $sum_pt = array();
    $sum_pt_all = 0;
    $sum_pt_bug = 0;
    foreach ( $allRelevantBugs as $bug_id )
    {
-      $ptime_row = $database_api->getPtimeRow( $bug_id );
+      $ptime_row = $specmanagement_database_api->getPtimeRow( $bug_id );
       if ( !is_null( $ptime_row[2] ) || 0 != $ptime_row[2] )
       {
          $sum_pt_all += $ptime_row[2];
@@ -349,7 +349,7 @@ function print_bugnote_note( $bugnote_count_value )
  */
 function print_bug_attachments( $bug_id )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
    $attachment_count = file_bug_attachment_count( $bug_id );
    echo '<tr>';
    echo '<td />';
@@ -359,7 +359,7 @@ function print_bug_attachments( $bug_id )
    echo '<tr id="attachments">';
    echo '<td />';
    echo '<td class="bug-attachments" colspan="2">';
-   $print_api->print_bug_attachments_list( $bug_id );
+   $specmanagement_print_api->print_bug_attachments_list( $bug_id );
    echo '</td>';
    echo '</tr>';
 }
@@ -540,7 +540,7 @@ function print_chapter_title( $chapter_index, $work_package, $option_show_durati
  */
 function print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_workpackage_bug_ids )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $document_duration = 0;
 
    echo '<br />';
@@ -558,7 +558,7 @@ function print_expenses_overview( $work_packages, $p_version_id, $print_flag, $n
          {
             continue;
          }
-         $duration = $database_api->getWorkpackageDuration( $p_version_id, $work_package );
+         $duration = $specmanagement_database_api->getWorkpackageDuration( $p_version_id, $work_package );
          $document_duration += $duration;
          echo '<tr>';
          echo '<td>' . $work_package . '</td>';
@@ -572,7 +572,7 @@ function print_expenses_overview( $work_packages, $p_version_id, $print_flag, $n
 
       foreach ( $no_workpackage_bug_ids as $no_workpackage_bug_id )
       {
-         $no_work_package_bug_duration = $database_api->getBugDuration( $no_workpackage_bug_id );
+         $no_work_package_bug_duration = $specmanagement_database_api->getBugDuration( $no_workpackage_bug_id );
          if ( !is_null( $no_work_package_bug_duration ) )
          {
             $sum_no_work_package_bug_duration += $no_work_package_bug_duration;
@@ -652,10 +652,10 @@ function print_editor_table_head( $print_flag )
  */
 function print_doc_head_versions( $versions, $act_version )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    foreach ( $versions as $version )
    {
-      $type_string = $database_api->getTypeString( $database_api->getTypeByVersion( $version['id'] ) );
+      $type_string = $specmanagement_database_api->getTypeString( $specmanagement_database_api->getTypeByVersion( $version['id'] ) );
       if ( strlen( $type_string ) > 0 )
       {
          $same_version = $act_version->id == $version['id'];
@@ -711,7 +711,7 @@ function print_doc_head_version_col( $same_version, $data )
  */
 function get_process_string( $allRelevantBugs )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
    $process_string = '';
    $status_flag = check_status_flag( $allRelevantBugs );
    if ( $status_flag )
@@ -719,7 +719,7 @@ function get_process_string( $allRelevantBugs )
       $status_process = 0;
       if ( !empty( $allRelevantBugs ) )
       {
-         $status_process = $print_api->calculate_status_doc_progress( $allRelevantBugs );
+         $status_process = $specmanagement_print_api->calculate_status_doc_progress( $allRelevantBugs );
       }
       $process_string .= '<div class="progress400">';
       $process_string .= '<span class="bar" style="width: ' . $status_process . '%;">' . round( $status_process, 2 ) . '%</span>';
@@ -750,11 +750,11 @@ function get_process_string( $allRelevantBugs )
  */
 function check_status_flag( $allRelevantBugs )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $status_flag = false;
    foreach ( $allRelevantBugs as $bug_id )
    {
-      $ptime_row = $database_api->getPtimeRow( $bug_id );
+      $ptime_row = $specmanagement_database_api->getPtimeRow( $bug_id );
       if ( is_null( $ptime_row[2] ) || 0 == $ptime_row[2] )
       {
          $status_flag = true;

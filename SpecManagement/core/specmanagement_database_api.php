@@ -1,6 +1,6 @@
 <?php
 
-class database_api
+class specmanagement_database_api
 {
    private $mysqli;
    private $dbPath;
@@ -61,6 +61,40 @@ class database_api
    }
 
    /**
+    * @param $table
+    * @return string
+    */
+   private function get_mantis_table( $table )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $mantis_table = db_get_table( 'mantis_' . $table . '_table' );
+      }
+      else
+      {
+         $mantis_table = db_get_table( $table );
+      }
+      return $mantis_table;
+   }
+
+   /**
+    * @param $table
+    * @return string
+    */
+   private function get_mantis_plugin_table( $table )
+   {
+      if ( $this->getMantisVersion() == '1.2.' )
+      {
+         $mantis_plugin_table = plugin_table( $table, 'SpecManagement' );
+      }
+      else
+      {
+         $mantis_plugin_table = db_get_table( 'plugin_SpecManagement_' . $table );
+      }
+      return $mantis_plugin_table;
+   }
+
+   /**
     * Returns true if incoming type id is in use
     *
     * @param $type_id
@@ -68,16 +102,8 @@ class database_api
     */
    public function checkTypeIsUsed( $type_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         $version_table = db_get_table( 'mantis_project_version_table' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         $version_table = db_get_table( 'project_version' );
-      }
+      $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
+      $version_table = $this->get_mantis_table( 'project_version' );
 
       $query = "SELECT COUNT(*) FROM $plugin_vers_table v, $version_table w
           WHERE v.type_id = " . $type_id . " AND v.version_id = w.id";
@@ -104,14 +130,7 @@ class database_api
    {
       if ( !is_null( $type_id ) )
       {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-         }
+         $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
          $query = "SELECT t.type FROM $plugin_type_table t
             WHERE t.id = " . $type_id;
@@ -139,16 +158,8 @@ class database_api
     */
    public function getTypeByVersion( $version_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         $version_table = db_get_table( 'mantis_project_version_table' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         $version_table = db_get_table( 'project_version' );
-      }
+      $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
+      $version_table = $this->get_mantis_table( 'project_version' );
 
       $query = "SELECT DISTINCT v.type_id FROM $plugin_vers_table v, $version_table w
           WHERE v.version_id = " . $version_id . " AND v.version_id = w.id";
@@ -174,14 +185,7 @@ class database_api
     */
    public function getTypeRow( $type_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
+      $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
       $query = "SELECT * FROM $plugin_type_table t
          WHERE t.id = " . $type_id;
@@ -206,14 +210,7 @@ class database_api
     */
    public function getSourceRow( $bug_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
       $query = "SELECT * FROM $plugin_src_table s
          WHERE s.bug_id = " . $bug_id;
@@ -238,14 +235,7 @@ class database_api
     */
    public function getPtimeRow( $bug_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-      }
+      $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
       $query = "SELECT * FROM $plugin_ptime_table p
          WHERE p.bug_id = " . $bug_id;
@@ -270,16 +260,9 @@ class database_api
     */
    public function getPluginVersionRowByVersionId( $version_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         $version_table = db_get_table( 'mantis_project_version_table' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         $version_table = db_get_table( 'project_version' );
-      }
+      $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
+      $version_table = $this->get_mantis_table( 'project_version' );
+
 
       if ( $version_id == false )
       {
@@ -311,16 +294,8 @@ class database_api
     */
    public function getVersionRowByPrimary( $primary_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         $version_table = db_get_table( 'mantis_project_version_table' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         $version_table = db_get_table( 'project_version' );
-      }
+      $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
+      $version_table = $this->get_mantis_table( 'project_version' );
 
       $query = "SELECT * FROM $plugin_vers_table v, $version_table w
         WHERE v.id = " . $primary_id . " AND v.version_id = w.id";
@@ -345,16 +320,8 @@ class database_api
     */
    public function getVersionRowsByProjectId( $project_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         $version_table = db_get_table( 'mantis_project_version_table' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         $version_table = db_get_table( 'project_version' );
-      }
+      $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
+      $version_table = $this->get_mantis_table( 'project_version' );
 
       $query = "SELECT * FROM $plugin_vers_table v, $version_table w
         WHERE v.project_id = " . $project_id . " AND v.version_id = w.id";
@@ -387,14 +354,7 @@ class database_api
     */
    public function getFirstType()
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
+      $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
       $query = "SELECT t.id FROM $plugin_type_table t
           ORDER BY t.id ASC LIMIT 1";
@@ -421,14 +381,7 @@ class database_api
     */
    public function getTypeId( $string )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
+      $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
       $query = "SELECT t.id FROM $plugin_type_table t
          WHERE t.type = '" . $string . "'";
@@ -453,14 +406,7 @@ class database_api
     */
    public function getFullTypes()
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
+      $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
       $query = "SELECT * FROM $plugin_type_table ORDER BY type ASC";
 
@@ -486,16 +432,8 @@ class database_api
     */
    public function getVersionIDs( $type_id, $project_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         $version_table = db_get_table( 'mantis_project_version_table' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         $version_table = db_get_table( 'project_version' );
-      }
+      $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
+      $version_table = $this->get_mantis_table( 'project_version' );
 
       $query = "SELECT DISTINCT v.version_id
          FROM $plugin_vers_table v, $version_table w
@@ -533,14 +471,7 @@ class database_api
     */
    public function getDocumentSpecWorkPackages( $p_version_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
       if ( $p_version_id != null )
       {
@@ -577,14 +508,7 @@ class database_api
     */
    public function getProjectSpecWorkPackages()
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
       $p_version_ids = $this->getVersionRowsByProjectId( helper_get_current_project() );
       $work_packages = array();
@@ -631,16 +555,8 @@ class database_api
     */
    public function getWorkPackageSpecBugs( $p_version_id, $work_package )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-         $bug_table = db_get_table( 'mantis_bug_table' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-         $bug_table = db_get_table( 'bug' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
+      $bug_table = $this->get_mantis_table( 'bug' );
 
       $query = "SELECT DISTINCT s.bug_id FROM $plugin_src_table s, $bug_table b
          WHERE s.p_version_id = '" . $p_version_id . "'
@@ -671,18 +587,9 @@ class database_api
     */
    public function getWorkpackageDuration( $p_version_id, $work_package )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-         $bug_table = db_get_table( 'mantis_bug_table' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-         $bug_table = db_get_table( 'bug' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
+      $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
+      $bug_table = $this->get_mantis_table( 'bug' );
 
       $query = "SELECT SUM( p.time ) FROM $plugin_ptime_table p, $plugin_src_table s, $bug_table b
          WHERE p.bug_id = s.bug_id
@@ -776,14 +683,7 @@ class database_api
     */
    public function insertTypeRow( $string )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
+      $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
       $query = "INSERT INTO $plugin_type_table ( id, type, opt )
          SELECT null,'" . $string . "', ';;'
@@ -803,14 +703,7 @@ class database_api
     */
    public function insertSourceRow( $bug_id, $p_version_id, $work_package )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
       $query = "INSERT INTO $plugin_src_table ( id, bug_id, p_version_id, work_package )
          SELECT null," . $bug_id . ",";
@@ -848,14 +741,7 @@ class database_api
     */
    public function insertPtimeRow( $bug_id, $ptime )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-      }
+      $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
       $query = "INSERT INTO $plugin_ptime_table ( id, bug_id, time )
          SELECT null," . $bug_id . "," . $ptime . "
@@ -875,14 +761,7 @@ class database_api
     */
    public function insertVersionRow( $project_id, $version_id, $type_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-      }
+      $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
 
       $query = "INSERT INTO $plugin_vers_table ( id, project_id, version_id, type_id )
          SELECT null," . $project_id . "," . $version_id . "," . $type_id . "
@@ -901,14 +780,7 @@ class database_api
     */
    public function updateTypeRow( $type_id, $new_type_string )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
+      $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
       $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
@@ -931,14 +803,7 @@ class database_api
     */
    public function updateTypeOptions( $type_id, $type_options )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
+      $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
       $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
@@ -968,14 +833,7 @@ class database_api
       }
       else
       {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-         }
+         $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
          $query = "SET SQL_SAFE_UPDATES = 0";
          $this->mysqli->query( $query );
@@ -1007,14 +865,7 @@ class database_api
     */
    public function updateSourceVersionSetNull( $p_version_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
       $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
@@ -1037,14 +888,7 @@ class database_api
     */
    public function updateSourceVersion( $bug_id, $p_version_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
       $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
@@ -1081,14 +925,7 @@ class database_api
       }
       else
       {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-         }
+         $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
          $query = "SET SQL_SAFE_UPDATES = 0";
          $this->mysqli->query( $query );
@@ -1119,14 +956,7 @@ class database_api
       }
       else
       {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         }
+         $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
 
          $version_row = $this->getPluginVersionRowByVersionId( $version_id );
          $p_version_id = $version_row[0];
@@ -1160,14 +990,7 @@ class database_api
       }
       else
       {
-         if ( $this->getMantisVersion() == '1.2.' )
-         {
-            $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-         }
-         else
-         {
-            $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-         }
+         $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
 
          $query = "SET SQL_SAFE_UPDATES = 0";
          $this->mysqli->query( $query );
@@ -1190,14 +1013,7 @@ class database_api
     */
    public function deleteTypeRow( $string )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_type_table = plugin_table( 'type', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_type_table = db_get_table( 'plugin_SpecManagement_type' );
-      }
+      $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
       $primary_key = $this->getTypeId( $string );
 
@@ -1214,14 +1030,7 @@ class database_api
     */
    public function deleteSourceRow( $p_version_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
       $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
@@ -1242,14 +1051,7 @@ class database_api
     */
    public function deleteSourceRowByBug( $bug_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_src_table = plugin_table( 'src', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_src_table = db_get_table( 'plugin_SpecManagement_src' );
-      }
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
       $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
@@ -1270,14 +1072,7 @@ class database_api
     */
    public function deletePtimeRow( $bug_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-      }
+      $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
       $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
@@ -1298,14 +1093,7 @@ class database_api
     */
    public function deleteVersionRow( $version_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_vers_table = plugin_table( 'vers', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_vers_table = db_get_table( 'plugin_SpecManagement_vers' );
-      }
+      $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
 
       $query = "SET SQL_SAFE_UPDATES = 0";
       $this->mysqli->query( $query );
@@ -1327,14 +1115,7 @@ class database_api
     */
    public function getVersionSpecBugs( $version_string )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $bug_table = db_get_table( 'mantis_bug_table' );
-      }
-      else
-      {
-         $bug_table = db_get_table( 'bug' );
-      }
+      $bug_table = $this->get_mantis_table( 'bug' );
 
       $query = "SELECT id FROM $bug_table
           WHERE target_version = '" . string_display( $version_string ) . "'";
@@ -1362,14 +1143,7 @@ class database_api
     */
    public function getBugArrayDuration( $bug_array )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-      }
+      $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
       $duration = 0;
       foreach ( $bug_array as $bug )
@@ -1399,14 +1173,7 @@ class database_api
     */
    public function getBugDuration( $bug_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $plugin_ptime_table = plugin_table( 'ptime', 'SpecManagement' );
-      }
-      else
-      {
-         $plugin_ptime_table = db_get_table( 'plugin_SpecManagement_ptime' );
-      }
+      $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
       $bug_duration = 0;
       $query = "SELECT time FROM $plugin_ptime_table
@@ -1431,14 +1198,7 @@ class database_api
     */
    public function getBugRelationshipTypeTwo( $src_bug_id, $dest_bug_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $bug_relationship_table = db_get_table( 'mantis_bug_relationship_table' );
-      }
-      else
-      {
-         $bug_relationship_table = db_get_table( 'bug_relationship' );
-      }
+      $bug_relationship_table = $this->get_mantis_table( 'bug_relationship' );
 
       $query = "SELECT * FROM $bug_relationship_table
          WHERE source_bug_id = " . $src_bug_id . "
@@ -1465,14 +1225,7 @@ class database_api
     */
    public function getBugsByProject( $project_id )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
-      {
-         $bug_table = db_get_table( 'mantis_bug_table' );
-      }
-      else
-      {
-         $bug_table = db_get_table( 'bug' );
-      }
+      $bug_table = $this->get_mantis_table( 'bug' );
 
       $query = "SELECT id FROM $bug_table
           WHERE project_id = " . $project_id;

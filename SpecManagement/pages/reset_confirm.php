@@ -1,12 +1,12 @@
 <?php
-require_once SPECMANAGEMENT_CORE_URI . 'constant_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_constant_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
 
-$database_api = new database_api();
+$specmanagement_database_api = new specmanagement_database_api();
 
 if ( isset( $_POST['con_reset'] ) )
 {
-   $database_api->resetPlugin();
+   $specmanagement_database_api->resetPlugin();
 }
 else
 {

@@ -1,10 +1,10 @@
 <?php
-require_once SPECMANAGEMENT_CORE_URI . 'authorization_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_authorization_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
 
 define( 'COLS', 7 );
-$print_api = new print_api();
+$specmanagement_print_api = new specmanagement_print_api();
 
 $edit_page = false;
 if ( isset( $_POST['edit'] ) )
@@ -15,7 +15,7 @@ if ( isset( $_POST['edit'] ) )
 /**
  * Page content
  */
-$print_api->print_page_head( plugin_lang_get( 'manversions_title' ) );
+$specmanagement_print_api->print_page_head( plugin_lang_get( 'manversions_title' ) );
 echo '<div align="center">';
 echo '<hr size="1" width="100%" />';
 print_table( $edit_page );
@@ -24,16 +24,16 @@ html_page_bottom1();
 
 function print_table( $edit_page = false )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
    if ( $edit_page )
    {
       echo '<form action="' . plugin_page( 'manage_versions_update' ) . '" method="post">';
    }
-   $print_api->printTableTop( '100' );
+   $specmanagement_print_api->printTableTop( '100' );
    print_tablehead( $edit_page );
    print_tablebody( $edit_page );
-   $print_api->printTableFoot();
+   $specmanagement_print_api->printTableFoot();
    echo '</form>';
 }
 
@@ -60,16 +60,16 @@ function print_tablebody( $edit_page )
  */
 function print_versions( $edit_page )
 {
-   $database_api = new database_api();
-   $print_api = new print_api();
+   $specmanagement_database_api = new specmanagement_database_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
    $versions = version_get_all_rows( helper_get_current_project(), null, null );
    for ( $version_index = 0; $version_index < count( $versions ); $version_index++ )
    {
       $version = $versions[$version_index];
-      $current_type = $database_api->getTypeString( $database_api->getTypeByVersion( $version['id'] ) );
+      $current_type = $specmanagement_database_api->getTypeString( $specmanagement_database_api->getTypeByVersion( $version['id'] ) );
 
-      $print_api->printRow();
+      $specmanagement_print_api->printRow();
       echo '<input type="hidden" name="version_ids[]" value="' . $version['id'] . '"/>';
       print_name( $edit_page, $version );
       print_released( $edit_page, $version_index, $version );
@@ -84,9 +84,9 @@ function print_versions( $edit_page )
 
 function print_tablefooter()
 {
-   $authorization_api = new authorization_api();
+   $specmanagement_authorization_api = new specmanagement_authorization_api();
 
-   if ( $authorization_api->userHasGlobalLevel() || $authorization_api->userHasWriteLevel() )
+   if ( $specmanagement_authorization_api->userHasGlobalLevel() || $specmanagement_authorization_api->userHasWriteLevel() )
    {
       echo '<tr>';
       echo '<td colspan="7" class="center">';
@@ -145,13 +145,13 @@ function print_description( $edit_page, $version )
 
 function print_type( $edit_page, $current_type, $version )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
 
    echo '<td>';
    if ( $edit_page )
    {
       $types = array();
-      $types_rows = $database_api->getFullTypes();
+      $types_rows = $specmanagement_database_api->getFullTypes();
       foreach ( $types_rows as $types_row )
       {
          $types[] = $types_row[1];
@@ -169,8 +169,8 @@ function print_type( $edit_page, $current_type, $version )
    }
    else
    {
-      $type_id = $database_api->getTypeByVersion( $version['id'] );
-      $type_string = $database_api->getTypeString( $type_id );
+      $type_id = $specmanagement_database_api->getTypeByVersion( $version['id'] );
+      $type_string = $specmanagement_database_api->getTypeString( $type_id );
       echo string_display( $type_string );
    }
    echo '</td>';
@@ -254,7 +254,7 @@ function print_name( $edit_page, $version )
 
 function print_tablehead( $edit_page )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
    $cols = ( COLS - 1 );
    if ( $edit_page )
@@ -263,7 +263,7 @@ function print_tablehead( $edit_page )
    }
 
    echo '<thead>';
-   $print_api->printFormTitle( $cols, 'manversions_thead' );
+   $specmanagement_print_api->printFormTitle( $cols, 'manversions_thead' );
    echo '<tr class="row-category2">';
    echo '<th class="form-title" colspan="1" width="40%">' . lang_get( 'version' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="10%">' . lang_get( 'released' ) . '</th>';

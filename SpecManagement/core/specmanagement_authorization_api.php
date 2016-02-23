@@ -1,6 +1,6 @@
 <?php
 
-class authorization_api
+class specmanagement_authorization_api
 {
    function userHasGlobalLevel()
    {

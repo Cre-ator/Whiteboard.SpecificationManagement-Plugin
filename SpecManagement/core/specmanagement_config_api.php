@@ -1,6 +1,6 @@
 <?php
 
-class config_api
+class specmanagement_config_api
 {
    /**
     * Updates a value in the plugin configuration

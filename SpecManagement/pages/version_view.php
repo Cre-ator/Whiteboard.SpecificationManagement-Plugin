@@ -1,6 +1,6 @@
 <?php
-require_once SPECMANAGEMENT_CORE_URI . 'database_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'print_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
+require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
 
 define( 'COLS', 7 );
 
@@ -42,7 +42,7 @@ calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues );
  */
 function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
    html_page_top1( plugin_lang_get( 'select_doc_title' ) );
    echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
@@ -55,7 +55,7 @@ function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues 
          $whiteboard_print_api = new whiteboard_print_api();
          $whiteboard_print_api->printWhiteboardMenu();
       }
-      $print_api->print_plugin_menu();
+      $specmanagement_print_api->print_plugin_menu();
       echo '<div align="center">';
       echo '<hr size="1" width="100%" />';
    }
@@ -79,7 +79,7 @@ function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues 
  */
 function print_table( $obsolete_flag, $show_zero_issues, $print_flag )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
    $obsolote = false;
    if ( $obsolete_flag )
    {
@@ -92,10 +92,10 @@ function print_table( $obsolete_flag, $show_zero_issues, $print_flag )
       $amount_stat_columns = PLUGINS_SPECMANAGEMENT_MAX_COLUMNS;
    }
 
-   $print_api->printTableTop( '90' );
+   $specmanagement_print_api->printTableTop( '90' );
    print_tablehead( $amount_stat_columns, $obsolete_flag, $show_zero_issues, $print_flag );
    print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, $versions );
-   $print_api->printTableFoot();
+   $specmanagement_print_api->printTableFoot();
 }
 
 /**
@@ -106,14 +106,14 @@ function print_table( $obsolete_flag, $show_zero_issues, $print_flag )
  */
 function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, $versions )
 {
-   $database_api = new database_api();
-   $print_api = new print_api();
+   $specmanagement_database_api = new specmanagement_database_api();
+   $specmanagement_print_api = new specmanagement_print_api();
 
    echo '<tbody>';
    for ( $version_index = 0; $version_index < count( $versions ); $version_index++ )
    {
       $version = $versions[$version_index];
-      $version_spec_bug_ids = $database_api->getVersionSpecBugs( $version['version'] );
+      $version_spec_bug_ids = $specmanagement_database_api->getVersionSpecBugs( $version['version'] );
       if ( is_null( $version_spec_bug_ids ) && !$show_zero_issues )
       {
          continue;
@@ -134,7 +134,7 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
       if ( !is_null( $version_spec_bug_ids ) )
       {
          $unsolveld_bug_ids = get_unsolved_issues( $version_spec_bug_ids );
-         $unsolved_bug_duration = $database_api->getBugArrayDuration( $unsolveld_bug_ids );
+         $unsolved_bug_duration = $specmanagement_database_api->getBugArrayDuration( $unsolveld_bug_ids );
          $rel_based_data = calculate_rel_based_data( $unsolveld_bug_ids );
          $add_rel_duration = $rel_based_data[0];
          $add_rel_uncertainty_bug_ids = $rel_based_data[1];
@@ -146,7 +146,7 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
       }
 
       $time_delay = calc_time_delay( $timeleft, $sum_duration );
-      $print_api->printRow();
+      $specmanagement_print_api->printRow();
       print_version( $version );
       print_date( $version_deadline, $time_delay[0] );
       print_issue_amount( $amount_stat_columns, $print_flag, $version, $version_spec_bug_ids, $null_issues_flag );
@@ -165,7 +165,7 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
  */
 function calculate_rel_based_data( $unsolveld_bug_ids )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $rel_based_data = array();
    $add_rel_duration = 0;
    $add_rel_uncertainty_bug_ids = array();
@@ -179,7 +179,7 @@ function calculate_rel_based_data( $unsolveld_bug_ids )
          {
             $blocking_bug_id = $bug_src_rel->dest_bug_id;
             $blocking_bug_status = bug_get_field( $blocking_bug_id, 'status' );
-            $blocking_bug_duration = $database_api->getBugDuration( $blocking_bug_id );
+            $blocking_bug_duration = $specmanagement_database_api->getBugDuration( $blocking_bug_id );
             if ( ( $blocking_bug_duration > 0 || !is_null( $blocking_bug_duration ) )
                && !( $blocking_bug_status == 80 || $blocking_bug_status == 90 )
             )
@@ -202,11 +202,11 @@ function calculate_rel_based_data( $unsolveld_bug_ids )
  */
 function get_uncertainty_issues( $unsolveld_bug_ids )
 {
-   $database_api = new database_api();
+   $specmanagement_database_api = new specmanagement_database_api();
    $uncertainty_bug_ids = array();
    foreach ( $unsolveld_bug_ids as $unsolveld_bug_id )
    {
-      if ( $database_api->getBugDuration( $unsolveld_bug_id ) == 0 )
+      if ( $specmanagement_database_api->getBugDuration( $unsolveld_bug_id ) == 0 )
       {
          array_push( $uncertainty_bug_ids, $unsolveld_bug_id );
       }
@@ -531,7 +531,7 @@ function print_version( $version )
  */
 function print_graph( $obsolete_flag )
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
    $project_id = helper_get_current_project();
    $obsolete = false;
    if ( $obsolete_flag )
@@ -553,10 +553,10 @@ function print_graph( $obsolete_flag )
    if ( !empty( $version_hash ) )
    {
       echo '<br/>';
-      $print_api->printTableTop( '90' );
+      $specmanagement_print_api->printTableTop( '90' );
       print_graph_tablehead();
       print_graph_tablebody( $version_hash );
-      $print_api->printTableFoot();
+      $specmanagement_print_api->printTableFoot();
    }
 }
 
@@ -565,9 +565,9 @@ function print_graph( $obsolete_flag )
  */
 function print_graph_tablehead()
 {
-   $print_api = new print_api();
+   $specmanagement_print_api = new specmanagement_print_api();
    echo '<thead>';
-   $print_api->printFormTitle( null, 'versview_theadgraph' );
+   $specmanagement_print_api->printFormTitle( null, 'versview_theadgraph' );
    echo '</thead>';
 }
 

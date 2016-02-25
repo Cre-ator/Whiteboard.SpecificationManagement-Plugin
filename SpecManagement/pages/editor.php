@@ -44,11 +44,12 @@ function calculate_page_content( $print_flag )
 {
    $specmanagement_database_api = new specmanagement_database_api();
    $version_id = $_POST['version_id'];
+   $version = version_get( $version_id );
    $plugin_version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
    $p_version_id = $plugin_version_obj[0];
 
-   $version_spec_bug_ids = $specmanagement_database_api->get_version_spec_bugs( version_get_field( $version_id, 'version' ) );
    $chapter_hash_array = array();
+   $version_spec_bug_ids = $specmanagement_database_api->get_version_spec_bugs( version_get_field( $version_id, 'version' ) );
    foreach ( $version_spec_bug_ids as $version_spec_bug_id )
    {
       $bug_spec_src = $specmanagement_database_api->get_source_row( $version_spec_bug_id );
@@ -79,6 +80,9 @@ function calculate_page_content( $print_flag )
    print_document_head( $type_string, $version_id, $parent_project_id, $version_spec_bug_ids, $print_flag );
    print_editor_table_head( $print_flag );
 
+   /**
+    * Bugs with work package
+    */
    $chapter_index = 1;
    if ( $chapter_hash_array != null )
    {
@@ -142,7 +146,7 @@ function calculate_page_content( $print_flag )
                   $bug_index = 10;
                }
 
-               $version = version_get( $version_id );
+
                $version_date = $version->date_order;
                $bug_data = calculate_bug_data( $bug_id, $version_date );
                print_bugs( $chapter_prefix, $bug_index, $bug_data, $option_show_duration, $print_flag );
@@ -156,6 +160,20 @@ function calculate_page_content( $print_flag )
             }
          }
       }
+   }
+
+   /**
+    * Bugs without work package
+    */
+   $bug_index = 10;
+   $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, null );
+   print_chapter_title( $chapter_index, plugin_lang_get( 'editor_no_workpackage' ), $option_show_duration, $chapter_duration );
+   foreach ( $no_workpackage_bug_ids as $no_workpackage_bug_id )
+   {
+      $version_date = $version->date_order;
+      $bug_data = calculate_bug_data( $no_workpackage_bug_id, $version_date );
+      print_bugs( $chapter_index, $bug_index, $bug_data, $option_show_duration, $print_flag );
+      $bug_index += 10;
    }
 
    echo '</table>';

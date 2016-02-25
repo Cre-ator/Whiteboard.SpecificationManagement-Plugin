@@ -12,6 +12,11 @@ if ( isset( $_POST['edit'] ) )
    $edit_page = true;
 }
 
+if ( isset( $_POST['to_plugin_config'] ) )
+{
+   print_successful_redirect( plugin_page( 'config_page', true ) );
+}
+
 /**
  * Page content
  */
@@ -66,7 +71,7 @@ function print_types( $edit_page )
    $specmanagement_database_api = new specmanagement_database_api();
    $specmanagement_print_api = new specmanagement_print_api();
 
-   $types = $specmanagement_database_api->getFullTypes();
+   $types = $specmanagement_database_api->get_full_types();
    for ( $type_index = 0; $type_index < count( $types ); $type_index++ )
    {
       $type = $types[$type_index];
@@ -102,6 +107,7 @@ function print_tablefooter()
       echo '<td colspan="' . COLS . '" class="center">';
       echo '<form action="' . plugin_page( 'manage_types' ) . '" method="post">';
       echo '<span class="input">';
+      echo '<input type="submit" name="to_plugin_config" class="button" value="' . plugin_lang_get( 'mantypes_to_pl_cfg' ) . '"/>&nbsp';
       echo '<input type="submit" name="edit" class="button" value="' . plugin_lang_get( 'mantypes_edit' ) . '"/>';
       echo '</span>';
       echo '</td>';

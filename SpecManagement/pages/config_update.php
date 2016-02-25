@@ -58,7 +58,7 @@ if ( $option_addtype )
 {
    if ( isset( $_POST['type'] ) )
    {
-      $specmanagement_database_api->insertTypeRow( $_POST['type'] );
+      $specmanagement_database_api->insert_type_row( $_POST['type'] );
    }
 }
 
@@ -70,14 +70,14 @@ if ( $option_deltype )
    if ( isset( $_POST['types'] ) )
    {
       $type_string = $_POST['types'];
-      $type_id = $specmanagement_database_api->getTypeId( $type_string );
+      $type_id = $specmanagement_database_api->get_type_id( $type_string );
 
       /*
        * Just delete a type if it is not used!
        */
-      if ( !$specmanagement_database_api->checkTypeIsUsed( $type_id ) )
+      if ( !$specmanagement_database_api->check_type_is_used( $type_id ) )
       {
-         $specmanagement_database_api->deleteTypeRow( $type_string );
+         $specmanagement_database_api->delete_type_row( $type_string );
       }
    }
 }
@@ -90,10 +90,10 @@ if ( $option_changetype )
    if ( isset( $_POST['types'] ) && isset( $_POST['newtype'] ) )
    {
       $type_string = $_POST['types'];
-      $type_id = $specmanagement_database_api->getTypeId( $type_string );
+      $type_id = $specmanagement_database_api->get_type_id( $type_string );
       $new_type_string = $_POST['newtype'];
 
-      $specmanagement_database_api->updateTypeRow( $type_id, $new_type_string );
+      $specmanagement_database_api->update_type_row( $type_id, $new_type_string );
    }
 }
 

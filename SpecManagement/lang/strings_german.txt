@@ -81,6 +81,7 @@ $s_plugin_SpecManagement_manversions_edit_submit = 'Änderungen bestätigen';
 $s_plugin_SpecManagement_mantypes_title = 'Document-Typenverwaltung';
 $s_plugin_SpecManagement_mantypes_thead = 'Typenverwaltung';
 $s_plugin_SpecManagement_mantypes_edit = 'Typen bearbeiten';
+$s_plugin_SpecManagement_mantypes_to_pl_cfg = 'Zu Plugin-Konfiguration';
 $s_plugin_SpecManagement_mantypes_show_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
 $s_plugin_SpecManagement_mantypes_show_expenses_overview = 'Aufwandsübersicht im Dokument anzeigen?';
 $s_plugin_SpecManagement_mantypes_show_directory = 'Inhaltsverzeichnis im Dokument anzeigen?';

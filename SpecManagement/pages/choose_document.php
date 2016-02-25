@@ -9,7 +9,7 @@ function calculate_page_content()
    $specmanagement_database_api = new specmanagement_database_api();
    $specmanagement_print_api = new specmanagement_print_api();
    $types = array();
-   $types_rows = $specmanagement_database_api->getFullTypes();
+   $types_rows = $specmanagement_database_api->get_full_types();
    foreach ( $types_rows as $types_row )
    {
       $types[] = $types_row[1];
@@ -48,8 +48,8 @@ function print_document_selection( $types )
    {
       $type_string = string_html_specialchars( $type );
 
-      $type_id = $specmanagement_database_api->getTypeId( $type );
-      $version_ids = $specmanagement_database_api->getVersionIDs( $type_id, $t_project_id );
+      $type_id = $specmanagement_database_api->get_type_id( $type );
+      $version_ids = $specmanagement_database_api->get_version_ids( $type_id, $t_project_id );
       foreach ( $version_ids as $version_id )
       {
          $version_string = version_full_name( $version_id );

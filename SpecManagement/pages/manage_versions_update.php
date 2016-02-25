@@ -84,12 +84,12 @@ if ( $update && isset( $_POST['version_ids'] ) )
          $new_type = $type[$version_id];
          if ( strlen( $new_type ) > 0 )
          {
-            $new_type_id = $specmanagement_database_api->getTypeId( $new_type );
-            $specmanagement_database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], $new_type_id );
+            $new_type_id = $specmanagement_database_api->get_type_id( $new_type );
+            $specmanagement_database_api->update_version_associated_type( $project_id, $version_ids[$version_id], $new_type_id );
          }
          else
          {
-            $specmanagement_database_api->updateVersionAssociatedType( $project_id, $version_ids[$version_id], 9999 );
+            $specmanagement_database_api->update_version_associated_type( $project_id, $version_ids[$version_id], 9999 );
          }
       }
 

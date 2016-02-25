@@ -194,7 +194,7 @@ function get_version_data( $version )
    /* Unpassende Issues aussortieren */
    $relevant_issue_ids = calculate_relevant_issues( $version, $reachable_issue_ids );
    /* Dauer für relevante Issues berechnen */
-   $relevant_issues_duration = $specmanagement_database_api->getBugArrayDuration( $relevant_issue_ids );
+   $relevant_issues_duration = $specmanagement_database_api->get_bug_array_duration( $relevant_issue_ids );
    /* Fortschritt berechnen */
    $status_process = calculate_status( $relevant_issue_ids );
    /* Daten sammeln */
@@ -233,7 +233,7 @@ function calculate_relevant_issues( $version, $reachable_issue_ids )
    /* Prüfen ob Bug zum gegebenen Zeitpunkt dieser Zielversion zugeordnet war */
    foreach ( $reachable_issue_ids as $reachable_issue_id )
    {
-      $target_version = $specmanagement_database_api->calculate_lastChange( $reachable_issue_id, $version_date, $int_filter_string );
+      $target_version = $specmanagement_database_api->calculate_last_change( $reachable_issue_id, $version_date, $int_filter_string );
       if ( $target_version != $version->version )
       {
          if ( ( $key = array_search( $reachable_issue_id, $reachable_issue_ids ) ) !== false )
@@ -255,7 +255,7 @@ function prepare_relevant_issues( $project_ids )
    $reachable_issue_ids = array();
    foreach ( $project_ids as $project_id )
    {
-      $project_related_issue_ids = $specmanagement_database_api->getBugsByProject( $project_id );
+      $project_related_issue_ids = $specmanagement_database_api->get_bugs_by_project( $project_id );
       foreach ( $project_related_issue_ids as $project_related_issue_id )
       {
          array_push( $reachable_issue_ids, $project_related_issue_id );

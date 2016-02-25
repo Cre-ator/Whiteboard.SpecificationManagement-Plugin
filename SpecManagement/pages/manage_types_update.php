@@ -60,7 +60,7 @@ if ( $update && isset( $_POST['type_ids'] ) )
       /* generate option string */
       $type_options_set = implode( ';', $type_options );
       /* fill database with option string */
-      $specmanagement_database_api->updateTypeOptions( $type_id, $type_options_set );
+      $specmanagement_database_api->update_type_options( $type_id, $type_options_set );
    }
 }
 

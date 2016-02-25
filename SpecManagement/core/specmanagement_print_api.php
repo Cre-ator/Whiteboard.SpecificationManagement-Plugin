@@ -180,7 +180,7 @@ class specmanagement_print_api
    public function printBugUpdateFields( $type, $work_package, $ptime )
    {
       $specmanagement_database_api = new specmanagement_database_api();
-      $work_packages = $specmanagement_database_api->getProjectSpecWorkPackages();
+      $work_packages = $specmanagement_database_api->get_project_spec_workpackages();
 
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
@@ -243,7 +243,7 @@ class specmanagement_print_api
    public function printBugReportFields()
    {
       $specmanagement_database_api = new specmanagement_database_api();
-      $work_packages = $specmanagement_database_api->getProjectSpecWorkPackages();
+      $work_packages = $specmanagement_database_api->get_project_spec_workpackages();
 
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {

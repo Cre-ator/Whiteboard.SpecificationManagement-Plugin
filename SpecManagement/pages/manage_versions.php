@@ -67,7 +67,7 @@ function print_versions( $edit_page )
    for ( $version_index = 0; $version_index < count( $versions ); $version_index++ )
    {
       $version = $versions[$version_index];
-      $current_type = $specmanagement_database_api->getTypeString( $specmanagement_database_api->getTypeByVersion( $version['id'] ) );
+      $current_type = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version['id'] ) );
 
       $specmanagement_print_api->printRow();
       echo '<input type="hidden" name="version_ids[]" value="' . $version['id'] . '"/>';
@@ -151,7 +151,7 @@ function print_type( $edit_page, $current_type, $version )
    if ( $edit_page )
    {
       $types = array();
-      $types_rows = $specmanagement_database_api->getFullTypes();
+      $types_rows = $specmanagement_database_api->get_full_types();
       foreach ( $types_rows as $types_row )
       {
          $types[] = $types_row[1];
@@ -169,8 +169,8 @@ function print_type( $edit_page, $current_type, $version )
    }
    else
    {
-      $type_id = $specmanagement_database_api->getTypeByVersion( $version['id'] );
-      $type_string = $specmanagement_database_api->getTypeString( $type_id );
+      $type_id = $specmanagement_database_api->get_type_by_version( $version['id'] );
+      $type_string = $specmanagement_database_api->get_type_string( $type_id );
       echo string_display( $type_string );
    }
    echo '</td>';

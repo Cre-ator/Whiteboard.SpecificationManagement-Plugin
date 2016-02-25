@@ -92,7 +92,7 @@ $specmanagement_print_api->printRow();
 $specmanagement_print_api->printCategoryField( 1, 1, 'config_types' );
 echo '<td colspan="1">';
 
-$types_rows = $specmanagement_database_api->getFullTypes();
+$types_rows = $specmanagement_database_api->get_full_types();
 foreach ( $types_rows as $types_row )
 {
    $types[] = $types_row[1];

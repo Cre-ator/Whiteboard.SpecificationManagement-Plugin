@@ -195,22 +195,22 @@ class SpecManagementPlugin extends MantisPlugin
 
       if ( $bug_id != null )
       {
-         $source_obj = $specmanagement_database_api->getSourceRow( $bug_id );
+         $source_obj = $specmanagement_database_api->get_source_row( $bug_id );
          $work_package = $source_obj[3];
-         $ptime_obj = $specmanagement_database_api->getPtimeRow( $bug_id );
+         $ptime_obj = $specmanagement_database_api->get_ptime_row( $bug_id );
          $ptime = $ptime_obj[2];
 
          if ( 0 == strlen( bug_get_field( $bug_id, 'target_version' ) ) )
          {
-            $specmanagement_database_api->updateSourceVersion( $bug_id, null );
+            $specmanagement_database_api->update_source_version( $bug_id, null );
          }
 
          $p_version_id = $source_obj[2];
          if ( !is_null( $p_version_id ) )
          {
-            $version_obj = $specmanagement_database_api->getVersionRowByPrimary( $p_version_id );
+            $version_obj = $specmanagement_database_api->get_version_row_by_primary( $p_version_id );
             $type_id = $version_obj[3];
-            $type = $specmanagement_database_api->getTypeString( $type_id );
+            $type = $specmanagement_database_api->get_type_string( $type_id );
          }
       }
 
@@ -264,22 +264,22 @@ class SpecManagementPlugin extends MantisPlugin
       if ( !is_null( $target_version ) )
       {
          $version_id = version_get_id( $target_version );
-         $version_obj = $specmanagement_database_api->getPluginVersionRowByVersionId( $version_id );
+         $version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
          $p_version_id = $version_obj[0];
-         $type_id = $specmanagement_database_api->getTypeId( $type );
+         $type_id = $specmanagement_database_api->get_type_id( $type );
       }
 
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
-            $specmanagement_database_api->insertVersionRow( $project_id, $version_id, $type_id );
-            $specmanagement_database_api->insertSourceRow( $bug_id, $p_version_id, $work_package );
-            $specmanagement_database_api->insertPtimeRow( $bug_id, $ptime );
+            $specmanagement_database_api->insert_version_row( $project_id, $version_id, $type_id );
+            $specmanagement_database_api->insert_source_row( $bug_id, $p_version_id, $work_package );
+            $specmanagement_database_api->insert_ptime_row( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
-            $specmanagement_database_api->updateVersionRow( $project_id, $version_id, $type_id );
-            $specmanagement_database_api->updateSourceRow( $bug_id, $p_version_id, $work_package );
-            $specmanagement_database_api->updatePtimeRow( $bug_id, $ptime );
+            $specmanagement_database_api->update_version_row( $project_id, $version_id, $type_id );
+            $specmanagement_database_api->update_source_row( $bug_id, $p_version_id, $work_package );
+            $specmanagement_database_api->update_ptime_row( $bug_id, $ptime );
             break;
       }
    }
@@ -304,10 +304,10 @@ class SpecManagementPlugin extends MantisPlugin
          if ( !( is_null( $target_version ) || $target_version == '' ) )
          {
             $version_id = version_get_id( $target_version );
-            $version_obj = $specmanagement_database_api->getPluginVersionRowByVersionId( $version_id );
+            $version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
             $p_version_id = $version_obj[0];
          }
-         $specmanagement_database_api->updateSourceVersion( $bug_id, $p_version_id );
+         $specmanagement_database_api->update_source_version( $bug_id, $p_version_id );
       }
    }
 
@@ -333,10 +333,10 @@ class SpecManagementPlugin extends MantisPlugin
       require_once( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       $version_id = gpc_get_int( 'version_id' );
-      $plugin_version_row = $specmanagement_database_api->getPluginVersionRowByVersionId( $version_id );
+      $plugin_version_row = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
       $p_version_id = $plugin_version_row[0];
-      $specmanagement_database_api->updateSourceVersionSetNull( $p_version_id );
-      $specmanagement_database_api->deleteVersionRow( $version_id );
+      $specmanagement_database_api->update_source_version_set_null( $p_version_id );
+      $specmanagement_database_api->delete_version_row( $version_id );
    }
 
    /**
@@ -349,7 +349,7 @@ class SpecManagementPlugin extends MantisPlugin
    {
       require_once( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
-      $specmanagement_database_api->deleteSourceRowByBug( $bug_id );
-      $specmanagement_database_api->deletePtimeRow( $bug_id );
+      $specmanagement_database_api->delete_source_row_by_bug( $bug_id );
+      $specmanagement_database_api->delete_ptime_row( $bug_id );
    }
 }

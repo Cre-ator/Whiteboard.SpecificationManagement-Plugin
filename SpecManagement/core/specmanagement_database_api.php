@@ -23,7 +23,7 @@ class specmanagement_database_api
     *
     * @return string
     */
-   public function getMantisVersion()
+   public function get_mantis_version()
    {
       return substr( MANTIS_VERSION, 0, 4 );
    }
@@ -34,7 +34,7 @@ class specmanagement_database_api
     * - config entries
     * - database entities
     */
-   public function resetPlugin()
+   public function reset_plugin()
    {
       $query = "DROP TABLE mantis_plugin_SpecManagement_src_table";
 
@@ -66,7 +66,7 @@ class specmanagement_database_api
     */
    private function get_mantis_table( $table )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
+      if ( $this->get_mantis_version() == '1.2.' )
       {
          $mantis_table = db_get_table( 'mantis_' . $table . '_table' );
       }
@@ -83,7 +83,7 @@ class specmanagement_database_api
     */
    private function get_mantis_plugin_table( $table )
    {
-      if ( $this->getMantisVersion() == '1.2.' )
+      if ( $this->get_mantis_version() == '1.2.' )
       {
          $mantis_plugin_table = plugin_table( $table, 'SpecManagement' );
       }
@@ -100,7 +100,7 @@ class specmanagement_database_api
     * @param $type_id
     * @return bool
     */
-   public function checkTypeIsUsed( $type_id )
+   public function check_type_is_used( $type_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
       $version_table = $this->get_mantis_table( 'project_version' );
@@ -126,7 +126,7 @@ class specmanagement_database_api
     * @param $type_id
     * @return string
     */
-   public function getTypeString( $type_id )
+   public function get_type_string( $type_id )
    {
       if ( !is_null( $type_id ) )
       {
@@ -156,7 +156,7 @@ class specmanagement_database_api
     * @param $version_id
     * @return mixed
     */
-   public function getTypeByVersion( $version_id )
+   public function get_type_by_version( $version_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
       $version_table = $this->get_mantis_table( 'project_version' );
@@ -183,7 +183,7 @@ class specmanagement_database_api
     * @param $type_id
     * @return array|null
     */
-   public function getTypeRow( $type_id )
+   public function get_type_row( $type_id )
    {
       $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
@@ -208,7 +208,7 @@ class specmanagement_database_api
     * @param $bug_id
     * @return array|null
     */
-   public function getSourceRow( $bug_id )
+   public function get_source_row( $bug_id )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
@@ -233,7 +233,7 @@ class specmanagement_database_api
     * @param $bug_id
     * @return array|null
     */
-   public function getPtimeRow( $bug_id )
+   public function get_ptime_row( $bug_id )
    {
       $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
@@ -258,7 +258,7 @@ class specmanagement_database_api
     * @param $version_id
     * @return array|null
     */
-   public function getPluginVersionRowByVersionId( $version_id )
+   public function get_plugin_version_row_by_version_id( $version_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
       $version_table = $this->get_mantis_table( 'project_version' );
@@ -292,7 +292,7 @@ class specmanagement_database_api
     * @param $primary_id
     * @return array|null
     */
-   public function getVersionRowByPrimary( $primary_id )
+   public function get_version_row_by_primary( $primary_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
       $version_table = $this->get_mantis_table( 'project_version' );
@@ -318,7 +318,7 @@ class specmanagement_database_api
     * @param $project_id
     * @return array|null
     */
-   public function getVersionRowsByProjectId( $project_id )
+   public function get_version_rows_by_project_id( $project_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
       $version_table = $this->get_mantis_table( 'project_version' );
@@ -352,7 +352,7 @@ class specmanagement_database_api
     *
     * @return mixed
     */
-   public function getFirstType()
+   public function get_first_type()
    {
       $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
@@ -379,7 +379,7 @@ class specmanagement_database_api
     * @param $string
     * @return mixed
     */
-   public function getTypeId( $string )
+   public function get_type_id( $string )
    {
       $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
@@ -404,7 +404,7 @@ class specmanagement_database_api
     *
     * @return array
     */
-   public function getFullTypes()
+   public function get_full_types()
    {
       $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
@@ -430,7 +430,7 @@ class specmanagement_database_api
     * @param $project_id
     * @return array
     */
-   public function getVersionIDs( $type_id, $project_id )
+   public function get_version_ids( $type_id, $project_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
       $version_table = $this->get_mantis_table( 'project_version' );
@@ -469,7 +469,7 @@ class specmanagement_database_api
     * @param $p_version_id
     * @return array
     */
-   public function getDocumentSpecWorkPackages( $p_version_id )
+   public function get_document_spec_workpackages( $p_version_id )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
@@ -506,11 +506,11 @@ class specmanagement_database_api
     *
     * @return array
     */
-   public function getProjectSpecWorkPackages()
+   public function get_project_spec_workpackages()
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
-      $p_version_ids = $this->getVersionRowsByProjectId( helper_get_current_project() );
+      $p_version_ids = $this->get_version_rows_by_project_id( helper_get_current_project() );
       $work_packages = array();
       $tmp_row = null;
 
@@ -553,7 +553,7 @@ class specmanagement_database_api
     * @param $work_package
     * @return array
     */
-   public function getWorkPackageSpecBugs( $p_version_id, $work_package )
+   public function get_workpackage_spec_bugs( $p_version_id, $work_package )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
       $bug_table = $this->get_mantis_table( 'bug' );
@@ -585,7 +585,7 @@ class specmanagement_database_api
     * @param $work_package
     * @return mixed
     */
-   public function getWorkpackageDuration( $p_version_id, $work_package )
+   public function get_workpackage_duration( $p_version_id, $work_package )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
       $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
@@ -618,7 +618,7 @@ class specmanagement_database_api
     * @param $p_version_id
     * @return array
     */
-   public function getAllBugsFromWorkpackages( $work_packages, $p_version_id )
+   public function get_all_bugs_from_workpackages( $work_packages, $p_version_id )
    {
       $allBugs = array();
 
@@ -626,7 +626,7 @@ class specmanagement_database_api
       {
          foreach ( $work_packages as $work_package )
          {
-            $work_package_bug_ids = $this->getWorkPackageSpecBugs( $p_version_id, $work_package );
+            $work_package_bug_ids = $this->get_workpackage_spec_bugs( $p_version_id, $work_package );
 
             foreach ( $work_package_bug_ids as $bug_id )
             {
@@ -644,7 +644,7 @@ class specmanagement_database_api
     * @param $project_id
     * @return int
     */
-   public function getMainProjectByHierarchy( $project_id )
+   public function get_main_project_by_hierarchy( $project_id )
    {
       if ( $project_id != 0 )
       {
@@ -681,7 +681,7 @@ class specmanagement_database_api
     *
     * @param $string
     */
-   public function insertTypeRow( $string )
+   public function insert_type_row( $string )
    {
       $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
@@ -701,7 +701,7 @@ class specmanagement_database_api
     * @param $p_version_id
     * @param $work_package
     */
-   public function insertSourceRow( $bug_id, $p_version_id, $work_package )
+   public function insert_source_row( $bug_id, $p_version_id, $work_package )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
@@ -739,7 +739,7 @@ class specmanagement_database_api
     * @param $bug_id
     * @param $ptime
     */
-   public function insertPtimeRow( $bug_id, $ptime )
+   public function insert_ptime_row( $bug_id, $ptime )
    {
       $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
@@ -759,7 +759,7 @@ class specmanagement_database_api
     * @param $version_id
     * @param $type_id
     */
-   public function insertVersionRow( $project_id, $version_id, $type_id )
+   public function insert_version_row( $project_id, $version_id, $type_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
 
@@ -778,7 +778,7 @@ class specmanagement_database_api
     * @param $type_id
     * @param $new_type_string
     */
-   public function updateTypeRow( $type_id, $new_type_string )
+   public function update_type_row( $type_id, $new_type_string )
    {
       $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
@@ -801,7 +801,7 @@ class specmanagement_database_api
     * @param $type_id
     * @param $type_options
     */
-   public function updateTypeOptions( $type_id, $type_options )
+   public function update_type_options( $type_id, $type_options )
    {
       $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
@@ -825,11 +825,11 @@ class specmanagement_database_api
     * @param $p_version_id
     * @param $work_package
     */
-   public function updateSourceRow( $bug_id, $p_version_id, $work_package )
+   public function update_source_row( $bug_id, $p_version_id, $work_package )
    {
-      if ( $this->getSourceRow( $bug_id ) == null )
+      if ( $this->get_source_row( $bug_id ) == null )
       {
-         $this->insertSourceRow( $bug_id, $p_version_id, $work_package );
+         $this->insert_source_row( $bug_id, $p_version_id, $work_package );
       }
       else
       {
@@ -863,7 +863,7 @@ class specmanagement_database_api
     *
     * @param $p_version_id
     */
-   public function updateSourceVersionSetNull( $p_version_id )
+   public function update_source_version_set_null( $p_version_id )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
@@ -886,7 +886,7 @@ class specmanagement_database_api
     * @param $bug_id
     * @param $p_version_id
     */
-   public function updateSourceVersion( $bug_id, $p_version_id )
+   public function update_source_version( $bug_id, $p_version_id )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
@@ -917,11 +917,11 @@ class specmanagement_database_api
     * @param $bug_id
     * @param $ptime
     */
-   public function updatePtimeRow( $bug_id, $ptime )
+   public function update_ptime_row( $bug_id, $ptime )
    {
-      if ( $this->getPtimeRow( $bug_id ) == null )
+      if ( $this->get_ptime_row( $bug_id ) == null )
       {
-         $this->insertPtimeRow( $bug_id, $ptime );
+         $this->insert_ptime_row( $bug_id, $ptime );
       }
       else
       {
@@ -948,17 +948,17 @@ class specmanagement_database_api
     * @param $version_id
     * @param $type_id
     */
-   public function updateVersionRow( $project_id, $version_id, $type_id )
+   public function update_version_row( $project_id, $version_id, $type_id )
    {
-      if ( $this->getPluginVersionRowByVersionId( $version_id ) == null )
+      if ( $this->get_plugin_version_row_by_version_id( $version_id ) == null )
       {
-         $this->insertVersionRow( $project_id, $version_id, $type_id );
+         $this->insert_version_row( $project_id, $version_id, $type_id );
       }
       else
       {
          $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
 
-         $version_row = $this->getPluginVersionRowByVersionId( $version_id );
+         $version_row = $this->get_plugin_version_row_by_version_id( $version_id );
          $p_version_id = $version_row[0];
 
          $query = "SET SQL_SAFE_UPDATES = 0";
@@ -982,11 +982,11 @@ class specmanagement_database_api
     * @param $version_id
     * @param $type_id
     */
-   public function updateVersionAssociatedType( $project_id, $version_id, $type_id )
+   public function update_version_associated_type( $project_id, $version_id, $type_id )
    {
-      if ( $this->getPluginVersionRowByVersionId( $version_id ) == null )
+      if ( $this->get_plugin_version_row_by_version_id( $version_id ) == null )
       {
-         $this->insertVersionRow( $project_id, $version_id, $type_id );
+         $this->insert_version_row( $project_id, $version_id, $type_id );
       }
       else
       {
@@ -1011,11 +1011,11 @@ class specmanagement_database_api
     *
     * @param $string
     */
-   public function deleteTypeRow( $string )
+   public function delete_type_row( $string )
    {
       $plugin_type_table = $this->get_mantis_plugin_table( 'type' );
 
-      $primary_key = $this->getTypeId( $string );
+      $primary_key = $this->get_type_id( $string );
 
       $query = "DELETE FROM $plugin_type_table
          WHERE id = " . $primary_key;
@@ -1028,7 +1028,7 @@ class specmanagement_database_api
     *
     * @param $p_version_id
     */
-   public function deleteSourceRow( $p_version_id )
+   public function delete_source_row( $p_version_id )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
@@ -1049,7 +1049,7 @@ class specmanagement_database_api
     *
     * @param $bug_id
     */
-   public function deleteSourceRowByBug( $bug_id )
+   public function delete_source_row_by_bug( $bug_id )
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
@@ -1070,7 +1070,7 @@ class specmanagement_database_api
     *
     * @param $bug_id
     */
-   public function deletePtimeRow( $bug_id )
+   public function delete_ptime_row( $bug_id )
    {
       $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
@@ -1091,7 +1091,7 @@ class specmanagement_database_api
     *
     * @param $version_id
     */
-   public function deleteVersionRow( $version_id )
+   public function delete_version_row( $version_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
 
@@ -1113,7 +1113,7 @@ class specmanagement_database_api
     * @param $version_string
     * @return array
     */
-   public function getVersionSpecBugs( $version_string )
+   public function get_version_spec_bugs( $version_string )
    {
       $bug_table = $this->get_mantis_table( 'bug' );
 
@@ -1141,7 +1141,7 @@ class specmanagement_database_api
     * @param $bug_array
     * @return int
     */
-   public function getBugArrayDuration( $bug_array )
+   public function get_bug_array_duration( $bug_array )
    {
       $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
@@ -1171,7 +1171,7 @@ class specmanagement_database_api
     * @param $bug_id
     * @return int
     */
-   public function getBugDuration( $bug_id )
+   public function get_bug_duration( $bug_id )
    {
       $plugin_ptime_table = $this->get_mantis_plugin_table( 'ptime' );
 
@@ -1196,7 +1196,7 @@ class specmanagement_database_api
     * @param $dest_bug_id
     * @return mixed|null
     */
-   public function getBugRelationshipTypeTwo( $src_bug_id, $dest_bug_id )
+   public function get_bug_relationship_type_two( $src_bug_id, $dest_bug_id )
    {
       $bug_relationship_table = $this->get_mantis_table( 'bug_relationship' );
 
@@ -1223,7 +1223,7 @@ class specmanagement_database_api
     * @param $project_id
     * @return array|null
     */
-   public function getBugsByProject( $project_id )
+   public function get_bugs_by_project( $project_id )
    {
       $bug_table = $this->get_mantis_table( 'bug' );
 
@@ -1267,7 +1267,7 @@ class specmanagement_database_api
     * @param $int_filter_string
     * @return array
     */
-   public function calculate_lastChange( $bug_id, $version_date, $int_filter_string )
+   public function calculate_last_change( $bug_id, $version_date, $int_filter_string )
    {
       $output_value = null;
       $spec_filter_string = lang_get( $int_filter_string );
@@ -1326,7 +1326,7 @@ class specmanagement_database_api
     * @param $type_id
     * @return null
     */
-   public function calculateLastTextfields( $bug_id, $version_date, $type_id )
+   public function calculate_last_text_fields( $bug_id, $version_date, $type_id )
    {
       $output_value = null;
       $min_pos_time_difference = 0;
@@ -1397,7 +1397,7 @@ class specmanagement_database_api
     * @param $version_date
     * @return int
     */
-   public function calculateLastBugnotes( $bug_id, $version_date )
+   public function calculate_last_bugnotes( $bug_id, $version_date )
    {
       $bugnote_count = 0;
 

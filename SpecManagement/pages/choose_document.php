@@ -41,16 +41,16 @@ function calculate_page_content()
  */
 function print_document_selection( $types )
 {
-   $t_project_id = gpc_get_int( 'project_id', helper_get_current_project() );
+   $project_id = gpc_get_int( 'project_id', helper_get_current_project() );
    $specmanagement_database_api = new specmanagement_database_api();
    echo '<select name="version_id">';
    foreach ( $types as $type )
    {
       $type_string = string_html_specialchars( $type );
-
       $type_id = $specmanagement_database_api->get_type_id( $type );
-      $version_ids = $specmanagement_database_api->get_version_ids( $type_id, $t_project_id );
-      foreach ( $version_ids as $version_id )
+      $version_id_array = get_version_ids( $type_id, $project_id );
+
+      foreach ( $version_id_array as $version_id )
       {
          $version_string = version_full_name( $version_id );
 
@@ -58,8 +58,38 @@ function print_document_selection( $types )
          echo $type_string . " - " . $version_string;
          echo '</option>';
       }
-
    }
    echo '</select>';
 }
 
+/**
+ * @param $type_id
+ * @param $project_id
+ * @return array
+ */
+function get_version_ids( $type_id, $project_id )
+{
+   $specmanagement_database_api = new specmanagement_database_api();
+
+   $version_id_array = array();
+   $version_ids = $specmanagement_database_api->get_version_ids( $type_id, $project_id );
+   foreach ( $version_ids as $version_id )
+   {
+      array_push( $version_id_array, $version_id );
+   }
+
+   if ( $project_id != 0 )
+   {
+      $sub_project_ids = project_hierarchy_get_all_subprojects( $project_id );
+      foreach ( $sub_project_ids as $sub_project_id )
+      {
+         $version_ids = $specmanagement_database_api->get_version_ids( $type_id, $sub_project_id );
+         foreach ( $version_ids as $version_id )
+         {
+            array_push( $version_id_array, $version_id );
+         }
+      }
+   }
+
+   return $version_id_array;
+}

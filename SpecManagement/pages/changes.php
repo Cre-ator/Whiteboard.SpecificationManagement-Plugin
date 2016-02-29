@@ -67,23 +67,27 @@ function print_changes_table_body( $old_version, $new_version )
    foreach ( $all_issues as $issue )
    {
       echo '<tr>';
-      echo '<td colspan="4">';
       if ( check_inserted( $issue, $old_version_data[0], $new_version_data[0] ) )
       {
-         echo '+ ';
-         echo print_bug_link( $issue, true ) . ' (' . plugin_lang_get( 'changes_inserted' ) . ')';
+         echo '<td colspan="2"></td><td colspan="2" class="center">';
+         echo print_bug_link( $issue, true ) . ' ( + ' . plugin_lang_get( 'changes_inserted' ) . ')';
+         echo '</td>';
       }
       if ( check_removed( $issue, $old_version_data[0], $new_version_data[0] ) )
       {
-         echo '- ';
-         echo print_bug_link( $issue, true ) . ' (' . plugin_lang_get( 'changes_removed' ) . ')';
+         echo '<td colspan="2" class="center">';
+         echo print_bug_link( $issue, true ) . ' ( - ' . plugin_lang_get( 'changes_removed' ) . ')';
+         echo '</td><td colspan="2"></td>';
       }
       if ( check_edited( $issue, $old_version_data[0], $new_version_data[0] ) )
       {
-         echo '# ';
-         echo print_bug_link( $issue, true ) . ' (' . plugin_lang_get( 'changes_edited' ) . ')';
+         for ( $index = 0; $index < 2; $index++ )
+         {
+            echo '<td colspan="2" class="center">';
+            echo print_bug_link( $issue, true ) . ' ( # ' . plugin_lang_get( 'changes_edited' ) . ')';
+            echo '</td>';
+         }
       }
-      echo '</td>';
       echo '</tr>';
    }
    echo '</tbody>';
@@ -253,12 +257,16 @@ function prepare_relevant_issues( $project_ids )
 {
    $specmanagement_database_api = new specmanagement_database_api();
    $reachable_issue_ids = array();
+
    foreach ( $project_ids as $project_id )
    {
       $project_related_issue_ids = $specmanagement_database_api->get_bugs_by_project( $project_id );
-      foreach ( $project_related_issue_ids as $project_related_issue_id )
+      if ( !is_null( $project_related_issue_ids ) )
       {
-         array_push( $reachable_issue_ids, $project_related_issue_id );
+         foreach ( $project_related_issue_ids as $project_related_issue_id )
+         {
+            array_push( $reachable_issue_ids, $project_related_issue_id );
+         }
       }
    }
    return $reachable_issue_ids;
@@ -318,13 +326,14 @@ function print_changes_table_head( $old_version, $act_version )
  */
 function print_version_progress( $relevant_issues_duration, $status_process )
 {
+   $status_process_round = round( $status_process, 2 );
    echo '<td>';
    echo plugin_lang_get( 'versview_progress' );
    echo '</td>';
-   echo '<td>';
+   echo '<td class="progress400">';
    if ( $relevant_issues_duration > 0 )
    {
-      echo $status_process . '%';
+      echo $status_process_round . '%';
    }
    echo '</td>';
 }

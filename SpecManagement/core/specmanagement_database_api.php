@@ -1311,6 +1311,13 @@ class specmanagement_database_api
       {
          $output_value = $output_values[1];
       }
+      /**
+       * TODO kann wegen der Feldbezeichnung eventuell noch zu Problemen führen.
+       */
+      if ( strlen( $output_change ) == 0 )
+      {
+         $output_value = bug_get_field( $bug_id, $int_filter_string );
+      }
 
       return $output_value;
    }

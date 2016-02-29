@@ -64,6 +64,8 @@ $s_plugin_SpecManagement_editor_expenses_overview = 'Aufwandsübersicht';
 $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Summe';
 $s_plugin_SpecManagement_editor_no_issues = 'Diesem Dokument sind keine Einträge zugeordnet.';
 
+$s_plugin_SpecManagement_editor_directory = 'Inhaltsverzeichnis';
+
 /* Changes Area */
 $s_plugin_SpecManagement_changes_title = 'Änderungsprotokoll';
 $s_plugin_SpecManagement_changes_inserted = 'Eintrag wurde hinzugefügt';

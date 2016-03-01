@@ -144,7 +144,7 @@ class specmanagement_print_api
    public function print_plugin_menu()
    {
       echo '<table align="center">';
-      echo '<tr><td colspan="4" class="center" ><font color="#8b0000" size="5">*** Plugin befindet sich in Entwicklungsphase ***</font></td></tr>';
+      echo '<tr><td colspan="3" class="center" ><font color="#8b0000" size="5">*** Plugin befindet sich in Entwicklungsphase ***</font></td></tr>';
 
       echo '<tr>';
 
@@ -157,12 +157,6 @@ class specmanagement_print_api
       echo '<td>';
       echo '[ <a href="' . plugin_page( 'manage_versions' ) . '">';
       echo plugin_lang_get( 'menu_manversions' );
-      echo '</a> ]';
-      echo '</td>';
-
-      echo '<td>';
-      echo '[ <a href="' . plugin_page( 'manage_types' ) . '">';
-      echo plugin_lang_get( 'menu_mantypes' );
       echo '</a> ]';
       echo '</td>';
 
@@ -186,7 +180,7 @@ class specmanagement_print_api
    public function printBugUpdateFields( $type, $work_package, $ptime )
    {
       $specmanagement_database_api = new specmanagement_database_api();
-      $work_packages = $specmanagement_database_api->getProjectSpecWorkPackages();
+      $work_packages = $specmanagement_database_api->get_project_spec_workpackages();
 
       $this->printRow();
       echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
@@ -249,7 +243,7 @@ class specmanagement_print_api
    public function printBugReportFields()
    {
       $specmanagement_database_api = new specmanagement_database_api();
-      $work_packages = $specmanagement_database_api->getProjectSpecWorkPackages();
+      $work_packages = $specmanagement_database_api->get_project_spec_workpackages();
 
       if ( substr( MANTIS_VERSION, 0, 4 ) == '1.2.' )
       {

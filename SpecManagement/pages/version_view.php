@@ -113,7 +113,7 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
    for ( $version_index = 0; $version_index < count( $versions ); $version_index++ )
    {
       $version = $versions[$version_index];
-      $version_spec_bug_ids = $specmanagement_database_api->getVersionSpecBugs( $version['version'] );
+      $version_spec_bug_ids = $specmanagement_database_api->get_version_spec_bugs( $version['version'] );
       if ( is_null( $version_spec_bug_ids ) && !$show_zero_issues )
       {
          continue;
@@ -134,7 +134,7 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
       if ( !is_null( $version_spec_bug_ids ) )
       {
          $unsolveld_bug_ids = get_unsolved_issues( $version_spec_bug_ids );
-         $unsolved_bug_duration = $specmanagement_database_api->getBugArrayDuration( $unsolveld_bug_ids );
+         $unsolved_bug_duration = $specmanagement_database_api->get_bug_array_duration( $unsolveld_bug_ids );
          $rel_based_data = calculate_rel_based_data( $unsolveld_bug_ids );
          $add_rel_duration = $rel_based_data[0];
          $add_rel_uncertainty_bug_ids = $rel_based_data[1];
@@ -179,7 +179,7 @@ function calculate_rel_based_data( $unsolveld_bug_ids )
          {
             $blocking_bug_id = $bug_src_rel->dest_bug_id;
             $blocking_bug_status = bug_get_field( $blocking_bug_id, 'status' );
-            $blocking_bug_duration = $specmanagement_database_api->getBugDuration( $blocking_bug_id );
+            $blocking_bug_duration = $specmanagement_database_api->get_bug_duration( $blocking_bug_id );
             if ( ( $blocking_bug_duration > 0 || !is_null( $blocking_bug_duration ) )
                && !( $blocking_bug_status == 80 || $blocking_bug_status == 90 )
             )
@@ -206,7 +206,7 @@ function get_uncertainty_issues( $unsolveld_bug_ids )
    $uncertainty_bug_ids = array();
    foreach ( $unsolveld_bug_ids as $unsolveld_bug_id )
    {
-      if ( $specmanagement_database_api->getBugDuration( $unsolveld_bug_id ) == 0 )
+      if ( $specmanagement_database_api->get_bug_duration( $unsolveld_bug_id ) == 0 )
       {
          array_push( $uncertainty_bug_ids, $unsolveld_bug_id );
       }

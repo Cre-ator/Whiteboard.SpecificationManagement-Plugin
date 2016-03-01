@@ -62,6 +62,9 @@ $s_plugin_SpecManagement_editor_bug_attachments = 'Attached Files';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'There are notes available';
 $s_plugin_SpecManagement_editor_expenses_overview = 'Expenses Overview';
 $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Total';
+$s_plugin_SpecManagement_editor_no_issues = 'There are no issues assigned to this version.';
+
+$s_plugin_SpecManagement_editor_directory = 'Directory';
 
 /* Changes Area */
 $s_plugin_SpecManagement_changes_title = 'Changes';
@@ -80,6 +83,7 @@ $s_plugin_SpecManagement_manversions_edit_submit = 'Accept Changes';
 $s_plugin_SpecManagement_mantypes_title = 'Document-Typemanager';
 $s_plugin_SpecManagement_mantypes_thead = 'Typemanager';
 $s_plugin_SpecManagement_mantypes_edit = 'Edit Types';
+$s_plugin_SpecManagement_mantypes_to_pl_cfg = 'Back To Plugin-Configuration';
 $s_plugin_SpecManagement_mantypes_show_print_duration = 'Show Planned Duration in Editor / Document?';
 $s_plugin_SpecManagement_mantypes_show_expenses_overview = 'Show Expenses Overview in Editor / Document?';
 $s_plugin_SpecManagement_mantypes_show_directory = 'Show Directory in Editor / Document?';

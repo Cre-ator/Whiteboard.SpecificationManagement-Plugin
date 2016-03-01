@@ -2,20 +2,7 @@
 require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
 require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
 
-$specmanagement_database_api = new specmanagement_database_api();
 $specmanagement_print_api = new specmanagement_print_api();
-
-$type_string = null;
-/* initialize version */
-$version_id = null;
-/* initialize plugin primary key for version */
-$p_version_id = null;
-/* initialize work packages */
-$work_packages = array();
-/* initialize bug ids assigned to work package */
-$work_package_bug_ids = array();
-/* initialize parent project */
-$parent_project_id = $specmanagement_database_api->getMainProjectByHierarchy( helper_get_current_project() );
 
 if ( isset( $_POST['version_id'] ) )
 {
@@ -24,27 +11,9 @@ if ( isset( $_POST['version_id'] ) )
    {
       $print_flag = true;
    }
-   $version_id = $_POST['version_id'];
-   $version = version_get( $version_id );
-   $version_date = $version->date_order;
-   $plugin_version_obj = $specmanagement_database_api->getPluginVersionRowByVersionId( $version_id );
-   $p_version_id = $plugin_version_obj[0];
-   $type_string = $specmanagement_database_api->getTypeString( $specmanagement_database_api->getTypeByVersion( $version_id ) );
-   $type_id = $specmanagement_database_api->getTypeId( $type_string );
-   $type_row = $specmanagement_database_api->getTypeRow( $type_id );
-
-   $type_options_set = $type_row[2];
-   $type_options = explode( ';', $type_options_set );
-
-   $option_show_duration = $type_options[0];
-   $option_show_expenses_overview = $type_options[1];
-
-   $work_packages = $specmanagement_database_api->getDocumentSpecWorkPackages( $p_version_id );
-   $versionSpecBugIds = $specmanagement_database_api->getVersionSpecBugs( version_get_field( $version_id, 'version' ) );
-   $no_workpackage_bug_ids = array();
 
    echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
-   html_page_top1( plugin_lang_get( 'editor_title' ) . ': ' . $type_string . ' - ' . version_get_field( $version_id, 'version' ) );
+   html_page_top1( plugin_lang_get( 'editor_title' ) );
    if ( !$print_flag )
    {
       html_page_top2();
@@ -57,90 +26,7 @@ if ( isset( $_POST['version_id'] ) )
       }
       $specmanagement_print_api->print_plugin_menu();
    }
-   print_document_head( $type_string, $version_id, $parent_project_id, $versionSpecBugIds, $print_flag );
-   print_editor_table_head( $print_flag );
-   $chapter_index = 1;
-   if ( $work_packages != null )
-   {
-      /* for each work package */
-      foreach ( $work_packages as $work_package )
-      {
-         /* go to next record, if workpackage is empty */
-         if ( $work_package == '' )
-         {
-            continue;
-         }
-
-         $duration = $specmanagement_database_api->getWorkpackageDuration( $p_version_id, $work_package );
-         /* print work package */
-         print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration );
-         /* get work package assigned bugs */
-         $work_package_bug_ids = $specmanagement_database_api->getWorkPackageSpecBugs( $p_version_id, $work_package );
-
-         $sub_chapter_index = 10;
-         /* for each bug in selected work package */
-         foreach ( $work_package_bug_ids as $bug_id )
-         {
-            /* ensure that bug exists */
-            if ( bug_exists( $bug_id ) )
-            {
-               /* bug data */
-               $bug_data = calculate_bug_data( $bug_id, $version_date );
-               /* print bugs */
-               print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag );
-               /* increment index */
-               $sub_chapter_index += 10;
-               /* remove bug from version spec bugs */
-               if ( ( $key = array_search( $bug_id, $versionSpecBugIds ) ) !== false )
-               {
-                  unset( $versionSpecBugIds[$key] );
-               }
-            }
-         }
-         /* increment index */
-         $chapter_index++;
-      }
-   }
-   echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
-
-   /*
-    * If there are bugs left without work packages, print them too, if it is set in the config
-    */
-   if ( count( $versionSpecBugIds ) > 0 )
-   {
-      $duration = $specmanagement_database_api->getBugArrayDuration( $versionSpecBugIds );
-      /* print work package */
-      print_simple_chapter_title( $chapter_index, $option_show_duration, $duration );
-
-      $sub_chapter_index = 10;
-      foreach ( $versionSpecBugIds as $versionSpecBugId )
-      {
-         /* ensure that bug exists */
-         if ( bug_exists( $versionSpecBugId ) )
-         {
-            /* bug data */
-            $bug_data = calculate_bug_data( $versionSpecBugId, $version_date );
-            /* print bugs */
-            print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag );
-            /* increment index */
-            $sub_chapter_index += 10;
-            /* remove bug from version spec bugs */
-            if ( ( $key = array_search( $versionSpecBugId, $versionSpecBugIds ) ) !== false )
-            {
-               array_push( $no_workpackage_bug_ids, $versionSpecBugId );
-               unset( $versionSpecBugIds[$key] );
-            }
-         }
-      }
-   }
-
-   echo '</table>';
-
-   if ( $option_show_expenses_overview == '1' )
-   {
-      print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_workpackage_bug_ids );
-   }
-
+   calculate_page_content( $print_flag );
    if ( !$print_flag )
    {
       html_page_bottom1();
@@ -149,6 +35,40 @@ if ( isset( $_POST['version_id'] ) )
 else
 {
    print_successful_redirect( 'plugin.php?page=SpecManagement/choose_document' );
+}
+
+/**
+ * @param $print_flag
+ */
+function calculate_page_content( $print_flag )
+{
+   $specmanagement_database_api = new specmanagement_database_api();
+   $version_id = $_POST['version_id'];
+   $plugin_version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
+   $p_version_id = $plugin_version_obj[0];
+
+   $version_spec_bug_ids = $specmanagement_database_api->get_version_spec_bugs( version_get_field( $version_id, 'version' ) );
+   if ( !is_null( $version_spec_bug_ids ) )
+   {
+      $type_string = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version_id ) );
+      $type_id = $specmanagement_database_api->get_type_id( $type_string );
+      $type_row = $specmanagement_database_api->get_type_row( $type_id );
+      $type_options = explode( ';', $type_row[2] );
+      $option_show_directory = $type_options[2];
+      $parent_project_id = $specmanagement_database_api->get_main_project_by_hierarchy( helper_get_current_project() );
+
+      print_document_head( $type_string, $version_id, $parent_project_id, $version_spec_bug_ids, $print_flag );
+      if ( $option_show_directory == '1' )
+      {
+         print_directory( $print_flag, $p_version_id );
+      }
+      print_editor_table_head( $print_flag );
+      print_directory_body( $p_version_id, true, $print_flag );
+   }
+   else
+   {
+      echo '<br/><table class="width60"><tr><td class="center"> ' . plugin_lang_get( 'editor_no_issues' ) . ' </td></tr></table>';
+   }
 }
 
 /**
@@ -176,9 +96,9 @@ function calculate_bug_data( $bug_id, $version_date )
    /* Attached files */
    $bug_data[5] = bug_get_attachments( $bug_id );
    /* Notes */
-   $bug_data[6] = $specmanagement_database_api->calculateLastBugnotes( $bug_id, $version_date );
+   $bug_data[6] = $specmanagement_database_api->calculate_last_bugnotes( $bug_id, $version_date );
    /* planned duration for each bug */
-   $bug_data[7] = $specmanagement_database_api->getPtimeRow( $bug_id )[2];
+   $bug_data[7] = $specmanagement_database_api->get_ptime_row( $bug_id )[2];
 
    return $bug_data;
 }
@@ -193,7 +113,7 @@ function get_bug_additionalinformation( $bug_id, $version_date )
    $specmanagement_database_api = new specmanagement_database_api();
    $additional_information_value = null;
    $value_type = 3;
-   $additional_information_value = $specmanagement_database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   $additional_information_value = $specmanagement_database_api->calculate_last_text_fields( $bug_id, $version_date, $value_type );
    return $additional_information_value;
 }
 
@@ -207,7 +127,7 @@ function get_bug_stepstoreproduce( $bug_id, $version_date )
    $specmanagement_database_api = new specmanagement_database_api();
    $steps_to_reproduce_value = null;
    $value_type = 2;
-   $steps_to_reproduce_value = $specmanagement_database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   $steps_to_reproduce_value = $specmanagement_database_api->calculate_last_text_fields( $bug_id, $version_date, $value_type );
    return $steps_to_reproduce_value;
 }
 
@@ -222,7 +142,7 @@ function get_bug_description( $bug_id, $version_date )
    $description_value = null;
    $bug = bug_get( $bug_id );
    $value_type = 1;
-   $description_value = $specmanagement_database_api->calculateLastTextfields( $bug_id, $version_date, $value_type );
+   $description_value = $specmanagement_database_api->calculate_last_text_fields( $bug_id, $version_date, $value_type );
    if ( strlen( $description_value ) == 0 )
    {
       $description_value = $bug->description;
@@ -239,7 +159,7 @@ function get_bug_summary( $bug_id, $version_date )
 {
    $specmanagement_database_api = new specmanagement_database_api();
    $int_filter_string = 'summary';
-   $summary_value = $specmanagement_database_api->calculate_lastChange( $bug_id, $version_date, $int_filter_string );
+   $summary_value = $specmanagement_database_api->calculate_last_change( $bug_id, $version_date, $int_filter_string );
    if ( strlen( $summary_value ) == 0 )
    {
       $summary_value = bug_get_field( $bug_id, 'summary' );
@@ -268,6 +188,7 @@ function calculate_person_in_charge( $version_id )
    {
       if ( $project_related_user['project_id'] == $project_id
          && $project_related_user['access_level'] == 70
+         && user_is_enabled( $project_related_user['user_id'] )
       )
       {
          if ( $count > 0 )
@@ -295,7 +216,7 @@ function calculate_pt_doc_progress( $allRelevantBugs )
    $sum_pt_bug = 0;
    foreach ( $allRelevantBugs as $bug_id )
    {
-      $ptime_row = $specmanagement_database_api->getPtimeRow( $bug_id );
+      $ptime_row = $specmanagement_database_api->get_ptime_row( $bug_id );
       if ( !is_null( $ptime_row[2] ) || 0 != $ptime_row[2] )
       {
          $sum_pt_all += $ptime_row[2];
@@ -373,7 +294,7 @@ function print_bug_attachments( $bug_id )
  * @param $option_show_duration
  * @param $print_flag
  */
-function print_bugs( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
+function print_bug( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
 {
    print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag );
    print_bug_infos( string_display_links( trim( $bug_data[2] ) ) );
@@ -520,7 +441,7 @@ function print_chapter_title( $chapter_index, $work_package, $option_show_durati
    echo '<td class="form-title">' . $chapter_index . '</td>';
    echo '<td class="form-title">' . $work_package;
    echo '</td>';
-   echo '<td class="duration_title">';
+   echo '<td class="duration_title" id="' . $work_package . '">';
    if ( $option_show_duration == '1' && !( $duration == 0 || is_null( $duration ) ) )
    {
       echo '[' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
@@ -528,91 +449,6 @@ function print_chapter_title( $chapter_index, $work_package, $option_show_durati
    echo '</td>';
    echo '</tr>';
    echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
-}
-
-/**
- * Prints the expenses overview area
- *
- * @param $work_packages
- * @param $p_version_id
- * @param $print_flag
- * @param $no_workpackage_bug_ids
- */
-function print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_workpackage_bug_ids )
-{
-   $specmanagement_database_api = new specmanagement_database_api();
-   $document_duration = 0;
-
-   echo '<br />';
-   print_editor_table_head( $print_flag );
-   print_expenses_overview_head();
-
-   echo '<tbody>';
-   if ( $work_packages != null )
-   {
-      $document_duration = 0;
-      foreach ( $work_packages as $work_package )
-      {
-         /* go to next record, if workpackage is empty */
-         if ( $work_package == '' )
-         {
-            continue;
-         }
-         $duration = $specmanagement_database_api->getWorkpackageDuration( $p_version_id, $work_package );
-         $document_duration += $duration;
-         echo '<tr>';
-         echo '<td>' . $work_package . '</td>';
-         echo '<td class="duration">' . $duration . '</td>';
-         echo '</tr>';
-      }
-   }
-   if ( count( $no_workpackage_bug_ids ) > 0 )
-   {
-      $sum_no_work_package_bug_duration = 0;
-
-      foreach ( $no_workpackage_bug_ids as $no_workpackage_bug_id )
-      {
-         $no_work_package_bug_duration = $specmanagement_database_api->getBugDuration( $no_workpackage_bug_id );
-         if ( !is_null( $no_work_package_bug_duration ) )
-         {
-            $sum_no_work_package_bug_duration += $no_work_package_bug_duration;
-         }
-      }
-
-      $document_duration += $sum_no_work_package_bug_duration;
-      echo '<tr>';
-      echo '<td>' . plugin_lang_get( 'editor_no_workpackage' ) . '</td>';
-      echo '<td class="duration">' . $sum_no_work_package_bug_duration . '</td>';
-      echo '</tr>';
-   }
-   echo '<tr>';
-   echo '<td colspan="2"><hr width="100%" align="center" /></td>';
-   echo '</tr>';
-   echo '<tr>';
-   echo '<td>';
-   echo plugin_lang_get( 'editor_expenses_overview_sum' ) . ':';
-   echo '</td>';
-   echo '<td class="duration">' . $document_duration . '</td>';
-   echo '</tr>';
-   echo '</tbody>';
-   echo '</table>';
-}
-
-/**
- * Prints the head of the expenses overview area
- */
-function print_expenses_overview_head()
-{
-   echo '<thead>';
-   echo '<tr>';
-   echo '<td class="form-title" colspan="2">' . plugin_lang_get( 'editor_expenses_overview' ) . '</td>';
-   echo '</tr>';
-
-   echo '<tr class="row-category">';
-   echo '<th>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</th>';
-   echo '<th class="duration">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')</th>';
-   echo '</tr>';
-   echo '</thead>';
 }
 
 /**
@@ -655,7 +491,7 @@ function print_doc_head_versions( $versions, $act_version )
    $specmanagement_database_api = new specmanagement_database_api();
    foreach ( $versions as $version )
    {
-      $type_string = $specmanagement_database_api->getTypeString( $specmanagement_database_api->getTypeByVersion( $version['id'] ) );
+      $type_string = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version['id'] ) );
       if ( strlen( $type_string ) > 0 )
       {
          $same_version = $act_version->id == $version['id'];
@@ -719,7 +555,7 @@ function get_process_string( $allRelevantBugs )
       $status_process = 0;
       if ( !empty( $allRelevantBugs ) )
       {
-         $status_process = $specmanagement_print_api->calculate_status_doc_progress( $allRelevantBugs );
+         $status_process = round( $specmanagement_print_api->calculate_status_doc_progress( $allRelevantBugs ), 2 );
       }
       $process_string .= '<div class="progress400">';
       $process_string .= '<span class="bar" style="width: ' . $status_process . '%;">' . round( $status_process, 2 ) . '%</span>';
@@ -735,7 +571,7 @@ function get_process_string( $allRelevantBugs )
 
       if ( $sum_pt_all != 0 )
       {
-         $pt_process = $sum_pt_bug * 100 / $sum_pt_all;
+         $pt_process = round( ( $sum_pt_bug * 100 / $sum_pt_all ), 2 );
       }
       $process_string .= '<div class="progress400">';
       $process_string .= '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';
@@ -754,7 +590,7 @@ function check_status_flag( $allRelevantBugs )
    $status_flag = false;
    foreach ( $allRelevantBugs as $bug_id )
    {
-      $ptime_row = $specmanagement_database_api->getPtimeRow( $bug_id );
+      $ptime_row = $specmanagement_database_api->get_ptime_row( $bug_id );
       if ( is_null( $ptime_row[2] ) || 0 == $ptime_row[2] )
       {
          $status_flag = true;
@@ -762,4 +598,339 @@ function check_status_flag( $allRelevantBugs )
       }
    }
    return $status_flag;
+}
+
+/**
+ * Prints the expenses overview area
+ *
+ * @param $work_packages
+ * @param $p_version_id
+ * @param $print_flag
+ * @param $no_workpackage_bug_ids
+ */
+function print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_workpackage_bug_ids )
+{
+   echo '<br />';
+   print_editor_table_head( $print_flag );
+   print_expenses_overview_head();
+   print_expenses_overview_body( $work_packages, $p_version_id, $no_workpackage_bug_ids );
+   echo '</table>';
+}
+
+/**
+ * Prints the head of the expenses overview area
+ */
+function print_expenses_overview_head()
+{
+   echo '<thead>';
+   echo '<tr>';
+   echo '<td class="form-title" colspan="2">' . plugin_lang_get( 'editor_expenses_overview' ) . '</td>';
+   echo '</tr>';
+
+   echo '<tr class="row-category">';
+   echo '<th>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</th>';
+   echo '<th class="duration">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')</th>';
+   echo '</tr>';
+   echo '</thead>';
+}
+
+/**
+ * @param $work_packages
+ * @param $p_version_id
+ * @param $no_workpackage_bug_ids
+ */
+function print_expenses_overview_body( $work_packages, $p_version_id, $no_workpackage_bug_ids )
+{
+   $specmanagement_database_api = new specmanagement_database_api();
+   $document_duration = 0;
+
+   echo '<tbody>';
+   if ( $work_packages != null )
+   {
+      $document_duration = 0;
+      foreach ( $work_packages as $work_package )
+      {
+         /* go to next record, if workpackage is empty */
+         if ( $work_package == '' )
+         {
+            continue;
+         }
+         $duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, $work_package );
+         $document_duration += $duration;
+         echo '<tr>';
+         echo '<td>' . $work_package . '</td>';
+         echo '<td class="duration">' . $duration . '</td>';
+         echo '</tr>';
+      }
+   }
+
+   if ( count( $no_workpackage_bug_ids ) > 0 )
+   {
+      $sum_no_work_package_bug_duration = 0;
+
+      foreach ( $no_workpackage_bug_ids as $no_workpackage_bug_id )
+      {
+         $no_work_package_bug_duration = $specmanagement_database_api->get_bug_duration( $no_workpackage_bug_id );
+         if ( !is_null( $no_work_package_bug_duration ) )
+         {
+            $sum_no_work_package_bug_duration += $no_work_package_bug_duration;
+         }
+      }
+
+      $document_duration += $sum_no_work_package_bug_duration;
+      echo '<tr>';
+      echo '<td>' . plugin_lang_get( 'editor_no_workpackage' ) . '</td>';
+      echo '<td class="duration">' . $sum_no_work_package_bug_duration . '</td>';
+      echo '</tr>';
+   }
+   echo '<tr>';
+   echo '<td colspan="2"><hr width="100%" align="center" /></td>';
+   echo '</tr>';
+   echo '<tr>';
+   echo '<td>';
+   echo plugin_lang_get( 'editor_expenses_overview_sum' ) . ':';
+   echo '</td>';
+   echo '<td class="duration">' . $document_duration . '</td>';
+   echo '</tr>';
+   echo '</tbody>';
+}
+
+/**
+ * @param $print_flag
+ * @param $p_version_id
+ */
+function print_directory( $print_flag, $p_version_id )
+{
+   echo '<br />';
+   print_editor_table_head( $print_flag );
+   print_directory_head();
+   echo '<tbody>';
+   print_directory_body( $p_version_id, false, false );
+   echo '</tbody>';
+   echo '</table>';
+   echo '<br />';
+}
+
+/**
+ * Print table head from directory
+ */
+function print_directory_head()
+{
+   echo '<thead>';
+   echo '<tr>';
+   echo '<td class="form-title" colspan="2">' . plugin_lang_get( 'editor_directory' ) . '</td>';
+   echo '</tr>';
+   echo '</thead>';
+}
+
+/**
+ * Print table body from directory
+ *
+ * @param $p_version_id
+ * @param $detail_flag
+ * @param $print_flag
+ */
+function print_directory_body( $p_version_id, $detail_flag, $print_flag )
+{
+   $specmanagement_database_api = new specmanagement_database_api();
+   $work_packages = $specmanagement_database_api->get_document_spec_workpackages( $p_version_id );
+   asort( $work_packages );
+   $directory_depth = calculate_directory_depth( $work_packages );
+   $chapter_counter_array = prepare_chapter_counter( $directory_depth );
+   $last_chapter_depth = 0;
+
+   $no_work_package_bug_ids = array();
+   $version_id = $_POST['version_id'];
+   $version = version_get( $version_id );
+   $version_date = $version->date_order;
+   $type_string = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version_id ) );
+   $type_id = $specmanagement_database_api->get_type_id( $type_string );
+   $type_row = $specmanagement_database_api->get_type_row( $type_id );
+   $type_options_set = $type_row[2];
+   $type_options = explode( ';', $type_options_set );
+   $option_show_duration = $type_options[0];
+   $option_show_expenses_overview = $type_options[1];
+
+   if ( !is_null( $work_packages ) )
+   {
+      foreach ( $work_packages as $work_package )
+      {
+         if ( strlen( $work_package ) > 0 )
+         {
+            $chapter_brackets = explode( '/', $work_package );
+            $chapters = clean_chapter_path( $chapter_brackets );
+            $chapter_depth = count( $chapters );
+            if ( $chapter_depth == 1 )
+            {
+               reset_chapter_counter( $chapter_counter_array );
+            }
+
+            $chapter_prefix = '';
+            $chapter_suffix = '';
+            $changed = false;
+            for ( $depth_index = 0; $depth_index < $chapter_depth; $depth_index++ )
+            {
+               if ( $chapter_depth > 0 && $chapter_depth <= $last_chapter_depth && $changed == false )
+               {
+                  $chapter_counter_array[$chapter_depth - 1]++;
+                  $changed = true;
+               }
+               $chapter_prefix .= $chapter_counter_array[$depth_index];
+               if ( $depth_index < $chapter_depth - 1 )
+               {
+                  $chapter_prefix .= '.';
+               }
+            }
+
+            if ( $chapter_depth > 0 )
+            {
+               $chapter_suffix = ' ' . $chapters[$chapter_depth - 1];
+            }
+
+            if ( $detail_flag )
+            {
+               $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, $work_package );
+               print_chapter_title( $chapter_prefix, $chapter_suffix, $option_show_duration, $chapter_duration );
+            }
+            else
+            {
+               echo '<tr><td><a href="#' . $chapter_suffix . '">';
+               echo $chapter_prefix . ' ' . $chapter_suffix . '<br/>';
+               echo '</a></td></tr>';
+            }
+            $last_chapter_depth = $chapter_depth;
+
+            /**
+             * Print bugs
+             */
+            if ( $detail_flag )
+            {
+               $work_package_spec_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, $work_package );
+               $bug_counter = 10;
+               foreach ( $work_package_spec_bug_ids as $work_package_spec_bug_id )
+               {
+                  if ( bug_exists( $work_package_spec_bug_id ) )
+                  {
+                     $bug_data = calculate_bug_data( $work_package_spec_bug_id, $version_date );
+                     print_bug( $chapter_prefix, $bug_counter, $bug_data, $option_show_duration, $print_flag );
+                     $bug_counter += 10;
+                  }
+               }
+            }
+         }
+         else
+         {
+            $no_work_package_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, '' );
+         }
+      }
+   }
+
+
+   $chapter_prefix = $chapter_counter_array[0] + 1;
+   $chapter_suffix = plugin_lang_get( 'editor_no_workpackage' );
+   if ( $detail_flag )
+   {
+      if ( !empty( $no_work_package_bug_ids ) )
+      {
+         $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, '' );
+         print_chapter_title( $chapter_prefix, $chapter_suffix, $option_show_duration, $chapter_duration );
+
+         $bug_counter = 10;
+         foreach ( $no_work_package_bug_ids as $no_work_package_bug_id )
+         {
+            if ( bug_exists( $no_work_package_bug_id ) )
+            {
+               $bug_data = calculate_bug_data( $no_work_package_bug_id, $version_date );
+               print_bug( $chapter_prefix, $bug_counter, $bug_data, $option_show_duration, $print_flag );
+               $bug_counter += 10;
+            }
+         }
+      }
+      echo '</table>';
+
+      if ( $option_show_expenses_overview == '1' )
+      {
+         $work_packages = $specmanagement_database_api->get_document_spec_workpackages( $p_version_id );
+         print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_work_package_bug_ids );
+      }
+   }
+   else
+   {
+      if ( !empty( $no_work_package_bug_ids ) )
+      {
+         echo '<tr><td><a href="#' . $chapter_suffix . '">';
+         echo $chapter_prefix . ' ' . $chapter_suffix . '<br/>';
+         echo '</a></td></tr>';
+      }
+   }
+}
+
+/**
+ * Calculate deepest path of all workpackages
+ *
+ * @param $work_packages
+ * @return int
+ */
+function calculate_directory_depth( $work_packages )
+{
+   $directory_depth = 0;
+   foreach ( $work_packages as $work_package )
+   {
+      $chapter_brackets = explode( '/', $work_package );
+      $chapters = clean_chapter_path( $chapter_brackets );
+      $chapter_depth = count( $chapters );
+      if ( $chapter_depth > $directory_depth )
+      {
+         $directory_depth = $chapter_depth;
+      }
+   }
+   return $directory_depth;
+}
+
+/**
+ * Generates an array with chapter counters for each depth-level
+ *
+ * @param $directory_depth
+ * @return array
+ */
+function prepare_chapter_counter( $directory_depth )
+{
+   $chapter_counter_array = array();
+   for ( $depth_index = 0; $depth_index < $directory_depth; $depth_index++ )
+   {
+      $chapter_counter_array[$depth_index] = 1;
+   }
+   return $chapter_counter_array;
+}
+
+/**
+ * @param $chapter_counter_array
+ * @return mixed
+ */
+function reset_chapter_counter( $chapter_counter_array )
+{
+   $level_amount = count( $chapter_counter_array );
+   for ( $level_index = 1; $level_index < $level_amount; $level_index++ )
+   {
+      $chapter_counter_array[$level_index] = 1;
+   }
+   return $chapter_counter_array;
+}
+
+/**
+ * @param $chapters
+ * @return mixed
+ */
+function clean_chapter_path( $chapters )
+{
+   $depth = count( $chapters );
+   for ( $chapter_index = 0; $chapter_index < $depth; $chapter_index++ )
+   {
+      if ( strlen( $chapters[$chapter_index] ) == 0 )
+      {
+         unset( $chapters[$chapter_index] );
+      }
+   }
+   sort( $chapters );
+   return $chapters;
 }

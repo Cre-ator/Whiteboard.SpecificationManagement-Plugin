@@ -62,6 +62,9 @@ $s_plugin_SpecManagement_editor_bug_attachments = 'Angehängte Dateien';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
 $s_plugin_SpecManagement_editor_expenses_overview = 'Aufwandsübersicht';
 $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Summe';
+$s_plugin_SpecManagement_editor_no_issues = 'Diesem Dokument sind keine Einträge zugeordnet.';
+
+$s_plugin_SpecManagement_editor_directory = 'Inhaltsverzeichnis';
 
 /* Changes Area */
 $s_plugin_SpecManagement_changes_title = 'Änderungsprotokoll';
@@ -81,6 +84,7 @@ $s_plugin_SpecManagement_manversions_edit_submit = 'Änderungen bestätigen';
 $s_plugin_SpecManagement_mantypes_title = 'Document-Typenverwaltung';
 $s_plugin_SpecManagement_mantypes_thead = 'Typenverwaltung';
 $s_plugin_SpecManagement_mantypes_edit = 'Typen bearbeiten';
+$s_plugin_SpecManagement_mantypes_to_pl_cfg = 'Zu Plugin-Konfiguration';
 $s_plugin_SpecManagement_mantypes_show_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
 $s_plugin_SpecManagement_mantypes_show_expenses_overview = 'Aufwandsübersicht im Dokument anzeigen?';
 $s_plugin_SpecManagement_mantypes_show_directory = 'Inhaltsverzeichnis im Dokument anzeigen?';

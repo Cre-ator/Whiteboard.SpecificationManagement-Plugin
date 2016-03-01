@@ -6,7 +6,7 @@ $specmanagement_database_api = new specmanagement_database_api();
 
 if ( isset( $_POST['con_reset'] ) )
 {
-   $specmanagement_database_api->resetPlugin();
+   $specmanagement_database_api->reset_plugin();
 }
 else
 {

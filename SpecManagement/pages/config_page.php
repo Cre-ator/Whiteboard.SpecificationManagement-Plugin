@@ -11,7 +11,6 @@ access_ensure_global_level( plugin_config_get( 'AccessLevel' ) );
 
 html_page_top1( plugin_lang_get( 'config_title' ) );
 html_page_top2();
-
 print_manage_menu();
 
 echo '<br/>';
@@ -93,7 +92,7 @@ $specmanagement_print_api->printRow();
 $specmanagement_print_api->printCategoryField( 1, 1, 'config_types' );
 echo '<td colspan="1">';
 
-$types_rows = $specmanagement_database_api->getFullTypes();
+$types_rows = $specmanagement_database_api->get_full_types();
 foreach ( $types_rows as $types_row )
 {
    $types[] = $types_row[1];
@@ -152,9 +151,11 @@ if ( plugin_config_get( 'ShowSpecStatCols' ) == ON )
 
 echo '<tr>';
 echo '<td class="center" colspan="2">';
+echo '<input type="submit" name="manage_doc_types" class="button" value="' . plugin_lang_get( 'menu_mantypes' ) . '"/>&nbsp';
 echo '<input type="submit" name="change" class="button" value="' . lang_get( 'update_prefs_button' ) . '"/>&nbsp';
 echo '<input type="submit" name="reset" class="button" value="' . lang_get( 'reset_prefs_button' ) . '"/>';
 echo '</td>';
+
 echo '</tr>';
 
 $specmanagement_print_api->printTableFoot();

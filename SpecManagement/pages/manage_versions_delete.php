@@ -13,11 +13,11 @@ helper_ensure_confirmed( lang_get( 'version_delete_sure' ) .
    '<br/>' . lang_get( 'version_label' ) . lang_get( 'word_separator' ) . string_display_line( $version->version ),
    lang_get( 'delete_version_button' ) );
 
-$plugin_version_row = $specmanagement_database_api->getPluginVersionRowByVersionId( $version_id );
+$plugin_version_row = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
 $p_version_id = $plugin_version_row[0];
 
-$specmanagement_database_api->updateSourceVersionSetNull( $p_version_id );
-$specmanagement_database_api->deleteVersionRow( $version_id );
+$specmanagement_database_api->update_source_version_set_null( $p_version_id );
+$specmanagement_database_api->delete_version_row( $version_id );
 version_remove( $version_id );
 
 print_successful_redirect( plugin_page( 'manage_versions', true ) );

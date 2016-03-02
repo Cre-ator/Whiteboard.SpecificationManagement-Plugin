@@ -562,7 +562,8 @@ class specmanagement_database_api
          WHERE s.p_version_id = '" . $p_version_id . "'
          AND s.work_package = '" . $work_package . "'
          AND s.bug_id = b.id
-         AND NOT b.resolution = 90";
+         AND NOT b.resolution = 90
+         ORDER BY s.bug_id";
 
       $result = $this->mysqli->query( $query );
 

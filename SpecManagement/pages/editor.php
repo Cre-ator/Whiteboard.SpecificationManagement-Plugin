@@ -17,7 +17,6 @@ if ( isset( $_POST['version_id'] ) )
    if ( !$print_flag )
    {
       html_page_top2();
-
       if ( plugin_is_installed( 'WhiteboardMenu' ) )
       {
          require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
@@ -44,26 +43,32 @@ function calculate_page_content( $print_flag )
 {
    $specmanagement_database_api = new specmanagement_database_api();
    $version_id = $_POST['version_id'];
-   $plugin_version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
-   $p_version_id = $plugin_version_obj[0];
-
    $version_spec_bug_ids = $specmanagement_database_api->get_version_spec_bugs( version_get_field( $version_id, 'version' ) );
    if ( !is_null( $version_spec_bug_ids ) )
    {
+      /** get bug and work package data */
+      $plugin_version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
+      $p_version_id = $plugin_version_obj[0];
+      $work_packages = $specmanagement_database_api->get_document_spec_workpackages( $p_version_id );
+      $no_work_package_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, '' );
+      /** get type options */
       $type_string = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version_id ) );
       $type_id = $specmanagement_database_api->get_type_id( $type_string );
       $type_row = $specmanagement_database_api->get_type_row( $type_id );
       $type_options = explode( ';', $type_row[2] );
-      $option_show_directory = $type_options[2];
-      $parent_project_id = $specmanagement_database_api->get_main_project_by_hierarchy( helper_get_current_project() );
 
-      print_document_head( $type_string, $version_id, $parent_project_id, $version_spec_bug_ids, $print_flag );
-      if ( $option_show_directory == '1' )
+      /** generate and print page content */
+      print_document_head( $type_string, $version_id, $version_spec_bug_ids, $print_flag );
+      if ( $type_options[2] == '1' )
       {
-         print_directory( $print_flag, $p_version_id );
+         print_directory( $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], $print_flag );
       }
       print_editor_table_head( $print_flag );
-      print_directory_body( $p_version_id, true, $print_flag );
+      generate_content( $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], true, $print_flag );
+      if ( $type_options[1] == '1' )
+      {
+         print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_work_package_bug_ids );
+      }
    }
    else
    {
@@ -346,13 +351,14 @@ function print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_
  *
  * @param $type_string
  * @param $version_id
- * @param $parent_project_id
  * @param $allRelevantBugs
  * @param $print_flag
  */
-function print_document_head( $type_string, $version_id, $parent_project_id, $allRelevantBugs, $print_flag )
+function print_document_head( $type_string, $version_id, $allRelevantBugs, $print_flag )
 {
+   $specmanagement_database_api = new specmanagement_database_api();
    $project_id = helper_get_current_project();
+   $parent_project_id = $specmanagement_database_api->get_main_project_by_hierarchy( $project_id );
    $versions = version_get_all_rows( $project_id );
    $act_version = version_get( $version_id );
    $head_project_id = $project_id;
@@ -435,7 +441,7 @@ function print_simple_chapter_title( $chapter_index, $option_show_duration, $dur
  * @param $option_show_duration
  * @param $duration
  */
-function print_chapter_title( $chapter_index, $work_package, $option_show_duration, $duration )
+function print_chapter_document( $chapter_index, $work_package, $option_show_duration, $duration )
 {
    echo '<tr>';
    echo '<td class="form-title">' . $chapter_index . '</td>';
@@ -651,7 +657,7 @@ function print_expenses_overview_body( $work_packages, $p_version_id, $no_workpa
       foreach ( $work_packages as $work_package )
       {
          /* go to next record, if workpackage is empty */
-         if ( $work_package == '' )
+         if ( strlen( $work_package ) == 0 )
          {
             continue;
          }
@@ -696,16 +702,19 @@ function print_expenses_overview_body( $work_packages, $p_version_id, $no_workpa
 }
 
 /**
- * @param $print_flag
  * @param $p_version_id
+ * @param $work_packages
+ * @param $no_work_package_bug_ids
+ * @param $option_show_duration
+ * @param $print_flag
  */
-function print_directory( $print_flag, $p_version_id )
+function print_directory( $p_version_id, $work_packages, $no_work_package_bug_ids, $option_show_duration, $print_flag )
 {
    echo '<br />';
    print_editor_table_head( $print_flag );
    print_directory_head();
    echo '<tbody>';
-   print_directory_body( $p_version_id, false, false );
+   generate_content( $p_version_id, $work_packages, $no_work_package_bug_ids, $option_show_duration, false, $print_flag );
    echo '</tbody>';
    echo '</table>';
    echo '<br />';
@@ -727,142 +736,200 @@ function print_directory_head()
  * Print table body from directory
  *
  * @param $p_version_id
+ * @param $work_packages
+ * @param $no_work_package_bug_ids
+ * @param $option_show_duration
  * @param $detail_flag
  * @param $print_flag
  */
-function print_directory_body( $p_version_id, $detail_flag, $print_flag )
+function generate_content( $p_version_id, $work_packages, $no_work_package_bug_ids, $option_show_duration, $detail_flag, $print_flag )
 {
    $specmanagement_database_api = new specmanagement_database_api();
-   $work_packages = $specmanagement_database_api->get_document_spec_workpackages( $p_version_id );
+
    asort( $work_packages );
    $directory_depth = calculate_directory_depth( $work_packages );
    $chapter_counter_array = prepare_chapter_counter( $directory_depth );
    $last_chapter_depth = 0;
-
-   $no_work_package_bug_ids = array();
    $version_id = $_POST['version_id'];
    $version = version_get( $version_id );
    $version_date = $version->date_order;
-   $type_string = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version_id ) );
-   $type_id = $specmanagement_database_api->get_type_id( $type_string );
-   $type_row = $specmanagement_database_api->get_type_row( $type_id );
-   $type_options_set = $type_row[2];
-   $type_options = explode( ';', $type_options_set );
-   $option_show_duration = $type_options[0];
-   $option_show_expenses_overview = $type_options[1];
 
+   /**
+    * Iterate through defined work packages
+    */
    if ( !is_null( $work_packages ) )
    {
       foreach ( $work_packages as $work_package )
       {
          if ( strlen( $work_package ) > 0 )
          {
-            $chapter_brackets = explode( '/', $work_package );
-            $chapters = clean_chapter_path( $chapter_brackets );
+            $chapters = explode( '/', $work_package );
             $chapter_depth = count( $chapters );
             if ( $chapter_depth == 1 )
             {
                reset_chapter_counter( $chapter_counter_array );
             }
 
-            $chapter_prefix = '';
-            $chapter_suffix = '';
-            $changed = false;
-            for ( $depth_index = 0; $depth_index < $chapter_depth; $depth_index++ )
-            {
-               if ( $chapter_depth > 0 && $chapter_depth <= $last_chapter_depth && $changed == false )
-               {
-                  $chapter_counter_array[$chapter_depth - 1]++;
-                  $changed = true;
-               }
-               $chapter_prefix .= $chapter_counter_array[$depth_index];
-               if ( $depth_index < $chapter_depth - 1 )
-               {
-                  $chapter_prefix .= '.';
-               }
-            }
+            $chapter_prefix_data = generate_chapter_prefix( $chapter_counter_array, $chapter_depth, $last_chapter_depth );
+            $chapter_counter_array = $chapter_prefix_data[0];
+            $chapter_prefix = $chapter_prefix_data[1];
+            $chapter_suffix = generate_chapter_suffix( $chapters, $chapter_depth );
 
-            if ( $chapter_depth > 0 )
-            {
-               $chapter_suffix = ' ' . $chapters[$chapter_depth - 1];
-            }
-
-            if ( $detail_flag )
-            {
-               $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, $work_package );
-               print_chapter_title( $chapter_prefix, $chapter_suffix, $option_show_duration, $chapter_duration );
-            }
-            else
-            {
-               echo '<tr><td><a href="#' . $chapter_suffix . '">';
-               echo $chapter_prefix . ' ' . $chapter_suffix . '<br/>';
-               echo '</a></td></tr>';
-            }
+            process_chapter( $p_version_id, $work_package, $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag );
+            $work_package_spec_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, $work_package );
+            process_content( $work_package_spec_bug_ids, $version_date, $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag );
             $last_chapter_depth = $chapter_depth;
-
-            /**
-             * Print bugs
-             */
-            if ( $detail_flag )
-            {
-               $work_package_spec_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, $work_package );
-               $bug_counter = 10;
-               foreach ( $work_package_spec_bug_ids as $work_package_spec_bug_id )
-               {
-                  if ( bug_exists( $work_package_spec_bug_id ) )
-                  {
-                     $bug_data = calculate_bug_data( $work_package_spec_bug_id, $version_date );
-                     print_bug( $chapter_prefix, $bug_counter, $bug_data, $option_show_duration, $print_flag );
-                     $bug_counter += 10;
-                  }
-               }
-            }
-         }
-         else
-         {
-            $no_work_package_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, '' );
          }
       }
    }
 
-
+   /**
+    * Iterate through issues without defined work package
+    */
    $chapter_prefix = $chapter_counter_array[0] + 1;
    $chapter_suffix = plugin_lang_get( 'editor_no_workpackage' );
+   if ( count( $no_work_package_bug_ids ) > 0 )
+   {
+      process_chapter( $p_version_id, '', $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag );
+      process_content( $no_work_package_bug_ids, $version_date, $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag );
+   }
+   echo '</table>';
+}
+
+/**
+ * @param $p_version_id
+ * @param $work_package
+ * @param $chapter_prefix
+ * @param $chapter_suffix
+ * @param $option_show_duration
+ * @param $detail_flag
+ * @param $print_flag
+ */
+function process_chapter( $p_version_id, $work_package, $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag )
+{
+   $specmanagement_database_api = new specmanagement_database_api();
    if ( $detail_flag )
    {
-      if ( !empty( $no_work_package_bug_ids ) )
-      {
-         $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, '' );
-         print_chapter_title( $chapter_prefix, $chapter_suffix, $option_show_duration, $chapter_duration );
+      $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, $work_package );
+      print_chapter_document( $chapter_prefix, $chapter_suffix, $option_show_duration, $chapter_duration );
+   }
+   else
+   {
+      print_chapter_directory( $print_flag, $chapter_suffix, $chapter_prefix, null, null, true );
+   }
+}
 
-         $bug_counter = 10;
-         foreach ( $no_work_package_bug_ids as $no_work_package_bug_id )
-         {
-            if ( bug_exists( $no_work_package_bug_id ) )
-            {
-               $bug_data = calculate_bug_data( $no_work_package_bug_id, $version_date );
-               print_bug( $chapter_prefix, $bug_counter, $bug_data, $option_show_duration, $print_flag );
-               $bug_counter += 10;
-            }
-         }
+/**
+ * @param $chapter_counter_array
+ * @param $chapter_depth
+ * @param $last_chapter_depth
+ * @return array
+ */
+function generate_chapter_prefix( $chapter_counter_array, $chapter_depth, $last_chapter_depth )
+{
+   $chapter_prefix = '';
+   $changed = false;
+   for ( $depth_index = 0; $depth_index < $chapter_depth; $depth_index++ )
+   {
+      if ( $chapter_depth > 0 && $chapter_depth <= $last_chapter_depth && $changed == false )
+      {
+         $chapter_counter_array[$chapter_depth - 1]++;
+         $changed = true;
       }
-      echo '</table>';
-
-      if ( $option_show_expenses_overview == '1' )
+      $chapter_prefix .= $chapter_counter_array[$depth_index];
+      if ( $depth_index < $chapter_depth - 1 )
       {
-         $work_packages = $specmanagement_database_api->get_document_spec_workpackages( $p_version_id );
-         print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_work_package_bug_ids );
+         $chapter_prefix .= '.';
+      }
+   }
+   return array( $chapter_counter_array, $chapter_prefix );
+}
+
+/**
+ * @param $chapters
+ * @param $chapter_depth
+ * @return string
+ */
+function generate_chapter_suffix( $chapters, $chapter_depth )
+{
+   $chapter_suffix = '';
+   if ( $chapter_depth > 0 )
+   {
+      $chapter_suffix = ' ' . $chapters[$chapter_depth - 1];
+   }
+
+   return $chapter_suffix;
+}
+
+/**
+ * @param $bug_ids
+ * @param $version_date
+ * @param $chapter_prefix
+ * @param $chapter_suffix
+ * @param $option_show_duration
+ * @param $detail_flag
+ * @param $print_flag
+ */
+function process_content( $bug_ids, $version_date, $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag )
+{
+   $bug_counter = 10;
+   foreach ( $bug_ids as $bug_id )
+   {
+      if ( bug_exists( $bug_id ) )
+      {
+         $bug_data = calculate_bug_data( $bug_id, $version_date );
+         if ( $detail_flag )
+         {
+            print_bug( $chapter_prefix, $bug_counter, $bug_data, $option_show_duration, $print_flag );
+         }
+         else
+         {
+            print_chapter_directory( $print_flag, $chapter_suffix, $chapter_prefix, $bug_counter, $bug_data, false );
+         }
+         $bug_counter += 10;
+      }
+   }
+}
+
+/**
+ * @param $print_flag
+ * @param $chapter_suffix
+ * @param $chapter_prefix
+ * @param $bug_counter
+ * @param $bug_data
+ * @param $is_chapter
+ */
+function print_chapter_directory( $print_flag, $chapter_suffix, $chapter_prefix, $bug_counter, $bug_data, $is_chapter )
+{
+   if ( $is_chapter )
+   {
+      echo '<tr><td class="form-title">';
+      if ( !$print_flag )
+      {
+         echo '<a href="#' . $chapter_suffix . '">';
+         echo $chapter_prefix . ' ' . $chapter_suffix . '<br/>';
+         echo '</a>';
+      }
+      else
+      {
+         echo $chapter_prefix . ' ' . $chapter_suffix . '<br/>';
       }
    }
    else
    {
-      if ( !empty( $no_work_package_bug_ids ) )
+      echo '<tr><td>';
+      if ( !$print_flag )
       {
-         echo '<tr><td><a href="#' . $chapter_suffix . '">';
-         echo $chapter_prefix . ' ' . $chapter_suffix . '<br/>';
-         echo '</a></td></tr>';
+         echo '<a href="#' . $chapter_suffix . '">';
+         echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display( $bug_data[1] ) . '<br/>';
+         echo '</a>';
+      }
+      else
+      {
+         echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display( $bug_data[1] ) . '<br/>';
       }
    }
+   echo '</td></tr>';
 }
 
 /**
@@ -876,8 +943,7 @@ function calculate_directory_depth( $work_packages )
    $directory_depth = 0;
    foreach ( $work_packages as $work_package )
    {
-      $chapter_brackets = explode( '/', $work_package );
-      $chapters = clean_chapter_path( $chapter_brackets );
+      $chapters = explode( '/', $work_package );
       $chapter_depth = count( $chapters );
       if ( $chapter_depth > $directory_depth )
       {
@@ -915,22 +981,4 @@ function reset_chapter_counter( $chapter_counter_array )
       $chapter_counter_array[$level_index] = 1;
    }
    return $chapter_counter_array;
-}
-
-/**
- * @param $chapters
- * @return mixed
- */
-function clean_chapter_path( $chapters )
-{
-   $depth = count( $chapters );
-   for ( $chapter_index = 0; $chapter_index < $depth; $chapter_index++ )
-   {
-      if ( strlen( $chapters[$chapter_index] ) == 0 )
-      {
-         unset( $chapters[$chapter_index] );
-      }
-   }
-   sort( $chapters );
-   return $chapters;
 }

@@ -5,10 +5,10 @@ class SpecManagementPlugin extends MantisPlugin
    function register()
    {
       $this->name = 'Specification Management';
-      $this->description = 'Adds fields for management specs to bug reports.';
+      $this->description = 'Generate and manage your own specified documents';
       $this->page = 'config_page';
 
-      $this->version = '1.1.32';
+      $this->version = '1.1.33';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',

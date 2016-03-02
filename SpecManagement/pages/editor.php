@@ -50,6 +50,7 @@ function calculate_page_content( $print_flag )
       $plugin_version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
       $p_version_id = $plugin_version_obj[0];
       $work_packages = $specmanagement_database_api->get_document_spec_workpackages( $p_version_id );
+      asort( $work_packages );
       $no_work_package_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, '' );
       /** get type options */
       $type_string = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version_id ) );
@@ -65,6 +66,7 @@ function calculate_page_content( $print_flag )
       }
       print_editor_table_head( $print_flag );
       generate_content( $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], true, $print_flag );
+      echo '</table>';
       if ( $type_options[1] == '1' )
       {
          print_expenses_overview( $work_packages, $p_version_id, $print_flag, $no_work_package_bug_ids );
@@ -86,23 +88,23 @@ function calculate_page_content( $print_flag )
 function calculate_bug_data( $bug_id, $version_date )
 {
    $specmanagement_database_api = new specmanagement_database_api();
-   /* Initialize bug data array */
+   /** Initialize bug data array */
    $bug_data = array();
-   /* ID */
+   /** ID */
    $bug_data[0] = $bug_id;
-   /* Summary */
+   /** Summary */
    $bug_data[1] = get_bug_summary( $bug_id, $version_date );
-   /* Description */
+   /** Description */
    $bug_data[2] = get_bug_description( $bug_id, $version_date );
-   /* Steps to reproduce */
+   /** Steps to reproduce */
    $bug_data[3] = get_bug_stepstoreproduce( $bug_id, $version_date );
-   /* Additional information */
+   /** Additional information */
    $bug_data[4] = get_bug_additionalinformation( $bug_id, $version_date );
-   /* Attached files */
+   /** Attached files */
    $bug_data[5] = bug_get_attachments( $bug_id );
-   /* Notes */
+   /** Notes */
    $bug_data[6] = $specmanagement_database_api->calculate_last_bugnotes( $bug_id, $version_date );
-   /* planned duration for each bug */
+   /** planned duration for each bug */
    $bug_data[7] = $specmanagement_database_api->get_ptime_row( $bug_id )[2];
 
    return $bug_data;
@@ -656,7 +658,7 @@ function print_expenses_overview_body( $work_packages, $p_version_id, $no_workpa
       $document_duration = 0;
       foreach ( $work_packages as $work_package )
       {
-         /* go to next record, if workpackage is empty */
+         /** go to next record, if work package is empty */
          if ( strlen( $work_package ) == 0 )
          {
             continue;
@@ -745,8 +747,6 @@ function print_directory_head()
 function generate_content( $p_version_id, $work_packages, $no_work_package_bug_ids, $option_show_duration, $detail_flag, $print_flag )
 {
    $specmanagement_database_api = new specmanagement_database_api();
-
-   asort( $work_packages );
    $directory_depth = calculate_directory_depth( $work_packages );
    $chapter_counter_array = prepare_chapter_counter( $directory_depth );
    $last_chapter_depth = 0;
@@ -754,15 +754,14 @@ function generate_content( $p_version_id, $work_packages, $no_work_package_bug_i
    $version = version_get( $version_id );
    $version_date = $version->date_order;
 
-   /**
-    * Iterate through defined work packages
-    */
+   /** Iterate through defined work packages */
    if ( !is_null( $work_packages ) )
    {
       foreach ( $work_packages as $work_package )
       {
          if ( strlen( $work_package ) > 0 )
          {
+            $work_package_spec_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, $work_package );
             $chapters = explode( '/', $work_package );
             $chapter_depth = count( $chapters );
             if ( $chapter_depth == 1 )
@@ -776,16 +775,13 @@ function generate_content( $p_version_id, $work_packages, $no_work_package_bug_i
             $chapter_suffix = generate_chapter_suffix( $chapters, $chapter_depth );
 
             process_chapter( $p_version_id, $work_package, $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag );
-            $work_package_spec_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, $work_package );
             process_content( $work_package_spec_bug_ids, $version_date, $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag );
             $last_chapter_depth = $chapter_depth;
          }
       }
    }
 
-   /**
-    * Iterate through issues without defined work package
-    */
+   /** Iterate through issues without defined work package */
    $chapter_prefix = $chapter_counter_array[0] + 1;
    $chapter_suffix = plugin_lang_get( 'editor_no_workpackage' );
    if ( count( $no_work_package_bug_ids ) > 0 )
@@ -793,7 +789,6 @@ function generate_content( $p_version_id, $work_packages, $no_work_package_bug_i
       process_chapter( $p_version_id, '', $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag );
       process_content( $no_work_package_bug_ids, $version_date, $chapter_prefix, $chapter_suffix, $option_show_duration, $detail_flag, $print_flag );
    }
-   echo '</table>';
 }
 
 /**

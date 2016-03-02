@@ -61,10 +61,6 @@ function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues 
    }
 
    print_table( $obsolete_flag, $show_zero_issues, $print_flag );
-   if ( helper_get_current_project() != 0 )
-   {
-//      print_graph( $obsolete_flag );
-   }
 
    if ( !$print_flag )
    {
@@ -524,71 +520,4 @@ function print_version( $version )
    echo '<td style="version">';
    echo string_display( version_full_name( $version['id'] ) );
    echo '</td>';
-}
-
-/**
- * @param $obsolete_flag
- */
-function print_graph( $obsolete_flag )
-{
-   $specmanagement_print_api = new specmanagement_print_api();
-   $project_id = helper_get_current_project();
-   $obsolete = false;
-   if ( $obsolete_flag )
-   {
-      $obsolete = null;
-   }
-   $versions = version_get_all_rows_with_subs( $project_id, null, $obsolete );
-   $version_hash = array();
-
-   for ( $version_index = count( $versions ) - 1; $version_index >= 0; $version_index-- )
-   {
-      $version = $versions[$version_index];
-      $version_record = array();
-      array_push( $version_record, $version['id'] );
-      array_push( $version_record, $version['date_order'] );
-      array_push( $version_hash, $version_record );
-   }
-
-   if ( !empty( $version_hash ) )
-   {
-      echo '<br/>';
-      $specmanagement_print_api->printTableTop( '90' );
-      print_graph_tablehead();
-      print_graph_tablebody( $version_hash );
-      $specmanagement_print_api->printTableFoot();
-   }
-}
-
-/**
- *
- */
-function print_graph_tablehead()
-{
-   $specmanagement_print_api = new specmanagement_print_api();
-   echo '<thead>';
-   $specmanagement_print_api->printFormTitle( null, 'versview_theadgraph' );
-   echo '</thead>';
-}
-
-/**
- * @param $version_hash
- */
-function print_graph_tablebody( $version_hash )
-{
-   echo '<tbody>';
-   echo '<tr>';
-   echo '<td class="center">';
-
-   foreach ( $version_hash as $version_value )
-   {
-      $version_id = $version_value[0];
-      $version_name = version_get_field( $version_id, 'version' );
-      $version_date = date_is_null( $version_value[1] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version_value[1] ) );
-      echo ' <img border="0" src="' . SPECMANAGEMENT_PLUGIN_URL . 'files/rel_next_version.png"/> ' . $version_name . ' [' . $version_date . ']';
-   }
-
-   echo '</td>';
-   echo '</tr>';
-   echo '</tbody>';
 }

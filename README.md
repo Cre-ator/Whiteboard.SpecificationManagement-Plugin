@@ -1,6 +1,6 @@
 # SpecificationManagement
 
-Plugin for MantisBT to add Specification - Requirement and Specification - Source/Name fields into bug-management
+Plugin for MantisBT - Generate and manage your own specified documents
 
 Requirements
 
@@ -8,4 +8,4 @@ Requirements
 
 Installation
 
-Copy the 'SpecificationManagement' plugin just in the plugins directory of Mantis. A new menu entry "Specification" should be added. Adds new fields "Specification - Requirement" and "Specification - Source/Name" into the issue-management.
+Copy the 'SpecManagement' plugin just in the plugins directory of Mantis. A new menu entry "Specification" should be added. Adds new fields "Specification - Requirement" and "Specification - Source/Name" into the issue-management.

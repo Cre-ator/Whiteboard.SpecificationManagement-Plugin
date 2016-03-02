@@ -166,6 +166,12 @@ class specmanagement_print_api
       echo '</a> ]';
       echo '</td>';
 
+      echo '<td>';
+      echo '[ <a href="' . plugin_page( 'version_graph' ) . '">';
+      echo plugin_lang_get( 'menu_versgraph' );
+      echo '</a> ]';
+      echo '</td>';
+
       echo '</tr>';
       echo '</table>';
    }

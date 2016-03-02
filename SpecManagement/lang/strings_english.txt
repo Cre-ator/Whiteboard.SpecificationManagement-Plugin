@@ -50,6 +50,7 @@ $s_plugin_SpecManagement_menu_manversions = 'Manage Document Versions';
 $s_plugin_SpecManagement_menu_mantypes = 'Manage Document Types';
 $s_plugin_SpecManagement_menu_printbutton = 'Print';
 $s_plugin_SpecManagement_menu_versview = 'Version Overview';
+$s_plugin_SpecManagement_menu_versgraph = 'Version Graph';
 
 /* Editor Area */
 $s_plugin_SpecManagement_editor_title = 'SpecManagement';

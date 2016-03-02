@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Adds fields for management specs to bug reports.';
       $this->page = 'config_page';
 
-      $this->version = '1.1.31';
+      $this->version = '1.1.32';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -257,7 +257,7 @@ class SpecManagementPlugin extends MantisPlugin
       $bug_id = $bug->id;
       $project_id = helper_get_current_project();
       $ptime = gpc_get_string( 'ptime', '0' );
-      $work_package = gpc_get_string( 'work_package', '' );
+      $work_package = preg_replace( '/\/\/+/', '/', gpc_get_string( 'work_package', '' ) );
       $type = gpc_get_string( 'types', '' );
       $target_version = gpc_get_string( 'target_version', null );
 

@@ -14,10 +14,11 @@ if ( $addversion && isset( $_POST['new_version'] ) )
 {
    $project_id = helper_get_current_project();
    $new_version = $_POST['new_version'];
+   $new_version_trimmed = str_replace( ' ', '', $new_version );
 
-   if ( version_is_unique( $new_version, $project_id ) )
+   if ( version_is_unique( $new_version_trimmed, $project_id ) && strlen( $new_version_trimmed ) > 0 )
    {
-      version_add( $project_id, $new_version );
+      version_add( $project_id, $new_version_trimmed );
    }
 }
 

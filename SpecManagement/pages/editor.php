@@ -23,7 +23,6 @@ if ( isset( $_POST['version_id'] ) )
          $whiteboard_print_api = new whiteboard_print_api();
          $whiteboard_print_api->printWhiteboardMenu();
       }
-      $specmanagement_print_api->print_plugin_menu();
    }
    calculate_page_content( $print_flag );
    if ( !$print_flag )

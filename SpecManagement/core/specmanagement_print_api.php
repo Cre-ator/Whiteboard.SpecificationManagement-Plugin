@@ -149,20 +149,14 @@ class specmanagement_print_api
       echo '<tr>';
 
       echo '<td>';
-      echo '[ <a href="' . plugin_page( 'choose_document' ) . '">';
-      echo plugin_lang_get( 'menu_choosedoc' );
+      echo '[ <a href="' . plugin_page( 'version_view' ) . '">';
+      echo plugin_lang_get( 'menu_versview' );
       echo '</a> ]';
       echo '</td>';
 
       echo '<td>';
       echo '[ <a href="' . plugin_page( 'manage_versions' ) . '">';
       echo plugin_lang_get( 'menu_manversions' );
-      echo '</a> ]';
-      echo '</td>';
-
-      echo '<td>';
-      echo '[ <a href="' . plugin_page( 'version_view' ) . '">';
-      echo plugin_lang_get( 'menu_versview' );
       echo '</a> ]';
       echo '</td>';
 

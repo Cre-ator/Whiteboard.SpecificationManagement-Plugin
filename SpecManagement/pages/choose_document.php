@@ -15,7 +15,15 @@ function calculate_page_content()
       $types[] = $types_row[1];
    }
 
-   $specmanagement_print_api->print_page_head( plugin_lang_get( 'select_doc_title' ) );
+   echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
+   html_page_top1( 'select_doc_title' );
+   html_page_top2();
+   if ( plugin_is_installed( 'WhiteboardMenu' ) )
+   {
+      require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
+      $whiteboard_print_api = new whiteboard_print_api();
+      $whiteboard_print_api->printWhiteboardMenu();
+   }
 
    echo '<div align="center">';
    echo '<hr size="1" width="50%" />';

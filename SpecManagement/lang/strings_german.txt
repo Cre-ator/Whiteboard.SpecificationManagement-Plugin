@@ -46,11 +46,11 @@ $s_plugin_SpecManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 /* Menu Area */
 $s_plugin_SpecManagement_menu_title = 'Spezifikationen';
 $s_plugin_SpecManagement_menu_choosedoc = 'Dokument erzeugen';
-$s_plugin_SpecManagement_menu_manversions = 'Dokumentversionen verwalten';
+$s_plugin_SpecManagement_menu_manversions = 'Dokumente verwalten';
 $s_plugin_SpecManagement_menu_mantypes = 'Dokumenttypen verwalten';
 $s_plugin_SpecManagement_menu_printbutton = 'Drucken';
-$s_plugin_SpecManagement_menu_versview = 'Versionsübersicht';
-$s_plugin_SpecManagement_menu_versgraph = 'Versionsgraph';
+$s_plugin_SpecManagement_menu_versview = 'Übersicht';
+$s_plugin_SpecManagement_menu_versgraph = 'Graph';
 
 /* Editor Area */
 $s_plugin_SpecManagement_editor_title = 'SpecManagement';

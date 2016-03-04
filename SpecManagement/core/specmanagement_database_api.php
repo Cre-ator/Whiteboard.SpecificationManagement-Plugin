@@ -318,7 +318,7 @@ class specmanagement_database_api
     * @param $project_id
     * @return array|null
     */
-   public function get_version_rows_by_project_id( $project_id )
+   public function get_version_row_ids_by_project_id( $project_id )
    {
       $plugin_vers_table = $this->get_mantis_plugin_table( 'vers' );
       $version_table = $this->get_mantis_table( 'project_version' );
@@ -510,7 +510,7 @@ class specmanagement_database_api
    {
       $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
 
-      $p_version_ids = $this->get_version_rows_by_project_id( helper_get_current_project() );
+      $p_version_ids = $this->get_version_row_ids_by_project_id( helper_get_current_project() );
       $work_packages = array();
       $tmp_row = null;
 

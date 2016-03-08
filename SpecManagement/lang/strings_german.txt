@@ -6,6 +6,7 @@ $s_plugin_SpecManagement_bug_view_specification_req = 'Ursprung der Anforderung'
 $s_plugin_SpecManagement_bug_view_specification_src = 'Anforderungsnummer';
 $s_plugin_SpecManagement_bug_view_specification_wpg = 'Arbeitspaket';
 $s_plugin_SpecManagement_bug_view_planned_time = 'Geplante Dauer';
+$s_plugin_SpecManagement_bug_view_work_package_description = 'Arbeitspakete dienen der Definition von (Unter)-Kapiteln. Ein Unterkapitel wird durch ein "/" gekennzeichnet. Beispiel: Kapitel/Unterkapitel/...';
 
 /* Configuration Page */
 $s_plugin_SpecManagement_config_title = 'SpecManagement - Einstellungen';

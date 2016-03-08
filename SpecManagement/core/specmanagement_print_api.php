@@ -179,6 +179,7 @@ class specmanagement_print_api
     */
    public function printBugUpdateFields( $type, $work_package, $ptime )
    {
+      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement_tooltip.css">';
       $specmanagement_database_api = new specmanagement_database_api();
       $work_packages = $specmanagement_database_api->get_project_spec_workpackages();
 
@@ -188,7 +189,9 @@ class specmanagement_print_api
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</td>';
+      echo '<td class="category">';
+      $this->print_work_package_description();
+      echo '</td>';
       echo '<td colspan="5">';
       echo '<input type="text" value="' . $work_package . '" id="work_package" name="work_package" list="work_packages"/>';
       echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
@@ -221,19 +224,22 @@ class specmanagement_print_api
     */
    public function printBugViewFields( $type, $work_package, $ptime )
    {
+      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement_tooltip.css">';
       $this->printRow();
-      echo '<td class="category">', plugin_lang_get( 'bug_view_specification_req' ), '</td>';
-      echo '<td colspan="5" id="requirement">', $type, '</td>';
+      echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_req' ) . '</td>';
+      echo '<td colspan="5" id="requirement">' . $type . '</td>';
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category">', plugin_lang_get( 'bug_view_specification_wpg' ), '</td>';
-      echo '<td colspan="5" id="work_package">', $work_package, '</td>';
+      echo '<td class="category">';
+      $this->print_work_package_description();
+      echo '</td>';
+      echo '<td colspan="5" id="work_package">' . $work_package . '&nbsp</td>';
       echo '</tr>';
 
       $this->printRow();
-      echo '<td class="category">', plugin_lang_get( 'bug_view_planned_time' ), ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')', '</td>';
-      echo '<td colspan="5" id="ptime">', $ptime, '</td>';
+      echo '<td class="category">' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</td>';
+      echo '<td colspan="5" id="ptime">' . $ptime . '</td>';
       echo '</tr>';
    }
 
@@ -242,6 +248,7 @@ class specmanagement_print_api
     */
    public function printBugReportFields()
    {
+      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement_tooltip.css">';
       $specmanagement_database_api = new specmanagement_database_api();
       $work_packages = $specmanagement_database_api->get_project_spec_workpackages();
 
@@ -249,7 +256,9 @@ class specmanagement_print_api
       {
          $this->printRow();
          echo '<td class="category">';
-         echo '<label><span>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</span></label>';
+         echo '<label><span>';
+         $this->print_work_package_description();
+         echo '</span></label>';
          echo '</td>';
          echo '<td>';
          echo '<span class="input">';
@@ -265,50 +274,61 @@ class specmanagement_print_api
          }
          echo '</datalist>';
          echo '</span>';
-         echo '<span class="label-style"></span>';
          echo '</td>';
          echo '</tr>';
 
          $this->printRow();
-         echo '<td class="category">';
-         echo '<label><span>' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</span></label>';
-         echo '</td>';
-         echo '<td>';
-         echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="" />';
-         echo '</span>';
-         echo '<span class="label-style"></span>';
-         echo '</td>';
-         echo '</tr>';
+         echo '<td class="category" > ';
+         echo '<label ><span > ' . plugin_lang_get( 'bug_view_planned_time' ) . ' ( ' . plugin_lang_get( 'editor_duration_unit' ) . ')' . ' </span ></label > ';
+         echo '</td > ';
+         echo '<td > ';
+         echo '<span class="input" > ';
+         echo '<input ' . helper_get_tab_index() . ' type = "text" id = "ptime" name = "ptime" size = "50" maxlength = "50" value = "" />';
+         echo '</span > ';
+         echo '<span class="label-style" ></span > ';
+         echo '</td > ';
+         echo '</tr > ';
       }
       else
       {
-         echo '<div class="field-container">';
-         echo '<label><span>' . plugin_lang_get( 'bug_view_specification_wpg' ) . '</span></label>';
-         echo '<span class="input">';
-         echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
-         echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
-         echo '<datalist id="work_packages">';
+         echo '<div class="field-container" > ';
+         echo '<label><span >';
+         $this->print_work_package_description();
+         echo ' </span ></label > ';
+         echo '<span class="input" > ';
+         echo '<input type = "text" id = "work_package" name = "work_package" list = "work_packages" />';
+         echo '<button type = "button" onClick = "document.getElementById(\'work_package\').value=\'\';" > X</button > ';
+         echo '<datalist id = "work_packages" > ';
          if ( !empty( $work_packages ) )
          {
             foreach ( $work_packages as $existing_work_package )
             {
-               echo '<option value="' . $existing_work_package . '">';
+               echo '<option value = "' . $existing_work_package . '" > ';
             }
          }
-         echo '</datalist>';
-         echo '</span>';
-         echo '<span class="label-style"></span>';
-         echo '</div>';
+         echo '</datalist > ';
+         echo '</span > ';
+         echo '<span class="label-style" ></span > ';
+         echo '</div > ';
 
-         echo '<div class="field-container">';
-         echo '<label><span>' . plugin_lang_get( 'bug_view_planned_time' ) . ' (' . plugin_lang_get( 'editor_duration_unit' ) . ')' . '</span></label>';
-         echo '<span class="input">';
-         echo '<input ' . helper_get_tab_index() . ' type="text" id="ptime" name="ptime" size="50" maxlength="50" value="" />';
-         echo '</span>';
-         echo '<span class="label-style"></span>';
-         echo '</div>';
+         echo '<div class="field-container" > ';
+         echo '<label ><span > ' . plugin_lang_get( 'bug_view_planned_time' ) . ' ( ' . plugin_lang_get( 'editor_duration_unit' ) . ')' . ' </span ></label > ';
+         echo '<span class="input" > ';
+         echo '<input ' . helper_get_tab_index() . ' type = "text" id = "ptime" name = "ptime" size = "50" maxlength = "50" value = "" />';
+         echo '</span > ';
+         echo '<span class="label-style" ></span > ';
+         echo '</div > ';
       }
+   }
+
+   function print_work_package_description()
+   {
+      echo '<a class="rcv_tooltip"><div class="tooltip">';
+      echo plugin_lang_get( 'bug_view_specification_wpg' ) . '&nbsp' . '[i]';
+      echo '<span><div class="rcv_tooltip_content">';
+      echo plugin_lang_get( 'bug_view_work_package_description' );
+      echo '</div></span>';
+      echo '</div></a>';
    }
 
    # List the attachments belonging to the specified bug.  This is used from within
@@ -329,13 +349,13 @@ class specmanagement_print_api
          if ( $image_previewed )
          {
             $image_previewed = false;
-            echo '<br />';
+            echo ' < br />';
          }
 
          if ( $t_attachment['can_download'] )
          {
-            $t_href_start = '<a href="' . string_attribute( $t_attachment['download_url'] ) . '">';
-            $t_href_end = '</a>';
+            $t_href_start = ' < a href = "' . string_attribute( $t_attachment['download_url'] ) . '" > ';
+            $t_href_end = '</a > ';
          }
          else
          {
@@ -346,7 +366,7 @@ class specmanagement_print_api
          if ( !$t_attachment['exists'] )
          {
             print_file_icon( $t_file_display_name );
-            echo '&#160;<span class="strike">' . $t_file_display_name . '</span>' . lang_get( 'word_separator' ) . '(' . lang_get( 'attachment_missing' ) . ')';
+            echo ' &#160;<span class="strike">' . $t_file_display_name . '</span>' . lang_get( 'word_separator' ) . '(' . lang_get( 'attachment_missing' ) . ')';
          }
          else
          {
@@ -455,7 +475,8 @@ document.getElementById( span ).style.display = displayType;
     * @param $allRelevantBugs
     * @return float
     */
-   public function calculate_status_doc_progress( $allRelevantBugs )
+   public
+   function calculate_status_doc_progress( $allRelevantBugs )
    {
       $segments = count( $allRelevantBugs );
       if ( $segments == 0 )

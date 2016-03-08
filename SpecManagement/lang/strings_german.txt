@@ -6,6 +6,7 @@ $s_plugin_SpecManagement_bug_view_specification_req = 'Ursprung der Anforderung'
 $s_plugin_SpecManagement_bug_view_specification_src = 'Anforderungsnummer';
 $s_plugin_SpecManagement_bug_view_specification_wpg = 'Arbeitspaket';
 $s_plugin_SpecManagement_bug_view_planned_time = 'Geplante Dauer';
+$s_plugin_SpecManagement_bug_view_work_package_description = 'Arbeitspakete dienen der Definition von (Unter)-Kapiteln. Ein Unterkapitel wird durch ein "/" gekennzeichnet. Beispiel: Kapitel/Unterkapitel/...';
 
 /* Configuration Page */
 $s_plugin_SpecManagement_config_title = 'SpecManagement - Einstellungen';
@@ -46,10 +47,11 @@ $s_plugin_SpecManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 /* Menu Area */
 $s_plugin_SpecManagement_menu_title = 'Spezifikationen';
 $s_plugin_SpecManagement_menu_choosedoc = 'Dokument erzeugen';
-$s_plugin_SpecManagement_menu_manversions = 'Dokumentversionen verwalten';
+$s_plugin_SpecManagement_menu_manversions = 'Dokumentstatus verwalten';
 $s_plugin_SpecManagement_menu_mantypes = 'Dokumenttypen verwalten';
 $s_plugin_SpecManagement_menu_printbutton = 'Drucken';
-$s_plugin_SpecManagement_menu_versview = 'Versionsübersicht';
+$s_plugin_SpecManagement_menu_versview = 'Statistik und Fortschritt';
+$s_plugin_SpecManagement_menu_versgraph = 'Graph';
 
 /* Editor Area */
 $s_plugin_SpecManagement_editor_title = 'SpecManagement';

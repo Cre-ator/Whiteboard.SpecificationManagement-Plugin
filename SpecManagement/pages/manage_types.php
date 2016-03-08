@@ -20,7 +20,6 @@ if ( isset( $_POST['to_plugin_config'] ) )
 /**
  * Page content
  */
-echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
 html_page_top1( plugin_lang_get( 'mantypes_title' ) );
 html_page_top2();
 print_manage_menu();

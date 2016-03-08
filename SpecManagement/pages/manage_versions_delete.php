@@ -10,7 +10,7 @@ $version = version_get( $version_id );
 access_ensure_project_level( config_get( 'manage_project_threshold' ), $version->project_id );
 
 helper_ensure_confirmed( lang_get( 'version_delete_sure' ) .
-   '<br/>' . lang_get( 'version_label' ) . lang_get( 'word_separator' ) . string_display_line( $version->version ),
+   '<br/>' . lang_get( 'word_separator' ) . string_display_line( $version->version ),
    lang_get( 'delete_version_button' ) );
 
 $plugin_version_row = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );

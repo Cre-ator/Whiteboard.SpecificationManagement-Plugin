@@ -6,6 +6,7 @@ $s_plugin_SpecManagement_bug_view_specification_req = 'Source/Name';
 $s_plugin_SpecManagement_bug_view_specification_src = 'Requirement';
 $s_plugin_SpecManagement_bug_view_specification_wpg = 'Work Package';
 $s_plugin_SpecManagement_bug_view_planned_time = 'Planned Duration';
+$s_plugin_SpecManagement_bug_view_work_package_description = 'A workpackage defines a chapter in the document. chapters/subchapters are defined with a "/". e. g: chapter/subchapter/...';
 
 /* Configuration Page */
 $s_plugin_SpecManagement_config_title = 'SpecManagement - Configuration';
@@ -46,10 +47,11 @@ $s_plugin_SpecManagement_select_confirm = 'Generate Selected Document';
 /* Menu Area */
 $s_plugin_SpecManagement_menu_title = 'Specifications';
 $s_plugin_SpecManagement_menu_choosedoc = 'Generate Document';
-$s_plugin_SpecManagement_menu_manversions = 'Manage Document Versions';
+$s_plugin_SpecManagement_menu_manversions = 'Manage Document Status';
 $s_plugin_SpecManagement_menu_mantypes = 'Manage Document Types';
 $s_plugin_SpecManagement_menu_printbutton = 'Print';
-$s_plugin_SpecManagement_menu_versview = 'Version Overview';
+$s_plugin_SpecManagement_menu_versview = 'Statistic and Progress';
+$s_plugin_SpecManagement_menu_versgraph = 'Graph';
 
 /* Editor Area */
 $s_plugin_SpecManagement_editor_title = 'SpecManagement';

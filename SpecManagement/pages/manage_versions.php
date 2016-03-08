@@ -6,6 +6,16 @@ require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
 define( 'COLS', 7 );
 $specmanagement_print_api = new specmanagement_print_api();
 
+$obsolete_flag = false;
+if ( isset( $_POST['obsolete_flag'] ) )
+{
+   $obsolete_flag = true;
+}
+if ( isset( $_POST['non_obsolete_flag'] ) )
+{
+   $obsolete_flag = false;
+}
+
 $edit_page = false;
 if ( isset( $_POST['edit'] ) )
 {
@@ -18,11 +28,15 @@ if ( isset( $_POST['edit'] ) )
 $specmanagement_print_api->print_page_head( plugin_lang_get( 'manversions_title' ) );
 echo '<div align="center">';
 echo '<hr size="1" width="100%" />';
-print_table( $edit_page );
+print_table( $edit_page, $obsolete_flag );
 html_page_bottom1();
 /* **************************** */
 
-function print_table( $edit_page = false )
+/**
+ * @param bool $edit_page
+ * @param $obsolete_flag
+ */
+function print_table( $edit_page = false, $obsolete_flag )
 {
    $specmanagement_print_api = new specmanagement_print_api();
 
@@ -31,19 +45,20 @@ function print_table( $edit_page = false )
       echo '<form action="' . plugin_page( 'manage_versions_update' ) . '" method="post">';
    }
    $specmanagement_print_api->printTableTop( '100' );
-   print_tablehead( $edit_page );
-   print_tablebody( $edit_page );
+   print_tablehead( $edit_page, $obsolete_flag );
+   print_tablebody( $edit_page, $obsolete_flag );
    $specmanagement_print_api->printTableFoot();
    echo '</form>';
 }
 
 /**
  * @param $edit_page
+ * @param $obsolete_flag
  */
-function print_tablebody( $edit_page )
+function print_tablebody( $edit_page, $obsolete_flag )
 {
    echo '<tbody>';
-   print_versions( $edit_page );
+   print_versions( $edit_page, $obsolete_flag );
    if ( $edit_page )
    {
       print_editbuttons();
@@ -57,13 +72,28 @@ function print_tablebody( $edit_page )
 
 /**
  * @param $edit_page
+ * @param $obsolete_flag
  */
-function print_versions( $edit_page )
+function print_versions( $edit_page, $obsolete_flag )
 {
    $specmanagement_database_api = new specmanagement_database_api();
    $specmanagement_print_api = new specmanagement_print_api();
 
-   $versions = version_get_all_rows( helper_get_current_project(), null, null );
+   $obsolote = false;
+   if ( $obsolete_flag )
+   {
+      $obsolote = null;
+   }
+
+   if ( $edit_page )
+   {
+      $versions = version_get_all_rows_with_subs( helper_get_current_project(), null, null );
+   }
+   else
+   {
+      $versions = version_get_all_rows_with_subs( helper_get_current_project(), null, $obsolote );
+   }
+
    for ( $version_index = 0; $version_index < count( $versions ); $version_index++ )
    {
       $version = $versions[$version_index];
@@ -253,18 +283,34 @@ function print_name( $edit_page, $version )
    echo '</td>';
 }
 
-function print_tablehead( $edit_page )
+/**
+ * @param $edit_page
+ * @param $obsolete_flag
+ */
+function print_tablehead( $edit_page, $obsolete_flag )
 {
-   $specmanagement_print_api = new specmanagement_print_api();
-
-   $cols = ( COLS - 1 );
-   if ( $edit_page )
-   {
-      $cols = COLS;
-   }
-
    echo '<thead>';
-   $specmanagement_print_api->printFormTitle( $cols, 'manversions_thead' );
+   echo '<tr>';
+   echo '<td class="form-title" colspan="4">';
+   echo plugin_lang_get( 'manversions_thead' );
+   echo '</td>';
+   if ( !$edit_page )
+   {
+      echo '<td>';
+      echo '<form action="' . plugin_page( 'manage_versions' ) . '" method="post">';
+      if ( $obsolete_flag === false )
+      {
+         echo '<input type="submit" name="obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_obsolete_flag' ) . '"/>';
+      }
+      else
+      {
+         echo '<input type="submit" name="non_obsolete_flag" class="button" value="' . plugin_lang_get( 'versview_non_obsolete_flag' ) . '"/>';
+      }
+      echo '</form>';
+      echo '</td>';
+   }
+   echo '</tr>';
+
    echo '<tr class="row-category2">';
    echo '<th class="form-title" colspan="1" width="40%">' . lang_get( 'version' ) . '</th>';
    echo '<th class="form-title" colspan="1" width="10%">' . lang_get( 'released' ) . '</th>';

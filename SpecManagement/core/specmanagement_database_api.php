@@ -640,6 +640,30 @@ class specmanagement_database_api
    }
 
    /**
+    * @param $bug_id
+    */
+   public function get_workpackage_by_bug_id( $bug_id )
+   {
+      $plugin_src_table = $this->get_mantis_plugin_table( 'src' );
+
+      if ( bug_exists( $bug_id ) )
+      {
+         $query = "SELECT work_package FROM $plugin_src_table
+            WHERE bug_id = " . $bug_id;
+
+         var_dump( $query );
+
+         $result = $this->mysqli->query( $query );
+         if ( 0 != $result->num_rows )
+         {
+            $row = mysqli_fetch_row( $result );
+            $work_package = $row[0];
+            return $work_package;
+         }
+      }
+   }
+
+   /**
     * Get the overall parent project by a given project/subproject
     *
     * @param $project_id

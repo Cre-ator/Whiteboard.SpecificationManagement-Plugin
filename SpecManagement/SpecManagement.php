@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Generate and manage your own specified documents';
       $this->page = 'config_page';
 
-      $this->version = '1.1.39';
+      $this->version = '1.1.40';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -257,9 +257,10 @@ class SpecManagementPlugin extends MantisPlugin
       $bug_id = $bug->id;
       $project_id = helper_get_current_project();
       $ptime = gpc_get_string( 'ptime', '0' );
-      $work_package = preg_replace( '/\/\/+/', '/', gpc_get_string( 'work_package', '' ) );
+
       $type = gpc_get_string( 'types', '' );
-      $target_version = gpc_get_string( 'target_version', null );
+      $target_version = bug_get_field( $bug_id, 'target_version' );
+      $work_package = preg_replace( '/\/\/+/', '/', gpc_get_string( 'work_package', '' ) );
 
       if ( !is_null( $target_version ) )
       {
@@ -277,6 +278,10 @@ class SpecManagementPlugin extends MantisPlugin
             $specmanagement_database_api->insert_ptime_row( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
+            if ( strlen( $work_package ) == 0 )
+            {
+               $work_package = $specmanagement_database_api->get_workpackage_by_bug_id( $bug_id );
+            }
             $specmanagement_database_api->update_version_row( $project_id, $version_id, $type_id );
             $specmanagement_database_api->update_source_row( $bug_id, $p_version_id, $work_package );
             $specmanagement_database_api->update_ptime_row( $bug_id, $ptime );

@@ -47,10 +47,10 @@ $s_plugin_SpecManagement_select_confirm = 'Generate Selected Document';
 /* Menu Area */
 $s_plugin_SpecManagement_menu_title = 'Specifications';
 $s_plugin_SpecManagement_menu_choosedoc = 'Generate Document';
-$s_plugin_SpecManagement_menu_manversions = 'Manage Documents';
+$s_plugin_SpecManagement_menu_manversions = 'Manage Document Status';
 $s_plugin_SpecManagement_menu_mantypes = 'Manage Document Types';
 $s_plugin_SpecManagement_menu_printbutton = 'Print';
-$s_plugin_SpecManagement_menu_versview = 'Overview';
+$s_plugin_SpecManagement_menu_versview = 'Statistic and Progress';
 $s_plugin_SpecManagement_menu_versgraph = 'Graph';
 
 /* Editor Area */

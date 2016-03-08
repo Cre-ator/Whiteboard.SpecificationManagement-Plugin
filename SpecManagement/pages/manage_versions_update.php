@@ -10,15 +10,17 @@ $addversion = gpc_get_bool( 'addversion', false );
 /**
  * Submit new version
  */
-if ( $addversion && isset( $_POST['new_version'] ) )
+if ( $addversion && isset( $_POST['new_version_name'] ) && isset( $_POST['new_version_date'] ) )
 {
    $project_id = helper_get_current_project();
-   $new_version = $_POST['new_version'];
-   $new_version_trimmed = trim( preg_replace( '/\s+/', ' ', $new_version ) );
+   $new_version_date = new DateTime( $_POST['new_version_date'] );
+   $new_version_date_timestamp = date_timestamp_get( $new_version_date );
+   $new_version_name = $_POST['new_version_name'];
+   $new_version_name_trimmed = trim( preg_replace( '/\s+/', ' ', $new_version_name ) );
 
-   if ( version_is_unique( $new_version_trimmed, $project_id ) && strlen( $new_version_trimmed ) > 0 )
+   if ( version_is_unique( $new_version_name_trimmed, $project_id ) && strlen( $new_version_name_trimmed ) > 0 )
    {
-      version_add( $project_id, $new_version_trimmed );
+      version_add( $project_id, $new_version_name_trimmed, false, '', $new_version_date_timestamp );
    }
 }
 

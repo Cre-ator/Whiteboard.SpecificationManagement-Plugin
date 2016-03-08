@@ -103,7 +103,8 @@ function print_editbuttons()
 {
    echo '<tr>';
    echo '<td colspan="7">';
-   echo '<input type="text" name="new_version" size="32" maxlength="64"/>';
+   echo '<input type="text" name="new_version_name" size="32" maxlength="64"/>';
+   echo '&nbsp<input type="date" name="new_version_date"/>';
    echo '&nbsp<input type="submit" name="addversion" class="button" value="' . lang_get( 'add_version_button' ) . '"/>';
    echo '</td>';
    echo '</tr>';

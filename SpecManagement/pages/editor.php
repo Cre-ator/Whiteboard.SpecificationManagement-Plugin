@@ -915,12 +915,16 @@ function print_chapter_directory( $print_flag, $chapter_suffix, $chapter_prefix,
       if ( !$print_flag )
       {
          echo '<a href="#' . string_display( $bug_data[1] ) . '">';
-         echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display( $bug_data[1] ) . '<br/>';
+         echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display( $bug_data[1] );
          echo '</a>';
+         echo '&nbsp(';
+         print_bug_link( bug_format_id( $bug_data[0] ) );
+         echo ')';
       }
       else
       {
-         echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display( $bug_data[1] ) . '<br/>';
+         echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display( $bug_data[1] );
+         echo '&nbsp(' . bug_format_id( $bug_data[0] ) . ')';
       }
    }
    echo '</td></tr>';

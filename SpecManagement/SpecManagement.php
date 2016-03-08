@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Generate and manage your own specified documents';
       $this->page = 'config_page';
 
-      $this->version = '1.1.38';
+      $this->version = '1.1.39';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',

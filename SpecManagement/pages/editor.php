@@ -326,7 +326,7 @@ function print_bug( $chapter_index, $sub_chapter_index, $bug_data, $option_show_
 function print_bug_head( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
 {
    echo '<tr>';
-   echo '<td class="form-title">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
+   echo '<td class="form-title" id="' . string_display( $bug_data[1] ) . '">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
    echo '<td class="form-title">' . string_display( $bug_data[1] ) . ' (';
    if ( !$print_flag )
    {
@@ -445,10 +445,10 @@ function print_simple_chapter_title( $chapter_index, $option_show_duration, $dur
 function print_chapter_document( $chapter_index, $work_package, $option_show_duration, $duration )
 {
    echo '<tr>';
-   echo '<td class="form-title">' . $chapter_index . '</td>';
+   echo '<td class="form-title" id="' . $work_package . '">' . $chapter_index . '</td>';
    echo '<td class="form-title">' . $work_package;
    echo '</td>';
-   echo '<td class="duration_title" id="' . $work_package . '">';
+   echo '<td class="duration_title">';
    if ( $option_show_duration == '1' && !( $duration == 0 || is_null( $duration ) ) )
    {
       echo '[' . plugin_lang_get( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']';
@@ -914,7 +914,7 @@ function print_chapter_directory( $print_flag, $chapter_suffix, $chapter_prefix,
       echo '<tr><td>';
       if ( !$print_flag )
       {
-         echo '<a href="#' . $chapter_suffix . '">';
+         echo '<a href="#' . string_display( $bug_data[1] ) . '">';
          echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display( $bug_data[1] ) . '<br/>';
          echo '</a>';
       }

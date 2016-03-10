@@ -39,8 +39,7 @@ $s_plugin_SpecManagement_config_reset_dont = 'Abort';
 
 /* Choose Doc Page */
 $s_plugin_SpecManagement_select_doc_title = 'SpecManagement - Create Document';
-$s_plugin_SpecManagement_select_doc = 'Document Selection';
-$s_plugin_SpecManagement_select_type = 'Document Type:';
+$s_plugin_SpecManagement_select_type = 'Document:';
 $s_plugin_SpecManagement_select_version = 'Document Version:';
 $s_plugin_SpecManagement_select_confirm = 'Generate Selected Document';
 

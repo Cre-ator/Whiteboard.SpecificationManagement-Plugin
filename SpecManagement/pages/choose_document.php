@@ -28,7 +28,7 @@ function calculate_page_content()
    echo '<div align="center">';
    echo '<hr size="1" width="50%" />';
    $specmanagement_print_api->printTableTop( '50' );
-   $specmanagement_print_api->printFormTitle( 2, 'select_doc' );
+   $specmanagement_print_api->printFormTitle( 2, 'menu_title' );
    $specmanagement_print_api->printCategoryField( 1, 1, 'select_type' );
    echo '<td>';
    echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
@@ -51,6 +51,7 @@ function print_document_selection( $types )
 {
    $project_id = gpc_get_int( 'project_id', helper_get_current_project() );
    $specmanagement_database_api = new specmanagement_database_api();
+
    echo '<select name="version_id">';
    foreach ( $types as $type )
    {
@@ -98,6 +99,5 @@ function get_version_ids( $type_id, $project_id )
          }
       }
    }
-
    return $version_id_array;
 }

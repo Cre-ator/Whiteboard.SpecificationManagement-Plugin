@@ -40,13 +40,12 @@ $s_plugin_SpecManagement_config_reset_dont = 'Abbrechen';
 /* Choose Doc Page */
 $s_plugin_SpecManagement_select_doc_title = 'SpecManagement - Dokument erzeugen';
 $s_plugin_SpecManagement_select_doc = 'Dokumentauswahl';
-$s_plugin_SpecManagement_select_type = 'Dokumenttyp:';
+$s_plugin_SpecManagement_select_type = 'Dokument:';
 $s_plugin_SpecManagement_select_version = 'Dokumentversion:';
 $s_plugin_SpecManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 
 /* Menu Area */
 $s_plugin_SpecManagement_menu_title = 'Spezifikationen';
-$s_plugin_SpecManagement_menu_choosedoc = 'Dokument erzeugen';
 $s_plugin_SpecManagement_menu_manversions = 'Dokumentstatus verwalten';
 $s_plugin_SpecManagement_menu_mantypes = 'Dokumenttypen verwalten';
 $s_plugin_SpecManagement_menu_printbutton = 'Drucken';

@@ -49,6 +49,14 @@ function calculate_page_content( $print_flag )
       /** get bug and work package data */
       $plugin_version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
       $p_version_id = $plugin_version_obj[0];
+      foreach ( $version_spec_bug_ids as $version_spec_bug_id )
+      {
+         $p_source_row = $specmanagement_database_api->get_source_row( $version_spec_bug_id );
+         if ( is_null( $p_source_row[2] ) )
+         {
+            $specmanagement_database_api->update_source_row( $version_spec_bug_id, $p_version_id, '' );
+         }
+      }
       $work_packages = $specmanagement_database_api->get_document_spec_workpackages( $p_version_id );
       asort( $work_packages );
       $no_work_package_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, '' );

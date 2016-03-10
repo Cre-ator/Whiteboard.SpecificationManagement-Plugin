@@ -49,6 +49,14 @@ function calculate_page_content( $print_flag )
       /** get bug and work package data */
       $plugin_version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
       $p_version_id = $plugin_version_obj[0];
+      foreach ( $version_spec_bug_ids as $version_spec_bug_id )
+      {
+         $p_source_row = $specmanagement_database_api->get_source_row( $version_spec_bug_id );
+         if ( is_null( $p_source_row[2] ) )
+         {
+            $specmanagement_database_api->update_source_row( $version_spec_bug_id, $p_version_id, '' );
+         }
+      }
       $work_packages = $specmanagement_database_api->get_document_spec_workpackages( $p_version_id );
       asort( $work_packages );
       $no_work_package_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs( $p_version_id, '' );
@@ -366,7 +374,7 @@ function print_document_head( $type_string, $version_id, $allRelevantBugs, $prin
    $specmanagement_database_api = new specmanagement_database_api();
    $project_id = helper_get_current_project();
    $parent_project_id = $specmanagement_database_api->get_main_project_by_hierarchy( $project_id );
-   $versions = version_get_all_rows( $project_id );
+   $versions = version_get_all_rows_with_subs( $project_id, null, null );
    $act_version = version_get( $version_id );
    $head_project_id = $project_id;
    if ( $parent_project_id == 0 )

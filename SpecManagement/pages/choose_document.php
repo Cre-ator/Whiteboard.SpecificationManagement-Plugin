@@ -16,7 +16,7 @@ function calculate_page_content()
    }
 
    echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
-   html_page_top1( 'select_doc_title' );
+   html_page_top1( plugin_lang_get( 'select_doc_title' ) );
    html_page_top2();
    if ( plugin_is_installed( 'WhiteboardMenu' ) )
    {

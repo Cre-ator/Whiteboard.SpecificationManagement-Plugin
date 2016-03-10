@@ -190,7 +190,8 @@ class specmanagement_print_api
 
       $this->printRow();
       echo '<td class="category">';
-      $this->print_work_package_description();
+      echo plugin_lang_get( 'bug_view_specification_wpg' ) . '<br />';
+      echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
       echo '</td>';
       echo '<td colspan="5">';
       echo '<input type="text" value="' . $work_package . '" id="work_package" name="work_package" list="work_packages"/>';
@@ -232,7 +233,8 @@ class specmanagement_print_api
 
       $this->printRow();
       echo '<td class="category">';
-      $this->print_work_package_description();
+      echo plugin_lang_get( 'bug_view_specification_wpg' ) . '<br />';
+      echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
       echo '</td>';
       echo '<td colspan="5" id="work_package">' . $work_package . '&nbsp</td>';
       echo '</tr>';
@@ -257,7 +259,8 @@ class specmanagement_print_api
          $this->printRow();
          echo '<td class="category">';
          echo '<label><span>';
-         $this->print_work_package_description();
+         echo plugin_lang_get( 'bug_view_specification_wpg' ) . '<br />';
+         echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
          echo '</span></label>';
          echo '</td>';
          echo '<td>';
@@ -293,7 +296,8 @@ class specmanagement_print_api
       {
          echo '<div class="field-container" > ';
          echo '<label><span >';
-         $this->print_work_package_description();
+         echo plugin_lang_get( 'bug_view_specification_wpg' ) . '<br />';
+         echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
          echo ' </span ></label > ';
          echo '<span class="input" > ';
          echo '<input type = "text" id = "work_package" name = "work_package" list = "work_packages" />';
@@ -319,16 +323,6 @@ class specmanagement_print_api
          echo '<span class="label-style" ></span > ';
          echo '</div > ';
       }
-   }
-
-   function print_work_package_description()
-   {
-      echo '<a class="rcv_tooltip"><div class="tooltip">';
-      echo plugin_lang_get( 'bug_view_specification_wpg' ) . '&nbsp' . '[i]';
-      echo '<span><div class="rcv_tooltip_content">';
-      echo plugin_lang_get( 'bug_view_work_package_description' );
-      echo '</div></span>';
-      echo '</div></a>';
    }
 
    # List the attachments belonging to the specified bug.  This is used from within

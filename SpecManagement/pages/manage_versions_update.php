@@ -35,26 +35,27 @@ if ( $update && isset( $_POST['version_ids'] ) )
    $type = $_POST['type'];
    $description = $_POST['description'];
 
-   for ( $version_id = 0; $version_id < count( $version_ids ); $version_id++ )
+   for ( $version_index = 0; $version_index < count( $version_ids ); $version_index++ )
    {
-      $version = version_get( $version_ids[$version_id] );
-      $project_id = helper_get_current_project();
+      $version = version_get( $version_ids[$version_index] );
+      $version_id = $version->id;
+      $project_id = version_get_field( $version_id, 'project_id' );
 
       $released = null;
       $obsolete = null;
 
-      if ( isset( $_POST['released' . $version_id] ) )
+      if ( isset( $_POST['released' . $version_index] ) )
       {
-         $released = $_POST['released' . $version_id];
+         $released = $_POST['released' . $version_index];
       }
-      if ( isset( $_POST['obsolete' . $version_id] ) )
+      if ( isset( $_POST['obsolete' . $version_index] ) )
       {
-         $obsolete = $_POST['obsolete' . $version_id];
+         $obsolete = $_POST['obsolete' . $version_index];
       }
 
       if ( !is_null( $versions ) )
       {
-         $new_version = $versions[$version_id];
+         $new_version = $versions[$version_index];
          $version->version = trim( $new_version );
       }
 
@@ -78,33 +79,33 @@ if ( $update && isset( $_POST['version_ids'] ) )
 
       if ( !is_null( $date_order ) )
       {
-         $new_date_order = $date_order[$version_id];
+         $new_date_order = $date_order[$version_index];
          $version->date_order = $new_date_order;
       }
 
       if ( !is_null( $type ) )
       {
-         $new_type = $type[$version_id];
+         $new_type = $type[$version_index];
          if ( strlen( $new_type ) > 0 )
          {
             $new_type_id = $specmanagement_database_api->get_type_id( $new_type );
-            $specmanagement_database_api->update_version_associated_type( $project_id, $version_ids[$version_id], $new_type_id );
+            $specmanagement_database_api->update_version_associated_type( $project_id, $version_ids[$version_index], $new_type_id );
          }
          else
          {
-            $specmanagement_database_api->update_version_associated_type( $project_id, $version_ids[$version_id], 9999 );
+            $specmanagement_database_api->update_version_associated_type( $project_id, $version_ids[$version_index], 9999 );
          }
       }
 
       if ( !is_null( $description ) )
       {
-         $new_description = $description[$version_id];
+         $new_description = $description[$version_index];
          $version->description = $new_description;
       }
 
       version_update( $version );
 
-      event_signal( 'EVENT_MANAGE_VERSION_UPDATE', array( $version->id ) );
+      event_signal( 'EVENT_MANAGE_VERSION_UPDATE', array( $version_id ) );
    }
 }
 

@@ -41,6 +41,7 @@ else
 function calculate_page_content( $print_flag )
 {
    $specmanagement_database_api = new specmanagement_database_api();
+   $specmanagement_print_api = new specmanagement_print_api();
    $version_id = $_POST['version_id'];
    $version_spec_bug_ids = $specmanagement_database_api->get_version_spec_bugs( version_get_field( $version_id, 'version' ) );
    if ( !is_null( $version_spec_bug_ids ) )
@@ -73,7 +74,12 @@ function calculate_page_content( $print_flag )
    }
    else
    {
-      echo '<br/><table class="width60"><tr><td class="center"> ' . plugin_lang_get( 'editor_no_issues' ) . ' </td></tr></table>';
+      echo '<br/>';
+      print_editor_table_head( $print_flag );
+      echo '<tr><td class="center">';
+      echo plugin_lang_get( 'editor_no_issues' );
+      echo '</td></tr>';
+      $specmanagement_print_api->printTableFoot();
    }
 }
 

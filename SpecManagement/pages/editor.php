@@ -366,7 +366,7 @@ function print_document_head( $type_string, $version_id, $allRelevantBugs, $prin
    $specmanagement_database_api = new specmanagement_database_api();
    $project_id = helper_get_current_project();
    $parent_project_id = $specmanagement_database_api->get_main_project_by_hierarchy( $project_id );
-   $versions = version_get_all_rows( $project_id );
+   $versions = version_get_all_rows_with_subs( $project_id, null, null );
    $act_version = version_get( $version_id );
    $head_project_id = $project_id;
    if ( $parent_project_id == 0 )

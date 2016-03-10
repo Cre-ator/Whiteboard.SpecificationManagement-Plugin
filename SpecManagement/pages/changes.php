@@ -24,7 +24,7 @@ function calculate_changes()
    $new_version = $specified_versions[1];
 
    $specmanagement_print_api->print_page_head( plugin_lang_get( 'changes_title' ) . ': ' . $old_version->version . ' / ' . $new_version->version );
-   $specmanagement_print_api->printTableTop( '60' );
+   echo '<table class="editor">';
    print_changes_table_head( $old_version, $new_version );
    print_changes_table_body( $old_version, $new_version );
    $specmanagement_print_api->printTableFoot();

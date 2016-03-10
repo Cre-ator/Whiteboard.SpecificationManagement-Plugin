@@ -44,7 +44,7 @@ function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues 
 {
    $specmanagement_print_api = new specmanagement_print_api();
 
-   html_page_top1( plugin_lang_get( 'versview_thead' ) );
+   html_page_top1( plugin_lang_get( 'menu_versview' ) );
    echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
    if ( !$print_flag )
    {
@@ -278,7 +278,7 @@ function print_thead_headrow( $obsolete_flag, $show_zero_issues, $print_flag, $a
    echo '<tr>';
    if ( !$print_flag )
    {
-      echo '<td class="form-title" colspan="' . ( COLS + $amount_stat_columns - 5 ) . '">' . plugin_lang_get( 'versview_thead' ) . '</td>';
+      echo '<td class="form-title" colspan="' . ( COLS + $amount_stat_columns - 5 ) . '">' . plugin_lang_get( 'menu_versview' ) . '</td>';
       echo '<td colspan="4"><form action="' . plugin_page( 'version_view' ) . '" method="post">';
       print_thead_headrow_obsoletebutton( $obsolete_flag );
       print_thead_headrow_showzeroissuebutton( $show_zero_issues );

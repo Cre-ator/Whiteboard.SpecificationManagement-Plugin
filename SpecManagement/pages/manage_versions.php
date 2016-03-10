@@ -25,7 +25,7 @@ if ( isset( $_POST['edit'] ) )
 /**
  * Page content
  */
-$specmanagement_print_api->print_page_head( plugin_lang_get( 'manversions_title' ) );
+$specmanagement_print_api->print_page_head( plugin_lang_get( 'menu_manversions' ) );
 echo '<div align="center">';
 echo '<hr size="1" width="100%" />';
 print_table( $edit_page, $obsolete_flag );
@@ -292,7 +292,7 @@ function print_tablehead( $edit_page, $obsolete_flag )
    echo '<thead>';
    echo '<tr>';
    echo '<td class="form-title" colspan="4">';
-   echo plugin_lang_get( 'manversions_thead' );
+   echo plugin_lang_get( 'menu_manversions' );
    echo '</td>';
    if ( !$edit_page )
    {

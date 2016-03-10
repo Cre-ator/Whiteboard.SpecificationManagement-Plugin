@@ -9,7 +9,7 @@ $s_plugin_SpecManagement_bug_view_planned_time = 'Geplante Dauer';
 $s_plugin_SpecManagement_bug_view_work_package_description = 'Arbeitspakete dienen der Definition von (Unter)-Kapiteln. Ein Unterkapitel wird durch ein "/" gekennzeichnet. Beispiel: Kapitel/Unterkapitel/...';
 
 /* Configuration Page */
-$s_plugin_SpecManagement_config_title = 'SpecManagement - Einstellungen';
+$s_plugin_SpecManagement_config_title = 'SpecificationManagement - Einstellungen';
 /* --------------- */
 $s_plugin_SpecManagement_config_caption = 'Allgemeine Einstellungen';
 $s_plugin_SpecManagement_config_accesslevel = 'Zugriffslevel für Plugin';
@@ -32,13 +32,13 @@ $s_plugin_SpecManagement_config_change = 'Ändern';
 /* --------------- */
 $s_plugin_SpecManagement_config_type = 'Dokumenttypen anpassen';
 /* --------------- */
-$s_plugin_SpecManagement_config_reset_title = 'SpecManagement - Alle Plugin Daten entfernen';
+$s_plugin_SpecManagement_config_reset_title = 'SpecificationManagement - Alle Plugin Daten entfernen';
 $s_plugin_SpecManagement_config_reset_expl = 'Achtung, wenn Sie fortfahren werden alle im Plugin hinterlegten Daten unwiderruflich gelöscht. Fortfahren?';
 $s_plugin_SpecManagement_config_reset_conf = 'Fortfahren';
 $s_plugin_SpecManagement_config_reset_dont = 'Abbrechen';
 
 /* Choose Doc Page */
-$s_plugin_SpecManagement_select_doc_title = 'SpecManagement - Dokument erzeugen';
+$s_plugin_SpecManagement_select_doc_title = 'Dokument erzeugen';
 $s_plugin_SpecManagement_select_doc = 'Dokumentauswahl';
 $s_plugin_SpecManagement_select_type = 'Dokument:';
 $s_plugin_SpecManagement_select_version = 'Dokumentversion:';
@@ -53,11 +53,11 @@ $s_plugin_SpecManagement_menu_versview = 'Statistik und Fortschritt';
 $s_plugin_SpecManagement_menu_versgraph = 'Graph';
 
 /* Editor Area */
-$s_plugin_SpecManagement_editor_title = 'SpecManagement';
+$s_plugin_SpecManagement_editor_title = 'SpecificationManagement';
 $s_plugin_SpecManagement_editor_work_package_duration = 'Geplante Dauer für Fertigstellung';
 $s_plugin_SpecManagement_editor_work_package_duration_null = '-nicht spezifiziert-';
 $s_plugin_SpecManagement_editor_no_workpackage = 'Allgemeine Einträge';
-$s_plugin_SpecManagement_editor_duration_unit = 'Personentage';
+$s_plugin_SpecManagement_editor_duration_unit = 'Personenstunden';
 $s_plugin_SpecManagement_editor_bug_duration = 'Dauer';
 $s_plugin_SpecManagement_editor_bug_attachments = 'Angehängte Dateien';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
@@ -86,7 +86,7 @@ $s_plugin_SpecManagement_mantypes_title = 'Document-Typenverwaltung';
 $s_plugin_SpecManagement_mantypes_thead = 'Typenverwaltung';
 $s_plugin_SpecManagement_mantypes_edit = 'Typen bearbeiten';
 $s_plugin_SpecManagement_mantypes_to_pl_cfg = 'Zu Plugin-Konfiguration';
-$s_plugin_SpecManagement_mantypes_show_print_duration = 'Geplante Dauer [PT] im Dokument anzeigen?';
+$s_plugin_SpecManagement_mantypes_show_print_duration = 'Geplante Dauer im Dokument anzeigen?';
 $s_plugin_SpecManagement_mantypes_show_expenses_overview = 'Aufwandsübersicht im Dokument anzeigen?';
 $s_plugin_SpecManagement_mantypes_show_directory = 'Inhaltsverzeichnis im Dokument anzeigen?';
 

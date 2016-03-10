@@ -9,7 +9,7 @@ $s_plugin_SpecManagement_bug_view_planned_time = 'Planned Duration';
 $s_plugin_SpecManagement_bug_view_work_package_description = 'A workpackage defines a chapter in the document. chapters/subchapters are defined with a "/". e. g: chapter/subchapter/...';
 
 /* Configuration Page */
-$s_plugin_SpecManagement_config_title = 'SpecManagement - Configuration';
+$s_plugin_SpecManagement_config_title = 'SpecificationManagement - Configuration';
 /* --------------- */
 $s_plugin_SpecManagement_config_caption = 'General Configuration';
 $s_plugin_SpecManagement_config_accesslevel = 'Access Level';
@@ -32,13 +32,13 @@ $s_plugin_SpecManagement_config_change = 'Change';
 /* --------------- */
 $s_plugin_SpecManagement_config_type = 'configure document types';
 /* --------------- */
-$s_plugin_SpecManagement_config_reset_title = 'SpecManagement - Remove All Plugin Settings And Data';
+$s_plugin_SpecManagement_config_reset_title = 'SpecificationManagement - Remove All Plugin Settings And Data';
 $s_plugin_SpecManagement_config_reset_expl = 'Caution, if you proceed all data stored in the plugin are permanently deleted. Continue?';
 $s_plugin_SpecManagement_config_reset_conf = 'Continue';
 $s_plugin_SpecManagement_config_reset_dont = 'Abort';
 
 /* Choose Doc Page */
-$s_plugin_SpecManagement_select_doc_title = 'SpecManagement - Create Document';
+$s_plugin_SpecManagement_select_doc_title = 'SpecificationManagement - Create Document';
 $s_plugin_SpecManagement_select_type = 'Document:';
 $s_plugin_SpecManagement_select_version = 'Document Version:';
 $s_plugin_SpecManagement_select_confirm = 'Generate Selected Document';
@@ -57,7 +57,7 @@ $s_plugin_SpecManagement_editor_title = 'SpecManagement';
 $s_plugin_SpecManagement_editor_work_package_duration = 'Planned Duration for Completion';
 $s_plugin_SpecManagement_editor_work_package_duration_null = '-not specified-';
 $s_plugin_SpecManagement_editor_no_workpackage = 'General Issues';
-$s_plugin_SpecManagement_editor_duration_unit = 'Days per Person';
+$s_plugin_SpecManagement_editor_duration_unit = 'Hours per Person';
 $s_plugin_SpecManagement_editor_bug_duration = 'Duration';
 $s_plugin_SpecManagement_editor_bug_attachments = 'Attached Files';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'There are notes available';

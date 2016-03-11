@@ -63,6 +63,7 @@ $s_plugin_SpecManagement_editor_bug_attachments = 'Attached Files';
 $s_plugin_SpecManagement_editor_bug_notes_note = 'There are notes available';
 $s_plugin_SpecManagement_editor_expenses_overview = 'Expenses Overview';
 $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Total';
+$s_plugin_SpecManagement_editor_expenses_overview_zero = 'not defined';
 $s_plugin_SpecManagement_editor_no_issues = 'There are no issues assigned to this version.';
 
 $s_plugin_SpecManagement_editor_directory = 'Directory';

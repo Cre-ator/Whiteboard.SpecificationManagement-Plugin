@@ -641,6 +641,7 @@ class specmanagement_database_api
 
    /**
     * @param $bug_id
+    * @return null
     */
    public function get_workpackage_by_bug_id( $bug_id )
    {
@@ -661,6 +662,7 @@ class specmanagement_database_api
             return $work_package;
          }
       }
+      return null;
    }
 
    /**
@@ -1324,8 +1326,12 @@ class specmanagement_database_api
             }
          }
       }
+      $output_change = '';
 
-      $output_change = $bug_history_events[$min_time_difference_event_id]['change'];
+      if ( key_exists( $min_time_difference_event_id, $bug_history_events ) )
+      {
+         $output_change = $bug_history_events[$min_time_difference_event_id]['change'];
+      }
       $output_values = explode( ' => ', $output_change );
 
       if ( $min_time_difference <= 0 )

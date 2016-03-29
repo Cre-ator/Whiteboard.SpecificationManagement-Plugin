@@ -21,7 +21,7 @@ class specmanagement_print_api
       echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
       html_page_top1( $string );
       html_page_top2();
-      if ( plugin_is_installed( 'WhiteboardMenu' ) )
+      if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists( config_get_global( 'plugin_path' ) . 'WhiteboardMenu' ) )
       {
          require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
          $whiteboard_print_api = new whiteboard_print_api();

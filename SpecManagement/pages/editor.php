@@ -680,7 +680,7 @@ function print_expenses_overview_body( $work_packages, $p_version_id, $no_workpa
          $document_duration += $duration;
          echo '<tr>';
          echo '<td>' . $work_package . '</td>';
-         print_exp_ov_duration( $duration );
+         echo '<td class="duration">' . $duration . '</td>';
          echo '</tr>';
       }
    }
@@ -701,7 +701,7 @@ function print_expenses_overview_body( $work_packages, $p_version_id, $no_workpa
       $document_duration += $sum_no_work_package_bug_duration;
       echo '<tr>';
       echo '<td>' . plugin_lang_get( 'editor_no_workpackage' ) . '</td>';
-      print_exp_ov_duration( $sum_no_work_package_bug_duration );
+      echo '<td class="duration">' . $sum_no_work_package_bug_duration . '</td>';
       echo '</tr>';
    }
    echo '<tr>';
@@ -711,24 +711,9 @@ function print_expenses_overview_body( $work_packages, $p_version_id, $no_workpa
    echo '<td>';
    echo plugin_lang_get( 'editor_expenses_overview_sum' ) . ':';
    echo '</td>';
-   print_exp_ov_duration( $document_duration );
+   echo '<td class="duration">' . $document_duration . '</td>';
    echo '</tr>';
    echo '</tbody>';
-}
-
-/**
- * @param $duration
- */
-function print_exp_ov_duration( $duration )
-{
-   if ( $duration == 0 )
-   {
-      echo '<td class="duration">' . plugin_lang_get( 'editor_expenses_overview_zero' ) . '</td>';
-   }
-   else
-   {
-      echo '<td class="duration">' . $duration . '</td>';
-   }
 }
 
 /**
@@ -810,14 +795,7 @@ function generate_content( $p_version_id, $work_packages, $no_work_package_bug_i
    }
 
    /** Iterate through issues without defined work package */
-   if ( !empty( $chapter_counter_array ) )
-   {
-      $chapter_prefix = $chapter_counter_array[0] + 1;
-   }
-   else
-   {
-      $chapter_prefix = 1;
-   }
+   $chapter_prefix = $chapter_counter_array[0] + 1;
    $chapter_suffix = plugin_lang_get( 'editor_no_workpackage' );
    if ( count( $no_work_package_bug_ids ) > 0 )
    {

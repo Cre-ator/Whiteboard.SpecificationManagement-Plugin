@@ -18,8 +18,8 @@ class specmanagement_print_api
     */
    public function print_page_head( $string )
    {
-      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
       html_page_top1( $string );
+      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/specmanagement.css">';
       html_page_top2();
       if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists( config_get_global( 'plugin_path' ) . 'WhiteboardMenu' ) )
       {

@@ -228,6 +228,7 @@ function calculate_status( $relevant_issue_ids )
 /**
  * @param $version
  * @param $reachable_issue_ids
+ * @return mixed
  */
 function calculate_relevant_issues( $version, $reachable_issue_ids )
 {

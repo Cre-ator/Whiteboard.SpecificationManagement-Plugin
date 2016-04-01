@@ -1325,8 +1325,13 @@ class specmanagement_database_api
          }
       }
 
-      $output_change = $bug_history_events[$min_time_difference_event_id]['change'];
-      $output_values = explode( ' => ', $output_change );
+      $output_change = null;
+      $output_values = null;
+      if ( !empty( $bug_history_events ) )
+      {
+         $output_change = $bug_history_events[$min_time_difference_event_id]['change'];
+         $output_values = explode( ' => ', $output_change );
+      }
 
       if ( $min_time_difference <= 0 )
       {

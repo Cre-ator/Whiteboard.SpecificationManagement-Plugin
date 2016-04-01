@@ -13,7 +13,7 @@ class PDF extends FPDF
       $version_id = $_POST['version_id'];
       $type_string = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version_id ) );
       // Logo
-//      $this->Image( 'logo.png', 10, 6, 30 );
+      $this->Image( SPECMANAGEMENT_FILES_URI . 'logo.png', 10, 6, 30 );
       // Arial bold 15
       $this->SetFont( 'Arial', 'B', 15 );
       // Move to the right
@@ -33,6 +33,36 @@ class PDF extends FPDF
       $this->SetFont( 'Arial', 'I', 8 );
       // Page number
       $this->Cell( 0, 10, 'Page ' . $this->PageNo() . '/{nb}', 0, 0, 'C' );
+   }
+
+   function ChapterTitle( $num, $label )
+   {
+      // Arial 12
+      $this->SetFont( 'Arial', '', 12 );
+      // Hintergrundfarbe
+      $this->SetFillColor( 192, 192, 192 );
+      // Titel
+      $this->Cell( 0, 6, "$num $label", 0, 1, 'L', 1 );
+      // Zeilenumbruch
+      $this->Ln( 3 );
+   }
+
+   function Title( $label )
+   {
+      // Arial 12
+      $this->SetFont( 'Arial', '', 12 );
+      // Hintergrundfarbe
+      $this->SetFillColor( 192, 192, 192 );
+      // Titel
+      $this->Cell( 0, 6, "$label", 0, 1, 'L', 1 );
+      // Zeilenumbruch
+      $this->Ln( 3 );
+   }
+
+   function Spacer( $level )
+   {
+      // Zeilenumbruch
+      $this->Ln( $level );
    }
 }
 
@@ -74,12 +104,13 @@ if ( !is_null( $version_spec_bug_ids ) )
    /** generate and print directory */
    if ( $type_options[2] == '1' )
    {
-      $pdf->Cell( 0, 10, plugin_lang_get( 'editor_directory' ), 1, 1 );
+      $pdf->Title( plugin_lang_get( 'editor_directory' ) );
       /** @var detail_flag = false :: show detailed bug-information */
       $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], false );
+      $pdf->Spacer( 20 );
    }
 
-   $pdf->Cell( 0, 10, 'content', 1, 1 );
+   $pdf->Title( 'content' );
    $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], true );
 
 
@@ -129,7 +160,7 @@ function generate_content( PDF $pdf, $p_version_id, $work_packages, $no_work_pac
             $chapter_prefix = $chapter_prefix_data[1];
             $chapter_suffix = $specmanagement_editor_api->generate_chapter_suffix( $chapters, $chapter_depth );
 
-//            $pdf->Cell( 200, 10, $chapter_prefix . ' ' . $chapter_suffix, 0, 1 );
+            $pdf->ChapterTitle( $chapter_prefix, utf8_decode( $chapter_suffix ) );
             process_content( $pdf, $work_package_spec_bug_ids, $version_date, $chapter_prefix, $option_show_duration, $detail_flag );
             $last_chapter_depth = $chapter_depth;
          }
@@ -141,7 +172,7 @@ function generate_content( PDF $pdf, $p_version_id, $work_packages, $no_work_pac
    $chapter_suffix = plugin_lang_get( 'editor_no_workpackage' );
    if ( count( $no_work_package_bug_ids ) > 0 )
    {
-//      $pdf->Cell( 200, 10, $chapter_prefix . ' ' . $chapter_suffix, 0, 1 );
+      $pdf->ChapterTitle( $chapter_prefix, utf8_decode( $chapter_suffix ) );
       process_content( $pdf, $no_work_package_bug_ids, $version_date, $chapter_prefix, $option_show_duration, $detail_flag );
    }
 
@@ -167,23 +198,23 @@ function process_content( PDF $pdf, $bug_ids, $version_date, $chapter_prefix, $o
          $bug_data = $specmanagement_editor_api->calculate_bug_data( $bug_id, $version_date );
          if ( $detail_flag )
          {
-            $pdf->Cell( 0, 10, $chapter_prefix . '.' . $bug_counter . ' ' . bug_format_id( $bug_data[0] ), 0, 1 );
-            $pdf->Cell( 0, 10, string_display_line( trim( $bug_data[2] ) ), 0, 1 );
-            $pdf->Cell( 0, 10, string_display_links( trim( $bug_data[3] ) ), 0, 1 );
-            $pdf->Cell( 0, 10, string_display_links( trim( $bug_data[4] ) ), 0, 1 );
+            $pdf->MultiCell( 0, 10, $chapter_prefix . '.' . $bug_counter . ' ' . utf8_decode( string_display( $bug_data[1] ) . ' (' . bug_format_id( $bug_data[0] ) ) . ')', 0, 1 );
+            $pdf->MultiCell( 0, 10, string_display_line( trim( $bug_data[2] ) ), 0, 1 );
+            $pdf->MultiCell( 0, 10, string_display_links( trim( $bug_data[3] ) ), 0, 1 );
+            $pdf->MultiCell( 0, 10, string_display_links( trim( $bug_data[4] ) ), 0, 1 );
             if ( !empty( $bug_data[5] ) )
             {
                $attachment_count = file_bug_attachment_count( $bug_id );
-               $pdf->Cell( 0, 10, plugin_lang_get( 'editor_bug_attachments' ) . ' (' . $attachment_count . ')', 0, 1 );
+               $pdf->MultiCell( 0, 10, plugin_lang_get( 'editor_bug_attachments' ) . ' (' . $attachment_count . ')', 0, 1 );
             }
             if ( !is_null( $bug_data[6] ) && $bug_data[6] != 0 )
             {
-               $pdf->Cell( 0, 10, plugin_lang_get( 'editor_bug_notes_note' ) . ' (' . $bug_data[6] . ')', 0, 1 );
+               $pdf->MultiCell( 0, 10, plugin_lang_get( 'editor_bug_notes_note' ) . ' (' . $bug_data[6] . ')', 0, 1 );
             }
          }
          else
          {
-            $pdf->Cell( 200, 10, $chapter_prefix . '.' . $bug_counter . ' ' . string_display( $bug_data[1] ) . ' (' . bug_format_id( $bug_data[0] ) . ')', 0, 1 );
+            $pdf->Cell( 200, 10, $chapter_prefix . '.' . $bug_counter . ' ' . utf8_decode( string_display( $bug_data[1] ) . ' (' . bug_format_id( $bug_data[0] ) ) . ')', 0, 1 );
          }
          $bug_counter += 10;
       }

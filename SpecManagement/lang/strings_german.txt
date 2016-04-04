@@ -66,7 +66,8 @@ $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Summe';
 $s_plugin_SpecManagement_editor_no_issues = 'Diesem Dokument sind keine Einträge zugeordnet.';
 
 $s_plugin_SpecManagement_editor_directory = 'Inhaltsverzeichnis';
-$s_plugin_SpecManagement_editor_printpdf = 'In PDF drucken';
+$s_plugin_SpecManagement_editor_printpdf = 'PDF Drucken';
+$s_plugin_SpecManagement_editor_printhtml = 'HTML Drucken';
 
 /* Changes Area */
 $s_plugin_SpecManagement_changes_title = 'Änderungsprotokoll';

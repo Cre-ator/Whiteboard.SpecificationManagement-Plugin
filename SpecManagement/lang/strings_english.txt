@@ -66,7 +66,8 @@ $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Total';
 $s_plugin_SpecManagement_editor_no_issues = 'There are no issues assigned to this version.';
 
 $s_plugin_SpecManagement_editor_directory = 'Directory';
-$s_plugin_SpecManagement_editor_printpdf = 'Print to PDF';
+$s_plugin_SpecManagement_editor_printpdf = 'Print PDF';
+$s_plugin_SpecManagement_editor_printhtml = 'Print HTML';
 
 /* Changes Area */
 $s_plugin_SpecManagement_changes_title = 'Changes';

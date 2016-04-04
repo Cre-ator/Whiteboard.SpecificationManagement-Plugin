@@ -468,7 +468,7 @@ class specmanagement_editor_api
          echo '<form action="' . plugin_page( 'editor' ) . '" method="post">';
          echo '<span class="input">';
          echo '<input type="hidden" name="version_id" value="' . $version_id . '" />';
-         echo '<input type="submit" name="print" class="button" value="' . lang_get( 'print' ) . '"/>';
+         echo '<input type="submit" name="print" class="button" value="' . plugin_lang_get( 'editor_printhtml' ) . '"/>';
          echo '</span>';
          echo '</form>';
          echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editorpdf' ) . '">';

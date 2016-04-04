@@ -6,7 +6,9 @@ require_once SPECMANAGEMENT_FILES_URI . 'fpdf181/fpdf.php';
 
 class PDF extends FPDF
 {
-   // Page header
+   /**
+    * Page Header
+    */
    function Header()
    {
       $specmanagement_database_api = new specmanagement_database_api();
@@ -24,7 +26,9 @@ class PDF extends FPDF
       $this->Ln( 20 );
    }
 
-   // Page footer
+   /**
+    * Page Footer
+    */
    function Footer()
    {
       // Position at 1.5 cm from bottom
@@ -35,6 +39,11 @@ class PDF extends FPDF
       $this->Cell( 0, 10, 'Page ' . $this->PageNo() . '/{nb}', 0, 0, 'C' );
    }
 
+   /**
+    * Chapter Title Element
+    * @param $num
+    * @param $label
+    */
    function ChapterTitle( $num, $label )
    {
       // Arial 12
@@ -47,6 +56,10 @@ class PDF extends FPDF
       $this->Ln( 3 );
    }
 
+   /**
+    * Title Element
+    * @param $label
+    */
    function Title( $label )
    {
       // Arial 12
@@ -59,6 +72,10 @@ class PDF extends FPDF
       $this->Ln( 3 );
    }
 
+   /**
+    * Spacer
+    * @param $level
+    */
    function Spacer( $level )
    {
       // Zeilenumbruch
@@ -107,11 +124,21 @@ if ( !is_null( $version_spec_bug_ids ) )
       $pdf->Title( plugin_lang_get( 'editor_directory' ) );
       /** @var detail_flag = false :: show detailed bug-information */
       $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], false );
+      if ( $type_options[1] == '1' )
+      {
+         $pdf->Title( utf8_decode( plugin_lang_get( 'editor_expenses_overview' ) ) );
+      }
       $pdf->Spacer( 20 );
    }
 
-   $pdf->Title( 'content' );
    $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], true );
+   $pdf->Spacer( 20 );
+
+   if ( $type_options[1] == '1' )
+   {
+      $pdf->Title( utf8_decode( plugin_lang_get( 'editor_expenses_overview' ) ) );
+      $pdf = generate_expenses_overview( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids );
+   }
 
 
    /** ************************************************************************************************************** */
@@ -219,4 +246,85 @@ function process_content( PDF $pdf, $bug_ids, $version_date, $chapter_prefix, $o
          $bug_counter += 10;
       }
    }
+}
+
+/**
+ * @param $pdf
+ * @param $p_version_id
+ * @param $work_packages
+ * @param $no_work_package_bug_ids
+ * @return mixed
+ */
+function generate_expenses_overview( PDF $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids )
+{
+   $specmanagement_database_api = new specmanagement_database_api();
+   $document_duration = 0;
+
+   $table_column_widths = Array( 95, 95 );
+   $header = Array( plugin_lang_get( 'bug_view_specification_wpg' ), plugin_lang_get( 'bug_view_planned_time' ) . ' ( ' . plugin_lang_get( 'editor_duration_unit' ) . ')' );
+
+   /** Head */
+   for ( $head_column_index = 0; $head_column_index < count( $header ); $head_column_index++ )
+   {
+      $pdf->Cell( $table_column_widths[$head_column_index], 7, $header[$head_column_index], 1, 0, 'C' );
+   }
+   $pdf->Ln();
+
+   /** Body */
+   if ( $work_packages != null )
+   {
+      $document_duration = 0;
+      foreach ( $work_packages as $work_package )
+      {
+         /** go to next record, if work package is empty */
+         if ( strlen( $work_package ) == 0 )
+         {
+            continue;
+         }
+         $duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, $work_package );
+         if ( is_null( $duration ) )
+         {
+            $duration = 0;
+         }
+         $document_duration += $duration;
+
+         $pdf->Cell( $table_column_widths[0], 6, $work_package, 'LR' );
+         $pdf->Cell( $table_column_widths[1], 6, $duration, 'LR' );
+         $pdf->Ln();
+         // Closure line
+         $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
+         $pdf->Ln();
+      }
+   }
+
+   if ( count( $no_work_package_bug_ids ) > 0 )
+   {
+      $sum_no_work_package_bug_duration = 0;
+
+      foreach ( $no_work_package_bug_ids as $no_work_package_bug_id )
+      {
+         $no_work_package_bug_duration = $specmanagement_database_api->get_bug_duration( $no_work_package_bug_id );
+         if ( !is_null( $no_work_package_bug_duration ) )
+         {
+            $sum_no_work_package_bug_duration += $no_work_package_bug_duration;
+         }
+      }
+
+      $document_duration += $sum_no_work_package_bug_duration;
+
+      $pdf->Cell( $table_column_widths[0], 6, utf8_decode( plugin_lang_get( 'editor_no_workpackage' ) ), 'LR' );
+      $pdf->Cell( $table_column_widths[1], 6, $sum_no_work_package_bug_duration, 'LR' );
+      $pdf->Ln();
+      // Closure line
+      $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
+      $pdf->Ln();
+   }
+
+   $pdf->Cell( $table_column_widths[0], 6, plugin_lang_get( 'editor_expenses_overview_sum' ) . ':', 'LR' );
+   $pdf->Cell( $table_column_widths[1], 6, $document_duration, 'LR' );
+   $pdf->Ln();
+   // Closure line
+   $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
+
+   return $pdf;
 }

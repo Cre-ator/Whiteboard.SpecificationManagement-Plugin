@@ -728,6 +728,10 @@ class specmanagement_editor_api
                continue;
             }
             $duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, $work_package );
+            if ( is_null( $duration ) )
+            {
+               $duration = 0;
+            }
             $document_duration += $duration;
             echo '<tr>';
             echo '<td>' . $work_package . '</td>';

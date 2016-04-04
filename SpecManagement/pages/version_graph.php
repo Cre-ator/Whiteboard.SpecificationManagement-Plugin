@@ -21,7 +21,7 @@ function calculate_page_content( $print_flag )
    $specmanagement_print_api = new specmanagement_print_api();
 
    html_page_top1( plugin_lang_get( 'menu_versgraph' ) );
-   echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement.css">';
+   echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/specmanagement.css">';
    if ( !$print_flag )
    {
       html_page_top2();

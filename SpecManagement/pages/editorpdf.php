@@ -232,11 +232,18 @@ function process_content( PDF $pdf, $bug_ids, $version_date, $chapter_prefix, $o
             if ( !empty( $bug_data[5] ) )
             {
                $attachment_count = file_bug_attachment_count( $bug_id );
-               $pdf->MultiCell( 0, 10, plugin_lang_get( 'editor_bug_attachments' ) . ' (' . $attachment_count . ')', 0, 1 );
+               $pdf->MultiCell( 0, 10, utf8_decode( plugin_lang_get( 'editor_bug_attachments' ) ) . ' (' . $attachment_count . ')', 0, 1 );
+
+
+               $t_attachments = file_get_visible_attachments( $bug_id );
+               $t_attachments_count = count( $t_attachments );
+
+//               var_dump( $t_attachments );
+
             }
             if ( !is_null( $bug_data[6] ) && $bug_data[6] != 0 )
             {
-               $pdf->MultiCell( 0, 10, plugin_lang_get( 'editor_bug_notes_note' ) . ' (' . $bug_data[6] . ')', 0, 1 );
+               $pdf->MultiCell( 0, 10, utf8_decode( plugin_lang_get( 'editor_bug_notes_note' ) ) . ' (' . $bug_data[6] . ')', 0, 1 );
             }
          }
          else

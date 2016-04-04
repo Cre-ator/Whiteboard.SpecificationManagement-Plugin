@@ -41,18 +41,6 @@ function calculate_page_content()
    echo '</form>';
    echo '</td>';
 
-   $specmanagement_print_api->printCategoryField( 1, 1, 'select_type' );
-   echo '<td>';
-   echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editorpdf' ) . '">';
-   print_document_selection( $types );
-   $specmanagement_print_api->printRow();
-   echo '<td class="center" colspan="2">';
-   echo '<input type="submit" name="formSubmit" class="button" value="PDF Druck TEST"/>';
-   echo '</td>';
-   echo '</tr>';
-   echo '</form>';
-   echo '</td>';
-
    $specmanagement_print_api->printTableFoot();
    html_page_bottom1();
 }

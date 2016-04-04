@@ -43,17 +43,23 @@ class PDF extends FPDF
     * Chapter Title Element
     * @param $num
     * @param $label
+    * @param $option_show_duration
+    * @param $chapter_duration
     */
-   function ChapterTitle( $num, $label )
+   function ChapterTitle( $num, $label, $option_show_duration, $chapter_duration )
    {
       // Arial 12
       $this->SetFont( 'Arial', '', 12 );
       // Hintergrundfarbe
       $this->SetFillColor( 192, 192, 192 );
       // Titel
-      $this->Cell( 0, 6, "$num $label", 0, 1, 'L', 1 );
+      $this->Cell( 95, 6, "$num $label" );
+      if ( $option_show_duration == '1' && $chapter_duration > 0 )
+      {
+         $this->Cell( 95, 6, '[' . utf8_decode( plugin_lang_get( 'editor_work_package_duration' ) ) . ': ' . $chapter_duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']', '', 0, 0 );
+      }
       // Zeilenumbruch
-      $this->Ln( 3 );
+      $this->Ln( 8 );
    }
 
    /**
@@ -70,16 +76,6 @@ class PDF extends FPDF
       $this->Cell( 0, 6, "$label", 0, 1, 'L', 1 );
       // Zeilenumbruch
       $this->Ln( 3 );
-   }
-
-   /**
-    * Spacer
-    * @param $level
-    */
-   function Spacer( $level )
-   {
-      // Zeilenumbruch
-      $this->Ln( $level );
    }
 }
 
@@ -123,16 +119,16 @@ if ( !is_null( $version_spec_bug_ids ) )
    {
       $pdf->Title( plugin_lang_get( 'editor_directory' ) );
       /** @var detail_flag = false :: show detailed bug-information */
-      $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], false );
+      $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, false, false );
       if ( $type_options[1] == '1' )
       {
          $pdf->Title( utf8_decode( plugin_lang_get( 'editor_expenses_overview' ) ) );
       }
-      $pdf->Spacer( 20 );
+      $pdf->Ln( 20 );
    }
 
    $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], true );
-   $pdf->Spacer( 20 );
+   $pdf->Ln( 20 );
 
    if ( $type_options[1] == '1' )
    {
@@ -186,11 +182,13 @@ function generate_content( PDF $pdf, $p_version_id, $work_packages, $no_work_pac
             $chapter_counter_array = $chapter_prefix_data[0];
             $chapter_prefix = $chapter_prefix_data[1];
             $chapter_suffix = $specmanagement_editor_api->generate_chapter_suffix( $chapters, $chapter_depth );
+            $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, $work_package );
 
-            $pdf->ChapterTitle( $chapter_prefix, utf8_decode( $chapter_suffix ) );
+            $pdf->ChapterTitle( $chapter_prefix, utf8_decode( $chapter_suffix ), $option_show_duration, $chapter_duration );
             process_content( $pdf, $work_package_spec_bug_ids, $version_date, $chapter_prefix, $option_show_duration, $detail_flag );
             $last_chapter_depth = $chapter_depth;
          }
+         $pdf->Ln( 7 );
       }
    }
 
@@ -199,7 +197,8 @@ function generate_content( PDF $pdf, $p_version_id, $work_packages, $no_work_pac
    $chapter_suffix = plugin_lang_get( 'editor_no_workpackage' );
    if ( count( $no_work_package_bug_ids ) > 0 )
    {
-      $pdf->ChapterTitle( $chapter_prefix, utf8_decode( $chapter_suffix ) );
+      $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, '' );
+      $pdf->ChapterTitle( $chapter_prefix, utf8_decode( $chapter_suffix ), $option_show_duration, $chapter_duration );
       process_content( $pdf, $no_work_package_bug_ids, $version_date, $chapter_prefix, $option_show_duration, $detail_flag );
    }
 
@@ -225,7 +224,12 @@ function process_content( PDF $pdf, $bug_ids, $version_date, $chapter_prefix, $o
          $bug_data = $specmanagement_editor_api->calculate_bug_data( $bug_id, $version_date );
          if ( $detail_flag )
          {
-            $pdf->MultiCell( 0, 10, $chapter_prefix . '.' . $bug_counter . ' ' . utf8_decode( string_display( $bug_data[1] ) . ' (' . bug_format_id( $bug_data[0] ) ) . ')', 0, 1 );
+            $pdf->Cell( 95, 10, $chapter_prefix . '.' . $bug_counter . ' ' . utf8_decode( string_display( $bug_data[1] ) . ' (' . bug_format_id( $bug_data[0] ) ) . ')' );
+            if ( $option_show_duration == '1' && !( $bug_data[7] == 0 || is_null( $bug_data[7] ) ) )
+            {
+               $pdf->Cell( 95, 10, plugin_lang_get( 'editor_bug_duration' ) . ': ' . $bug_data[7] . ' ' . plugin_lang_get( 'editor_duration_unit' ), '', 0, 0 );
+            }
+            $pdf->Ln();
             $pdf->MultiCell( 0, 10, string_display_line( trim( $bug_data[2] ) ), 0, 1 );
             $pdf->MultiCell( 0, 10, string_display_links( trim( $bug_data[3] ) ), 0, 1 );
             $pdf->MultiCell( 0, 10, string_display_links( trim( $bug_data[4] ) ), 0, 1 );
@@ -234,12 +238,7 @@ function process_content( PDF $pdf, $bug_ids, $version_date, $chapter_prefix, $o
                $attachment_count = file_bug_attachment_count( $bug_id );
                $pdf->MultiCell( 0, 10, utf8_decode( plugin_lang_get( 'editor_bug_attachments' ) ) . ' (' . $attachment_count . ')', 0, 1 );
 
-
                $t_attachments = file_get_visible_attachments( $bug_id );
-               $t_attachments_count = count( $t_attachments );
-
-//               var_dump( $t_attachments );
-
             }
             if ( !is_null( $bug_data[6] ) && $bug_data[6] != 0 )
             {
@@ -296,7 +295,7 @@ function generate_expenses_overview( PDF $pdf, $p_version_id, $work_packages, $n
          $document_duration += $duration;
 
          $pdf->Cell( $table_column_widths[0], 6, $work_package, 'LR' );
-         $pdf->Cell( $table_column_widths[1], 6, $duration, 'LR' );
+         $pdf->Cell( $table_column_widths[1], 6, $duration, 'LR', 0, 0 );
          $pdf->Ln();
          // Closure line
          $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
@@ -320,7 +319,7 @@ function generate_expenses_overview( PDF $pdf, $p_version_id, $work_packages, $n
       $document_duration += $sum_no_work_package_bug_duration;
 
       $pdf->Cell( $table_column_widths[0], 6, utf8_decode( plugin_lang_get( 'editor_no_workpackage' ) ), 'LR' );
-      $pdf->Cell( $table_column_widths[1], 6, $sum_no_work_package_bug_duration, 'LR' );
+      $pdf->Cell( $table_column_widths[1], 6, $sum_no_work_package_bug_duration, 'LR', 0, 0 );
       $pdf->Ln();
       // Closure line
       $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
@@ -328,7 +327,7 @@ function generate_expenses_overview( PDF $pdf, $p_version_id, $work_packages, $n
    }
 
    $pdf->Cell( $table_column_widths[0], 6, plugin_lang_get( 'editor_expenses_overview_sum' ) . ':', 'LR' );
-   $pdf->Cell( $table_column_widths[1], 6, $document_duration, 'LR' );
+   $pdf->Cell( $table_column_widths[1], 6, $document_duration, 'LR', 0, 0 );
    $pdf->Ln();
    // Closure line
    $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );

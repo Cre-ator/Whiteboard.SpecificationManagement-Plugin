@@ -179,7 +179,7 @@ class specmanagement_print_api
     */
    public function printBugUpdateFields( $type, $work_package, $ptime )
    {
-      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement_tooltip.css">';
+      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/specmanagement_tooltip.css">';
       $specmanagement_database_api = new specmanagement_database_api();
       $work_packages = $specmanagement_database_api->get_project_spec_workpackages();
 
@@ -191,7 +191,7 @@ class specmanagement_print_api
       $this->printRow();
       echo '<td class="category">';
       echo plugin_lang_get( 'bug_view_specification_wpg' ) . '<br />';
-      echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
+      $this->print_workpackage_description_field();
       echo '</td>';
       echo '<td colspan="5">';
       echo '<input type="text" value="' . $work_package . '" id="work_package" name="work_package" list="work_packages"/>';
@@ -225,7 +225,7 @@ class specmanagement_print_api
     */
    public function printBugViewFields( $type, $work_package, $ptime )
    {
-      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement_tooltip.css">';
+      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/specmanagement_tooltip.css">';
       $this->printRow();
       echo '<td class="category">' . plugin_lang_get( 'bug_view_specification_req' ) . '</td>';
       echo '<td colspan="5" id="requirement">' . $type . '</td>';
@@ -234,7 +234,7 @@ class specmanagement_print_api
       $this->printRow();
       echo '<td class="category">';
       echo plugin_lang_get( 'bug_view_specification_wpg' ) . '<br />';
-      echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
+      $this->print_workpackage_description_field();
       echo '</td>';
       echo '<td colspan="5" id="work_package">' . $work_package . '&nbsp</td>';
       echo '</tr>';
@@ -250,7 +250,7 @@ class specmanagement_print_api
     */
    public function printBugReportFields()
    {
-      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_FILES_URI . 'specmanagement_tooltip.css">';
+      echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/specmanagement_tooltip.css">';
       $specmanagement_database_api = new specmanagement_database_api();
       $work_packages = $specmanagement_database_api->get_project_spec_workpackages();
 
@@ -260,7 +260,7 @@ class specmanagement_print_api
          echo '<td class="category">';
          echo '<label><span>';
          echo plugin_lang_get( 'bug_view_specification_wpg' ) . '<br />';
-         echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
+         $this->print_workpackage_description_field();
          echo '</span></label>';
          echo '</td>';
          echo '<td>';
@@ -297,7 +297,7 @@ class specmanagement_print_api
          echo '<div class="field-container" > ';
          echo '<label><span >';
          echo plugin_lang_get( 'bug_view_specification_wpg' ) . '<br />';
-         echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
+         $this->print_workpackage_description_field();
          echo ' </span ></label > ';
          echo '<span class="input" > ';
          echo '<input type = "text" id = "work_package" name = "work_package" list = "work_packages" />';
@@ -469,8 +469,7 @@ document.getElementById( span ).style.display = displayType;
     * @param $allRelevantBugs
     * @return float
     */
-   public
-   function calculate_status_doc_progress( $allRelevantBugs )
+   public function calculate_status_doc_progress( $allRelevantBugs )
    {
       $segments = count( $allRelevantBugs );
       if ( $segments == 0 )
@@ -524,5 +523,21 @@ document.getElementById( span ).style.display = displayType;
       $document_process = $segment_process / $segments;
 
       return $document_process;
+   }
+
+   /**
+    * Prints description how to define and seperate workpackages / chapters
+    */
+   public function print_workpackage_description_field()
+   {
+      echo '<span class="small">' . plugin_lang_get( 'bug_view_work_package_description' ) . '</span>';
+      echo '<a class="rcv_tooltip">';
+      echo '&nbsp[i]';
+      echo '<span>';
+      echo '<div class="rcv_tooltip_content">';
+      echo utf8_substr( string_email_links( plugin_lang_get( 'bug_view_work_package_description_detailed' ) ), 0, 255 );
+      echo '</div>';
+      echo '</span>';
+      echo '</a>';
    }
 }

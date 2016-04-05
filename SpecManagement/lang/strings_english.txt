@@ -6,7 +6,8 @@ $s_plugin_SpecManagement_bug_view_specification_req = 'Source/Name';
 $s_plugin_SpecManagement_bug_view_specification_src = 'Requirement';
 $s_plugin_SpecManagement_bug_view_specification_wpg = 'Work Package';
 $s_plugin_SpecManagement_bug_view_planned_time = 'Planned Duration';
-$s_plugin_SpecManagement_bug_view_work_package_description = 'A workpackage defines a chapter in the document. chapters/subchapters are defined with a "/". e. g: chapter/subchapter/...';
+$s_plugin_SpecManagement_bug_view_work_package_description = '"/" between Chapter and Subchapter';
+$s_plugin_SpecManagement_bug_view_work_package_description_detailed = 'A workpackage defines a chapter in the document. chapters/subchapters are defined with a "/". e. g: chapter/subchapter/...';
 
 /* Configuration Page */
 $s_plugin_SpecManagement_config_title = 'SpecificationManagement - Configuration';

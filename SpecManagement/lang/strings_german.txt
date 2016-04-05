@@ -46,7 +46,7 @@ $s_plugin_SpecManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 
 /* Menu Area */
 $s_plugin_SpecManagement_menu_title = 'Spezifikationen';
-$s_plugin_SpecManagement_menu_manversions = 'Dokumentstatus verwalten';
+$s_plugin_SpecManagement_menu_manversions = 'Versionen';
 $s_plugin_SpecManagement_menu_mantypes = 'Dokumenttypen verwalten';
 $s_plugin_SpecManagement_menu_printbutton = 'Drucken';
 $s_plugin_SpecManagement_menu_versview = 'Statistik und Fortschritt';

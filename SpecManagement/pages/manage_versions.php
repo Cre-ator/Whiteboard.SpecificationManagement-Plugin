@@ -132,15 +132,12 @@ function print_tablefooter()
 function print_editbuttons()
 {
    echo '<tr>';
-   echo '<td colspan="7">';
+   echo '<td colspan="5">';
    echo '<input type="text" name="new_version_name" size="32" maxlength="64"/>';
    echo '&nbsp<input type="date" name="new_version_date"/>';
    echo '&nbsp<input type="submit" name="addversion" class="button" value="' . lang_get( 'add_version_button' ) . '"/>';
    echo '</td>';
-   echo '</tr>';
-
-   echo '<tr>';
-   echo '<td colspan="7" class="center">';
+   echo '<td colspan="2" class="center">';
    echo '<input type="submit" name="update" class="button" value="' . plugin_lang_get( 'manversions_edit_submit' ) . '"/>';
    echo '</td>';
    echo '</tr>';

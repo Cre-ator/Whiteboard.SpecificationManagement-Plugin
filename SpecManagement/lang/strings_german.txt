@@ -55,7 +55,7 @@ $s_plugin_SpecManagement_menu_versgraph = 'Graph';
 
 /* Editor Area */
 $s_plugin_SpecManagement_editor_title = 'SpecificationManagement';
-$s_plugin_SpecManagement_editor_work_package_duration = 'Geplante Dauer für Fertigstellung';
+$s_plugin_SpecManagement_editor_work_package_duration = 'Geplante Dauer';
 $s_plugin_SpecManagement_editor_work_package_duration_null = '-nicht spezifiziert-';
 $s_plugin_SpecManagement_editor_no_workpackage = 'Allgemeine Einträge';
 $s_plugin_SpecManagement_editor_duration_unit = 'Personenstunden';

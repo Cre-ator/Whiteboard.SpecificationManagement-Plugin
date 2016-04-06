@@ -442,7 +442,23 @@ class specmanagement_editor_api
       $this->print_doc_head_row( 'head_person_in_charge', $this->calculate_person_in_charge( $version_id ) );
       if ( !is_null( $allRelevantBugs ) )
       {
-         $this->print_doc_head_row( 'head_process', $this->get_process_string( $allRelevantBugs ) );
+         $process = $this->get_process( $allRelevantBugs );
+         if ( is_array( $process ) )
+         {
+            $sum_pt_all = $process[0];
+            $sum_pt_bug = $process[1];
+            $pt_process = 0;
+            if ( $sum_pt_all != 0 )
+            {
+               $pt_process = round( ( $sum_pt_bug * 100 / $sum_pt_all ), 2 );
+            }
+            $process_string = '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';
+         }
+         else
+         {
+            $process_string = '<span class="bar" style="width: ' . $process . '%;">' . round( $process, 2 ) . '%</span>';
+         }
+         $this->print_doc_head_row( 'head_process', $this->create_process_bar( $process_string ) );
       }
       if ( !$print_flag )
       {
@@ -623,40 +639,29 @@ class specmanagement_editor_api
     * @param $allRelevantBugs
     * @return string
     */
-   public function get_process_string( $allRelevantBugs )
+   public function get_process( $allRelevantBugs )
    {
       $specmanagement_print_api = new specmanagement_print_api();
-      $process_string = '';
       $status_flag = $this->check_status_flag( $allRelevantBugs );
       if ( $status_flag )
       {
-         $status_process = 0;
-         if ( !empty( $allRelevantBugs ) )
-         {
-            $status_process = round( $specmanagement_print_api->calculate_status_doc_progress( $allRelevantBugs ), 2 );
-         }
-         $process_string .= '<div class="progress400">';
-         $process_string .= '<span class="bar" style="width: ' . $status_process . '%;">' . round( $status_process, 2 ) . '%</span>';
-         $process_string .= '</div>';
-         return $process_string;
+         return round( $specmanagement_print_api->calculate_status_doc_progress( $allRelevantBugs ), 2 );;
       }
       else
       {
-         $sum_pt = $this->calculate_pt_doc_progress( $allRelevantBugs );
-         $sum_pt_all = $sum_pt[0];
-         $sum_pt_bug = $sum_pt[1];
-         $pt_process = 0;
-
-         if ( $sum_pt_all != 0 )
-         {
-            $pt_process = round( ( $sum_pt_bug * 100 / $sum_pt_all ), 2 );
-         }
-         $process_string .= '<div class="progress400">';
-         $process_string .= '<span class="bar" style="width: ' . $pt_process . '%;">' . $sum_pt_bug . '/' . $sum_pt_all . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ' (' . $pt_process . '%)</span>';
-         $process_string .= '</div>';
-         return $process_string;
+         return $this->calculate_pt_doc_progress( $allRelevantBugs );
       }
    }
+
+   /**
+    * @param $process
+    * @return string
+    */
+   public function create_process_bar( $process )
+   {
+      return '<div class="progress400">' . $process . '</div>';
+   }
+
 
    /**
     * @param $allRelevantBugs

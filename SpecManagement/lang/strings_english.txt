@@ -54,7 +54,7 @@ $s_plugin_SpecManagement_menu_versgraph = 'Graph';
 
 /* Editor Area */
 $s_plugin_SpecManagement_editor_title = 'SpecManagement';
-$s_plugin_SpecManagement_editor_work_package_duration = 'Planned Duration for Completion';
+$s_plugin_SpecManagement_editor_work_package_duration = 'Planned Duration';
 $s_plugin_SpecManagement_editor_work_package_duration_null = '-not specified-';
 $s_plugin_SpecManagement_editor_no_workpackage = 'General Issues';
 $s_plugin_SpecManagement_editor_duration_unit = 'Hours per Person';

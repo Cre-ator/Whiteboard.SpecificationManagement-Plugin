@@ -114,6 +114,8 @@ if ( !is_null( $version_spec_bug_ids ) )
    $type_row = $specmanagement_database_api->get_type_row( $type_id );
    $type_options = explode( ';', $type_row[2] );
 
+   $pdf = generate_document_head( $pdf, $type_string, $version_id, $version_spec_bug_ids );
+   $pdf->Ln( 10 );
    /** generate and print directory */
    if ( $type_options[2] == '1' )
    {
@@ -230,9 +232,9 @@ function process_content( PDF $pdf, $bug_ids, $version_date, $chapter_prefix, $o
                $pdf->Cell( 95, 10, plugin_lang_get( 'editor_bug_duration' ) . ': ' . $bug_data[7] . ' ' . plugin_lang_get( 'editor_duration_unit' ), '', 0, 0 );
             }
             $pdf->Ln();
-            $pdf->MultiCell( 0, 10, string_display_line( trim( $bug_data[2] ) ), 0, 1 );
-            $pdf->MultiCell( 0, 10, string_display_links( trim( $bug_data[3] ) ), 0, 1 );
-            $pdf->MultiCell( 0, 10, string_display_links( trim( $bug_data[4] ) ), 0, 1 );
+            $pdf->MultiCell( 0, 10, utf8_decode( trim( $bug_data[2] ) ), 0, 1 );
+            $pdf->MultiCell( 0, 10, utf8_decode( trim( $bug_data[3] ) ), 0, 1 );
+            $pdf->MultiCell( 0, 10, utf8_decode( trim( $bug_data[4] ) ), 0, 1 );
             if ( !empty( $bug_data[5] ) )
             {
                $attachment_count = file_bug_attachment_count( $bug_id );
@@ -333,4 +335,59 @@ function generate_expenses_overview( PDF $pdf, $p_version_id, $work_packages, $n
    $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
 
    return $pdf;
+}
+
+/**
+ * @param PDF $pdf
+ * @param $type_string
+ * @param $version_id
+ * @param $version_spec_bug_ids
+ * @return PDF
+ */
+function generate_document_head( PDF $pdf, $type_string, $version_id, $version_spec_bug_ids )
+{
+   $specmanagement_database_api = new specmanagement_database_api();
+   $specmanagement_editor_api = new specmanagement_editor_api();
+
+   $project_id = helper_get_current_project();
+   $parent_project_id = $specmanagement_database_api->get_main_project_by_hierarchy( $project_id );
+   $head_project_id = $project_id;
+   if ( $parent_project_id == 0 )
+   {
+      $parent_project_id = version_get_field( $version_id, 'project_id' );
+      $head_project_id = version_get_field( $version_id, 'project_id' );
+   }
+
+   $table_column_widths = Array( 95, 95 );
+   $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
+   $pdf->Ln();
+
+   generate_document_head_row( $pdf, 'head_title', $type_string . ' - ' . version_get_field( $version_id, 'version' ) );
+   generate_document_head_row( $pdf, 'head_version', version_get_field( $version_id, 'version' ) );
+   generate_document_head_row( $pdf, 'head_customer', project_get_name( $parent_project_id ) );
+   generate_document_head_row( $pdf, 'head_project', project_get_name( $head_project_id ) );
+   generate_document_head_row( $pdf, 'head_date', date( 'd\.m\.Y' ) );
+   generate_document_head_row( $pdf, 'head_person_in_charge', $specmanagement_editor_api->calculate_person_in_charge( $version_id ) );
+   if ( !is_null( $version_spec_bug_ids ) )
+   {
+      generate_document_head_row( $pdf, 'head_process', $specmanagement_editor_api->get_process( $version_spec_bug_ids ) );
+   }
+
+   return $pdf;
+}
+
+/**
+ * @param PDF $pdf
+ * @param $lang_string
+ * @param $data
+ */
+function generate_document_head_row( PDF $pdf, $lang_string, $data )
+{
+   $table_column_widths = Array( 95, 95 );
+   $pdf->Cell( $table_column_widths[0], 6, plugin_lang_get( $lang_string ), 'LR' );
+   $pdf->Cell( $table_column_widths[1], 6, $data, 'LR' );
+   $pdf->Ln();
+   // Closure line
+   $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
+   $pdf->Ln();
 }

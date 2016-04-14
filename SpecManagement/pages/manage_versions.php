@@ -229,9 +229,9 @@ function print_obsolete( $edit_page, $version_index, $version )
    if ( $edit_page )
    {
       echo '<span class="checkbox">'; ?>
-      <label for="proj-version-obsolete">
-         <input type="checkbox" id="proj-version-obsolete"
-                name="obsolete<?php echo $version_index ?>" <?php check_checked( (boolean) $version['obsolete'], true ); ?> />
+      <label for="proj-version-obsolete-<?php echo $version_index ?>">
+         <input type="checkbox" id="proj-version-obsolete-<?php echo $version_index ?>"
+                name="obsolete<?php echo $version_index ?>" <?php check_checked( (int) $version['obsolete'], ON ); ?> />
       </label>
       <?php echo '</span>';
    }
@@ -248,9 +248,9 @@ function print_released( $edit_page, $version_index, $version )
    if ( $edit_page )
    {
       echo '<span class="checkbox">'; ?>
-      <label for="proj-version-released">
-         <input type="checkbox" id="proj-version-released"
-                name="released<?php echo $version_index ?>" <?php check_checked( (boolean) $version['released'], true ); ?> />
+      <label for="proj-version-released-<?php echo $version_index ?>">
+         <input type="checkbox" id="proj-version-released-<?php echo $version_index ?>"
+                name="released<?php echo $version_index ?>" <?php check_checked( (int) $version['released'], ON ); ?> />
       </label>
       <?php echo '</span>';
    }

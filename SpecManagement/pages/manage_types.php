@@ -136,10 +136,9 @@ function print_dictionary( $edit_page, $type_index, $option_show_directory )
    if ( $edit_page )
    {
       echo '<span class="checkbox">'; ?>
-      <label>
-         <input type="checkbox"
-                name="showdy<?php echo $type_index ?>" <?php check_checked( (boolean) $option_show_directory, true );
-         ?> />
+      <label for="showdy-<?php echo $type_index ?>">
+         <input type="checkbox" id="showdy-<?php echo $type_index ?>"
+                name="showdy<?php echo $type_index ?>" <?php check_checked( (int)$option_show_directory, ON ); ?> />
       </label>
       <?php echo '</span>';
    }
@@ -156,10 +155,9 @@ function print_expoverview( $edit_page, $type_index, $option_show_expenses_overv
    if ( $edit_page )
    {
       echo '<span class="checkbox">'; ?>
-      <label>
-         <input type="checkbox"
-                name="showeo<?php echo $type_index ?>" <?php check_checked( (boolean) $option_show_expenses_overview, true );
-         ?> />
+      <label for="showeo-<?php echo $type_index ?>">
+         <input type="checkbox" id="showeo-<?php echo $type_index ?>"
+                name="showeo<?php echo $type_index ?>" <?php check_checked( (int)$option_show_expenses_overview, ON ); ?> />
       </label>
       <?php echo '</span>';
    }
@@ -176,10 +174,9 @@ function print_duration( $edit_page, $type_index, $option_show_duration )
    if ( $edit_page )
    {
       echo '<span class="checkbox">'; ?>
-      <label>
-         <input type="checkbox"
-                name="showpt<?php echo $type_index ?>" <?php check_checked( (boolean) $option_show_duration, true );
-         ?> />
+      <label for="showpt-<?php echo $type_index ?>">
+         <input type="checkbox" id="showpt-<?php echo $type_index ?>"
+                name="showpt<?php echo $type_index ?>" <?php check_checked( (int)$option_show_duration, ON ); ?> />
       </label>
       <?php echo '</span>';
    }

@@ -47,7 +47,7 @@ function calculate_page_content()
    }
    else
    {
-      echo 'kein Zugriff!';
+      echo lang_get( 'access_denied' );
    }
    html_page_bottom1();
 }

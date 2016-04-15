@@ -25,7 +25,7 @@ function calculate_page_content()
       $whiteboard_print_api->printWhiteboardMenu();
    }
 
-   if ( project_includes_user( helper_get_current_project(), auth_get_current_user_id() ) || helper_get_current_project() == 0 )
+   if ( project_includes_user( helper_get_current_project(), auth_get_current_user_id() ) || helper_get_current_project() == 0 || user_is_administrator( auth_get_current_user_id() ) )
    {
       echo '<div align="center">';
       echo '<hr size="1" width="50%" />';
@@ -47,7 +47,7 @@ function calculate_page_content()
    }
    else
    {
-      echo lang_get( 'access_denied' );
+      echo '<table class="width60"><tr><td class="center">' . lang_get( 'access_denied' ) . '</td></tr></table>';
    }
    html_page_bottom1();
 }
@@ -69,7 +69,7 @@ function print_document_selection( $types )
       foreach ( $version_id_array as $version_id )
       {
          $version_spec_project_id = version_get_field( $version_id, 'project_id' );
-         if ( project_includes_user( $version_spec_project_id, auth_get_current_user_id() ) )
+         if ( project_includes_user( $version_spec_project_id, auth_get_current_user_id() ) || user_is_administrator( auth_get_current_user_id() ) )
          {
             $version_string = version_full_name( $version_id );
 

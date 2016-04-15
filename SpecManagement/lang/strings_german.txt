@@ -65,6 +65,7 @@ $s_plugin_SpecManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
 $s_plugin_SpecManagement_editor_expenses_overview = 'Aufwandsübersicht';
 $s_plugin_SpecManagement_editor_expenses_overview_sum = 'Summe';
 $s_plugin_SpecManagement_editor_no_issues = 'Diesem Dokument sind keine Einträge zugeordnet.';
+$s_plugin_SpecManagement_editor_page = 'Seite';
 
 $s_plugin_SpecManagement_editor_directory = 'Inhaltsverzeichnis';
 $s_plugin_SpecManagement_editor_printpdf = 'PDF Drucken';

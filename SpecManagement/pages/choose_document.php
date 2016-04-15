@@ -25,23 +25,30 @@ function calculate_page_content()
       $whiteboard_print_api->printWhiteboardMenu();
    }
 
-   echo '<div align="center">';
-   echo '<hr size="1" width="50%" />';
-   $specmanagement_print_api->printTableTop( '50' );
-   $specmanagement_print_api->printFormTitle( 2, 'menu_title' );
-   $specmanagement_print_api->printCategoryField( 1, 1, 'select_type' );
-   echo '<td>';
-   echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
-   print_document_selection( $types );
-   $specmanagement_print_api->printRow();
-   echo '<td class="center" colspan="2">';
-   echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'select_confirm' ) . '"/>';
-   echo '</td>';
-   echo '</tr>';
-   echo '</form>';
-   echo '</td>';
+   if ( project_includes_user( helper_get_current_project(), auth_get_current_user_id() ) || helper_get_current_project() == 0 )
+   {
+      echo '<div align="center">';
+      echo '<hr size="1" width="50%" />';
+      $specmanagement_print_api->printTableTop( '50' );
+      $specmanagement_print_api->printFormTitle( 2, 'menu_title' );
+      $specmanagement_print_api->printCategoryField( 1, 1, 'select_type' );
+      echo '<td>';
+      echo '<form method="post" name="form_set_source" action="' . plugin_page( 'editor' ) . '">';
+      print_document_selection( $types );
+      $specmanagement_print_api->printRow();
+      echo '<td class="center" colspan="2">';
+      echo '<input type="submit" name="formSubmit" class="button" value="' . plugin_lang_get( 'select_confirm' ) . '"/>';
+      echo '</td>';
+      echo '</tr>';
+      echo '</form>';
+      echo '</td>';
 
-   $specmanagement_print_api->printTableFoot();
+      $specmanagement_print_api->printTableFoot();
+   }
+   else
+   {
+      echo 'kein Zugriff!';
+   }
    html_page_bottom1();
 }
 
@@ -59,14 +66,17 @@ function print_document_selection( $types )
       $type_string = string_html_specialchars( $type );
       $type_id = $specmanagement_database_api->get_type_id( $type );
       $version_id_array = get_version_ids( $type_id, $project_id );
-
       foreach ( $version_id_array as $version_id )
       {
-         $version_string = version_full_name( $version_id );
+         $version_spec_project_id = version_get_field( $version_id, 'project_id' );
+         if ( project_includes_user( $version_spec_project_id, auth_get_current_user_id() ) )
+         {
+            $version_string = version_full_name( $version_id );
 
-         echo '<option value="' . $version_id . '">';
-         echo $type_string . " - " . $version_string;
-         echo '</option>';
+            echo '<option value="' . $version_id . '">';
+            echo $type_string . " - " . $version_string;
+            echo '</option>';
+         }
       }
    }
    echo '</select>';

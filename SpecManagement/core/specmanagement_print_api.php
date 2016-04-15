@@ -19,6 +19,7 @@ class specmanagement_print_api
    public function print_page_head( $string )
    {
       html_page_top1( $string );
+      echo '<script language="javascript" type="text/javascript" src="' . SPECMANAGEMENT_PLUGIN_URL . 'files/checkbox.js"></script>';
       echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/specmanagement.css">';
       html_page_top2();
       if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists( config_get_global( 'plugin_path' ) . 'WhiteboardMenu' ) )
@@ -138,7 +139,7 @@ class specmanagement_print_api
       echo '</tr>';
    }
 
-   /** todo *easier to find the method
+   /**
     * Prints the plugin specific menu
     */
    public function print_plugin_menu()

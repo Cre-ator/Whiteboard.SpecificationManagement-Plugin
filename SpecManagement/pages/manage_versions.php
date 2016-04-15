@@ -209,12 +209,12 @@ function print_date( $edit_page, $version )
    echo '<td>';
    if ( $edit_page )
    {
-      echo '<span class="input">';
       echo '<label for="proj-version-date-order">';
+      echo '<span class="input">';
       echo '<input type="text" id="proj-version-date-order" name="date_order[]" class="datetime" size="15"
                       value="' . ( date_is_null( $version['date_order'] ) ? '' : string_attribute( date( config_get( 'calendar_date_format' ), $version['date_order'] ) ) ) . '" />';
-      echo '</label>';
       echo '</span>';
+      echo '</label>';
    }
    else
    {
@@ -228,12 +228,12 @@ function print_obsolete( $edit_page, $version_index, $version )
    echo '<td class="center">';
    if ( $edit_page )
    {
-      echo '<span class="checkbox">'; ?>
+      ?>
       <label for="proj-version-obsolete-<?php echo $version_index ?>">
-         <input type="checkbox" id="proj-version-obsolete-<?php echo $version_index ?>"
-                name="obsolete<?php echo $version_index ?>" <?php check_checked( (int) $version['obsolete'], ON ); ?> />
+      <span class="checkbox"><input type="checkbox" id="proj-version-obsolete-<?php echo $version_index ?>"
+                                    name="obsolete<?php echo $version_index ?>" <?php check_checked( (int) $version['obsolete'], ON ); ?> /></span>
       </label>
-      <?php echo '</span>';
+      <?php
    }
    else
    {
@@ -247,12 +247,12 @@ function print_released( $edit_page, $version_index, $version )
    echo '<td class="center">';
    if ( $edit_page )
    {
-      echo '<span class="checkbox">'; ?>
+      ?>
       <label for="proj-version-released-<?php echo $version_index ?>">
-         <input type="checkbox" id="proj-version-released-<?php echo $version_index ?>"
-                name="released<?php echo $version_index ?>" <?php check_checked( (int) $version['released'], ON ); ?> />
+      <span class="checkbox"><input type="checkbox" id="proj-version-released-<?php echo $version_index ?>"
+                                    name="released<?php echo $version_index ?>" <?php check_checked( (int) $version['released'], ON ); ?> /></span>
       </label>
-      <?php echo '</span>';
+      <?php
    }
    else
    {
@@ -266,12 +266,12 @@ function print_name( $edit_page, $version )
    echo '<td width="200">';
    if ( $edit_page )
    {
-      echo '<span class="input" style="width:100%;">';
       echo '<label for="proj-version-new-version">';
+      echo '<span class="input" style="width:100%;">';
       echo '<input type="text" id="proj-version-new-version" name="version[]"
                       style="width:100%;" maxlength="64" value="' . string_attribute( $version['version'] ) . '" />';
-      echo '</label>';
       echo '</span>';
+      echo '</label>';
    }
    else
    {

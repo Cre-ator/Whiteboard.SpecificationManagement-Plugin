@@ -21,6 +21,7 @@ if ( isset( $_POST['to_plugin_config'] ) )
  * Page content
  */
 html_page_top1( plugin_lang_get( 'mantypes_title' ) );
+echo '<script language="javascript" type="text/javascript" src="' . SPECMANAGEMENT_PLUGIN_URL . 'files/checkbox.js"></script>';
 html_page_top2();
 print_manage_menu();
 echo '<div align="center">';
@@ -135,12 +136,12 @@ function print_dictionary( $edit_page, $type_index, $option_show_directory )
    echo '<td class="center">';
    if ( $edit_page )
    {
-      echo '<span class="checkbox">'; ?>
-      <label for="showdy-<?php echo $type_index ?>">
-         <input type="checkbox" id="showdy-<?php echo $type_index ?>"
-                name="showdy<?php echo $type_index ?>" <?php check_checked( (int)$option_show_directory, ON ); ?> />
+      ?>
+      <label for="show-dictionary-<?php echo $type_index ?>">
+      <span class="checkbox"><input type="checkbox" id="show-dictionary-<?php echo $type_index ?>"
+                                    name="showdy<?php echo $type_index ?>" <?php check_checked( (int) $option_show_directory, ON ); ?> /></span>
       </label>
-      <?php echo '</span>';
+      <?php
    }
    else
    {
@@ -154,12 +155,12 @@ function print_expoverview( $edit_page, $type_index, $option_show_expenses_overv
    echo '<td class="center">';
    if ( $edit_page )
    {
-      echo '<span class="checkbox">'; ?>
-      <label for="showeo-<?php echo $type_index ?>">
-         <input type="checkbox" id="showeo-<?php echo $type_index ?>"
-                name="showeo<?php echo $type_index ?>" <?php check_checked( (int)$option_show_expenses_overview, ON ); ?> />
+      ?>
+      <label for="show-expenses-overview-<?php echo $type_index ?>">
+      <span class="checkbox"><input type="checkbox" id="show-expenses-overview-<?php echo $type_index ?>"
+                                    name="showeo<?php echo $type_index ?>" <?php check_checked( (int) $option_show_expenses_overview, ON ); ?> /></span>
       </label>
-      <?php echo '</span>';
+      <?php
    }
    else
    {
@@ -173,12 +174,11 @@ function print_duration( $edit_page, $type_index, $option_show_duration )
    echo '<td class="center">';
    if ( $edit_page )
    {
-      echo '<span class="checkbox">'; ?>
-      <label for="showpt-<?php echo $type_index ?>">
-         <input type="checkbox" id="showpt-<?php echo $type_index ?>"
-                name="showpt<?php echo $type_index ?>" <?php check_checked( (int)$option_show_duration, ON ); ?> />
-      </label>
-      <?php echo '</span>';
+      ?>
+      <label for="show-duration"></label>
+      <span class="checkbox"><input type="checkbox" id="show-duration"
+                                    name="showpt<?php echo $type_index ?>" <?php check_checked( (int) $option_show_duration, ON ); ?> /></span>
+      <?php
    }
    else
    {

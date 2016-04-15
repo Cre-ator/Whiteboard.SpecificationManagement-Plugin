@@ -11,18 +11,9 @@ class PDF extends FPDF
     */
    function Header()
    {
-      $specmanagement_database_api = new specmanagement_database_api();
-      $version_id = $_POST['version_id'];
-      $type_string = $specmanagement_database_api->get_type_string( $specmanagement_database_api->get_type_by_version( $version_id ) );
-      // Logo
-      $this->Image( SPECMANAGEMENT_FILES_URI . 'logo.png', 10, 6, 30 );
-      // Arial bold 15
-      $this->SetFont( 'Arial', 'B', 15 );
-      // Move to the right
-      $this->Cell( 45 );
-      // Title
-      $this->Cell( 100, 10, $type_string . ' - ' . version_get_field( $version_id, 'version' ), 1, 0, 'C' );
-      // Line break
+      $this->Image( SPECMANAGEMENT_FILES_URI . 'logo.png', 160, 6, 30 );
+      $this->Ln( 10 );
+      $this->Cell( 0, 0, '', 'T' );
       $this->Ln( 20 );
    }
 
@@ -31,12 +22,10 @@ class PDF extends FPDF
     */
    function Footer()
    {
-      // Position at 1.5 cm from bottom
       $this->SetY( -15 );
-      // Arial italic 8
-      $this->SetFont( 'Arial', 'I', 8 );
-      // Page number
-      $this->Cell( 0, 10, 'Page ' . $this->PageNo() . '/{nb}', 0, 0, 'C' );
+      $this->SetFont( 'Arial', '', 9 );
+      $this->Cell( 95, 10, date( 'd\.m\.Y' ), 0, 0, 'L' );
+      $this->Cell( 95, 10, plugin_lang_get( 'editor_page' ) . ' ' . $this->PageNo() . '/{nb}', 0, 0, 'R' );
    }
 
    /**
@@ -48,22 +37,18 @@ class PDF extends FPDF
     */
    function ChapterTitle( $num, $label, $option_show_duration, $chapter_duration )
    {
-      // Arial 12
       $this->SetFont( 'Arial', 'B', 12 );
-      // Hintergrundfarbe
       $this->SetFillColor( 192, 192, 192 );
-      // Titel
       if ( $option_show_duration == '1' && $chapter_duration > 0 )
       {
          $this->Cell( 95, 6, "$num $label", 0, 0, 'L', 1 );
-         $this->Cell( 95, 6, '[' . utf8_decode( plugin_lang_get( 'editor_work_package_duration' ) ) . ': ' . $chapter_duration . ' ' . plugin_lang_get( 'editor_duration_unit' ) . ']', 0, 0, 'R', 1 );
+         $this->Cell( 95, 6, utf8_decode( plugin_lang_get( 'editor_work_package_duration' ) ) . ': ' . $chapter_duration . ' ' . plugin_lang_get( 'editor_duration_unit' ), 0, 0, 'R', 1 );
       }
       else
       {
          $this->Cell( 0, 6, "$num $label", 0, 0, 'L', 1 );
       }
       $this->SetFont( 'Arial', '', 12 );
-      // Zeilenumbruch
       $this->Ln( 8 );
    }
 
@@ -73,13 +58,10 @@ class PDF extends FPDF
     */
    function Title( $label )
    {
-      // Arial 12
       $this->SetFont( 'Arial', 'B', 12 );
-      // Hintergrundfarbe
       $this->SetFillColor( 192, 192, 192 );
-      // Titel
       $this->Cell( 0, 6, "$label", 0, 1, 'L', 1 );
-      // Zeilenumbruch
+      $this->SetFont( 'Arial', '', 12 );
       $this->Ln( 3 );
    }
 }
@@ -96,7 +78,6 @@ if ( !is_null( $version_spec_bug_ids ) )
    $pdf->AliasNbPages();
    $pdf->AddPage();
    $pdf->SetFont( 'Arial', '', 12 );
-   /** Page Content ************************************************************************************************* */
 
    /** get bug and work package data */
    $plugin_version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
@@ -119,8 +100,10 @@ if ( !is_null( $version_spec_bug_ids ) )
    $type_row = $specmanagement_database_api->get_type_row( $type_id );
    $type_options = explode( ';', $type_row[2] );
 
+   /** print document head */
    $pdf = generate_document_head( $pdf, $type_string, $version_id, $version_spec_bug_ids );
    $pdf->Ln( 10 );
+
    /** generate and print directory */
    if ( $type_options[2] == '1' )
    {
@@ -129,12 +112,15 @@ if ( !is_null( $version_spec_bug_ids ) )
       $pdf->Cell( 0, 0, '', 'T' );
       $pdf->Ln();
       /** @var detail_flag = false :: show detailed bug-information */
-      $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, false, false );
+      $content = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, false, false );
+      $pdf = $content[0];
+      $chapter_counter = $content[1];
       if ( $type_options[1] == '1' )
       {
          $pdf->SetFont( 'Arial', 'B', 12 );
          $pdf->SetFillColor( 255, 255, 255 );
-         $pdf->Cell( 0, 6, utf8_decode( plugin_lang_get( 'editor_expenses_overview' ) ), 0, 0, 'L', 1 );
+         $pdf->Cell( 95, 6, $chapter_counter . ' ' . utf8_decode( plugin_lang_get( 'editor_expenses_overview' ) ), 0, 0, 'L', 1 );
+         $pdf->Cell( 95, 6, $pdf->PageNo(), 0, 0, 'R', 1 );
          $pdf->SetFont( 'Arial', '', 12 );
          $pdf->Ln();
       }
@@ -142,17 +128,20 @@ if ( !is_null( $version_spec_bug_ids ) )
       $pdf->Ln( 20 );
    }
 
-   $pdf = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], true );
+   /** print core */
+   $content = generate_content( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $type_options[0], true );
+   $pdf = $content[0];
+   $chapter_counter = $content[1];
    $pdf->Ln( 20 );
 
+   /** print expeneses overview */
    if ( $type_options[1] == '1' )
    {
-      $pdf->Title( utf8_decode( plugin_lang_get( 'editor_expenses_overview' ) ) );
+      $pdf->Title( $chapter_counter . ' ' . utf8_decode( plugin_lang_get( 'editor_expenses_overview' ) ) );
       $pdf = generate_expenses_overview( $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids );
    }
 
-
-   /** ************************************************************************************************************** */
+   /** generate pdf */
    $pdf->Output();
 }
 
@@ -165,7 +154,7 @@ if ( !is_null( $version_spec_bug_ids ) )
  * @param $no_work_package_bug_ids
  * @param $option_show_duration
  * @param $detail_flag
- * @return PDF
+ * @return Array
  */
 function generate_content( PDF $pdf, $p_version_id, $work_packages, $no_work_package_bug_ids, $option_show_duration, $detail_flag )
 {
@@ -207,7 +196,8 @@ function generate_content( PDF $pdf, $p_version_id, $work_packages, $no_work_pac
             {
                $pdf->SetFont( 'Arial', 'B', 12 );
                $pdf->SetFillColor( 255, 255, 255 );
-               $pdf->Cell( 0, 6, $chapter_prefix . ' ' . utf8_decode( $chapter_suffix ), 0, 0, 'L', 1 );
+               $pdf->Cell( 95, 6, $chapter_prefix . ' ' . utf8_decode( $chapter_suffix ), 0, 0, 'L', 1 );
+               $pdf->Cell( 95, 6, $pdf->PageNo(), 0, 0, 'R', 1 );
                $pdf->SetFont( 'Arial', '', 12 );
                $pdf->Ln();
             }
@@ -224,9 +214,9 @@ function generate_content( PDF $pdf, $p_version_id, $work_packages, $no_work_pac
 
    /** Iterate through issues without defined work package */
    $chapter_prefix = $chapter_counter_array[0] + 1;
-   $chapter_suffix = plugin_lang_get( 'editor_no_workpackage' );
    if ( count( $no_work_package_bug_ids ) > 0 )
    {
+      $chapter_suffix = plugin_lang_get( 'editor_no_workpackage' );
       $chapter_duration = $specmanagement_database_api->get_workpackage_duration( $p_version_id, '' );
       if ( $detail_flag )
       {
@@ -246,9 +236,13 @@ function generate_content( PDF $pdf, $p_version_id, $work_packages, $no_work_pac
          $pdf->Cell( 0, 0, '', 'T' );
       }
       $pdf->Ln( 7 );
+      $chapter_prefix++;
    }
 
-   return $pdf;
+   $content_package = array();
+   $content_package[0] = $pdf;
+   $content_package[1] = ( $chapter_prefix );
+   return $content_package;
 }
 
 /**
@@ -285,8 +279,26 @@ function process_content( PDF $pdf, $bug_ids, $version_date, $chapter_prefix, $o
             $pdf->MultiCell( 0, 10, utf8_decode( trim( $bug_data[4] ) ), 0, 1 );
             if ( !empty( $bug_data[5] ) )
             {
-               $attachment_count = file_bug_attachment_count( $bug_id );
-               $pdf->MultiCell( 0, 10, utf8_decode( plugin_lang_get( 'editor_bug_attachments' ) ) . ' (' . $attachment_count . ')', 0, 1 );
+               $bug_attachements = file_get_visible_attachments( $bug_id );
+               $bug_attachements_count = count( $bug_attachements );
+               $pdf->MultiCell( 0, 10, utf8_decode( plugin_lang_get( 'editor_bug_attachments' ) ) . ' (' . $bug_attachements_count . ')', 0, 1 );
+               foreach ( $bug_attachements as $bug_attachement )
+               {
+//                  var_dump( $bug_attachement );
+                  /** TODO: Bilder anzeigen */
+                  if ( $bug_attachement['type'] == 'image' )
+                  {
+                     $file_download_url = config_get_global( 'path' ) . $bug_attachement['download_url'];
+//                  $file_download_url = 'https://upload.wikimedia.org/wikipedia/commons/c/c6/Bayerischer_Wald_-_Aufichtenwald_001.jpg';
+                     fopen( $file_download_url, 'r' );
+                     $contents = file_get_contents( $file_download_url );
+                     $savename = '_' . $bug_attachement['id'] . $bug_attachement['display_name'];
+                     $savefile = fopen( $savename, 'w' );
+                     fwrite( $savefile, $contents );
+                     fclose( $savefile );
+//                     $pdf->Image( $savename );
+                  }
+               }
             }
             if ( !is_null( $bug_data[6] ) && $bug_data[6] != 0 )
             {
@@ -295,7 +307,8 @@ function process_content( PDF $pdf, $bug_ids, $version_date, $chapter_prefix, $o
          }
          else
          {
-            $pdf->Cell( 0, 10, $chapter_prefix . '.' . $bug_counter . ' ' . utf8_decode( string_display( $bug_data[1] ) . ' (' . bug_format_id( $bug_data[0] ) ) . ')', 0, 1 );
+            $pdf->Cell( 95, 10, $chapter_prefix . '.' . $bug_counter . ' ' . utf8_decode( string_display( $bug_data[1] ) . ' (' . bug_format_id( $bug_data[0] ) ) . ')', 0, 0 );
+            $pdf->Cell( 95, 10, $pdf->PageNo(), 0, 1, 'R' );
          }
          $bug_counter += 10;
       }
@@ -347,7 +360,6 @@ function generate_expenses_overview( PDF $pdf, $p_version_id, $work_packages, $n
          $pdf->Cell( $table_column_widths[0], 6, $work_package, 'LR' );
          $pdf->Cell( $table_column_widths[1], 6, $duration, 'LR', 0, 0 );
          $pdf->Ln();
-         // Closure line
          $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
          $pdf->Ln();
       }
@@ -371,7 +383,6 @@ function generate_expenses_overview( PDF $pdf, $p_version_id, $work_packages, $n
       $pdf->Cell( $table_column_widths[0], 6, utf8_decode( plugin_lang_get( 'editor_no_workpackage' ) ), 'LR' );
       $pdf->Cell( $table_column_widths[1], 6, $sum_no_work_package_bug_duration, 'LR', 0, 0 );
       $pdf->Ln();
-      // Closure line
       $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
       $pdf->Ln();
    }
@@ -379,9 +390,8 @@ function generate_expenses_overview( PDF $pdf, $p_version_id, $work_packages, $n
    $pdf->SetFont( 'Arial', 'B', 12 );
    $pdf->Cell( $table_column_widths[0], 6, plugin_lang_get( 'editor_expenses_overview_sum' ) . ':', 'LR' );
    $pdf->Cell( $table_column_widths[1], 6, $document_duration, 'LR', 0, 0 );
-   $pdf->SetFont( 'Arial', '', 12 );
    $pdf->Ln();
-   // Closure line
+   $pdf->SetFont( 'Arial', '', 12 );
    $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
 
    return $pdf;
@@ -412,8 +422,8 @@ function generate_document_head( PDF $pdf, $type_string, $version_id, $version_s
    $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
    $pdf->Ln();
 
-   generate_document_head_row( $pdf, 'manversions_thdoctype', $type_string );
    generate_document_head_row( $pdf, 'head_version', version_get_field( $version_id, 'version' ) );
+   generate_document_head_row( $pdf, 'manversions_thdoctype', $type_string );
    generate_document_head_row( $pdf, 'head_customer', project_get_name( $parent_project_id ) );
    generate_document_head_row( $pdf, 'head_project', project_get_name( $head_project_id ) );
    generate_document_head_row( $pdf, 'head_date', date( 'd\.m\.Y' ) );
@@ -453,7 +463,6 @@ function generate_document_head_row( PDF $pdf, $lang_string, $data )
    $pdf->Cell( $table_column_widths[0], 6, plugin_lang_get( $lang_string ), 'LR' );
    $pdf->Cell( $table_column_widths[1], 6, $data, 'LR' );
    $pdf->Ln();
-   // Closure line
    $pdf->Cell( array_sum( $table_column_widths ), 0, '', 'T' );
    $pdf->Ln();
 }

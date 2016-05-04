@@ -702,8 +702,6 @@ class specmanagement_database_api
    }
 
    /**
-    * Add a specific type
-    *
     * @param $string
     */
    public function insert_type_row( $string )

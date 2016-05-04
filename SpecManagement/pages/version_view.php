@@ -25,7 +25,7 @@ if ( isset( $_POST['non_show_zero_issues'] ) )
 }
 
 $print_flag = false;
-if ( isset( $_POST['print_flag'] ) )
+if ( isset( $_POST['print'] ) )
 {
    $print_flag = true;
 }
@@ -49,7 +49,7 @@ function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues 
    if ( !$print_flag )
    {
       html_page_top2();
-      if ( plugin_is_installed( 'WhiteboardMenu' ) )
+      if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
       {
          require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
          $whiteboard_print_api = new whiteboard_print_api();
@@ -282,7 +282,7 @@ function print_thead_headrow( $obsolete_flag, $show_zero_issues, $print_flag, $a
       echo '<td colspan="4"><form action="' . plugin_page( 'version_view' ) . '" method="post">';
       print_thead_headrow_obsoletebutton( $obsolete_flag );
       print_thead_headrow_showzeroissuebutton( $show_zero_issues );
-      echo '&nbsp<input type="submit" name="print_flag" class="button" value="' . lang_get( 'print' ) . '"/>';
+      echo '&nbsp<input type="submit" name="print" class="button" value="' . lang_get( 'print' ) . '"/>';
       echo '</form></td>';
    }
    else

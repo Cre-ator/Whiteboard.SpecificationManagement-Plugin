@@ -3,7 +3,7 @@ require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
 require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
 
 $print_flag = false;
-if ( isset( $_POST['print_flag'] ) )
+if ( isset( $_POST['print'] ) )
 {
    $print_flag = true;
 }
@@ -25,7 +25,7 @@ function calculate_page_content( $print_flag )
    if ( !$print_flag )
    {
       html_page_top2();
-      if ( plugin_is_installed( 'WhiteboardMenu' ) )
+      if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
       {
          require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
          $whiteboard_print_api = new whiteboard_print_api();

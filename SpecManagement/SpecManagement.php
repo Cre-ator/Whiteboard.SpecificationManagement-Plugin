@@ -2,13 +2,13 @@
 
 class SpecManagementPlugin extends MantisPlugin
 {
-   function register()
+   function register ()
    {
       $this->name = 'Specification Management';
       $this->description = 'Generate and manage your own specified documents';
       $this->page = 'config_page';
 
-      $this->version = '1.1.52';
+      $this->version = '1.1.53';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -19,9 +19,9 @@ class SpecManagementPlugin extends MantisPlugin
       $this->url = '';
    }
 
-   function hooks()
+   function hooks ()
    {
-      if ( substr( MANTIS_VERSION, 0, 4 ) > '1.2.' )
+      if ( substr ( MANTIS_VERSION, 0, 4 ) > '1.2.' )
       {
          $hooks = array
          (
@@ -55,17 +55,17 @@ class SpecManagementPlugin extends MantisPlugin
       return $hooks;
    }
 
-   function init()
+   function init ()
    {
-      $t_core_path = config_get_global( 'plugin_path' )
-         . plugin_get_current()
+      $t_core_path = config_get_global ( 'plugin_path' )
+         . plugin_get_current ()
          . DIRECTORY_SEPARATOR
          . 'core'
          . DIRECTORY_SEPARATOR;
-      require_once( $t_core_path . 'specmanagement_constant_api.php' );
+      require_once ( $t_core_path . 'specmanagement_constant_api.php' );
    }
 
-   function config()
+   function config ()
    {
       return array
       (
@@ -82,13 +82,13 @@ class SpecManagementPlugin extends MantisPlugin
       );
    }
 
-   function schema()
+   function schema ()
    {
       return array
       (
          array
          (
-            'CreateTableSQL', array( plugin_table( 'src' ), "
+            'CreateTableSQL', array ( plugin_table ( 'src' ), "
             id              I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id          I       NOTNULL UNSIGNED,
             p_version_id    I       UNSIGNED,
@@ -97,7 +97,7 @@ class SpecManagementPlugin extends MantisPlugin
          ),
          array
          (
-            'CreateTableSQL', array( plugin_table( 'ptime' ), "
+            'CreateTableSQL', array ( plugin_table ( 'ptime' ), "
             id       I    NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id   I    NOTNULL UNSIGNED,
             time     I    NOTNULL UNSIGNED
@@ -105,7 +105,7 @@ class SpecManagementPlugin extends MantisPlugin
          ),
          array
          (
-            'CreateTableSQL', array( plugin_table( 'vers' ), "
+            'CreateTableSQL', array ( plugin_table ( 'vers' ), "
             id          I   NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             project_id  I   NOTNULL UNSIGNED,
             version_id  I   NOTNULL UNSIGNED,
@@ -114,7 +114,7 @@ class SpecManagementPlugin extends MantisPlugin
          ),
          array
          (
-            'CreateTableSQL', array( plugin_table( 'type' ), "
+            'CreateTableSQL', array ( plugin_table ( 'type' ), "
             id           I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             type         C(250)  NOTNULL DEFAULT '',
             opt          C(250)  DEFAULT ''
@@ -128,28 +128,28 @@ class SpecManagementPlugin extends MantisPlugin
     *
     * @return bool - Userlevel is greater or equal then plugin access level
     */
-   function getUserHasLevel()
+   function getUserHasLevel ()
    {
-      $project_id = helper_get_current_project();
-      $user_id = auth_get_current_user_id();
+      $project_id = helper_get_current_project ();
+      $user_id = auth_get_current_user_id ();
 
-      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'AccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT );
+      return user_get_access_level ( $user_id, $project_id ) >= plugin_config_get ( 'AccessLevel', PLUGINS_SPECMANAGEMENT_THRESHOLD_LEVEL_DEFAULT );
    }
 
-   function getReadLevel()
+   function getReadLevel ()
    {
-      $project_id = helper_get_current_project();
-      $user_id = auth_get_current_user_id();
+      $project_id = helper_get_current_project ();
+      $user_id = auth_get_current_user_id ();
 
-      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'ReadAccessLevel', PLUGINS_SPECMANAGEMENT_READ_LEVEL_DEFAULT );
+      return user_get_access_level ( $user_id, $project_id ) >= plugin_config_get ( 'ReadAccessLevel', PLUGINS_SPECMANAGEMENT_READ_LEVEL_DEFAULT );
    }
 
-   function getWriteLevel()
+   function getWriteLevel ()
    {
-      $project_id = helper_get_current_project();
-      $user_id = auth_get_current_user_id();
+      $project_id = helper_get_current_project ();
+      $user_id = auth_get_current_user_id ();
 
-      return user_get_access_level( $user_id, $project_id ) >= plugin_config_get( 'WriteAccessLevel', PLUGINS_SPECMANAGEMENT_WRITE_LEVEL_DEFAULT );
+      return user_get_access_level ( $user_id, $project_id ) >= plugin_config_get ( 'WriteAccessLevel', PLUGINS_SPECMANAGEMENT_WRITE_LEVEL_DEFAULT );
    }
 
    /**
@@ -157,9 +157,9 @@ class SpecManagementPlugin extends MantisPlugin
     *
     * @return null|string
     */
-   function footer()
+   function footer ()
    {
-      if ( plugin_config_get( 'ShowInFooter' ) && $this->getUserHasLevel() )
+      if ( plugin_config_get ( 'ShowInFooter' ) && $this->getUserHasLevel () )
       {
          return '<address>' . $this->name . ' ' . $this->version . ' Copyright &copy; 2015 by ' . $this->author . '</address>';
       }
@@ -172,10 +172,10 @@ class SpecManagementPlugin extends MantisPlugin
     * @param $event
     * @return null
     */
-   function bugViewFields( $event )
+   function bugViewFields ( $event )
    {
-      require_once( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
-      require_once( SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php' );
+      require_once ( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
+      require_once ( SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       $specmanagement_print_api = new specmanagement_print_api();
       $bug_id = null;
@@ -186,54 +186,54 @@ class SpecManagementPlugin extends MantisPlugin
       switch ( $event )
       {
          case 'EVENT_UPDATE_BUG_FORM':
-            $bug_id = gpc_get_int( 'bug_id' );
+            $bug_id = gpc_get_int ( 'bug_id' );
             break;
          case 'EVENT_VIEW_BUG_DETAILS':
-            $bug_id = gpc_get_int( 'id' );
+            $bug_id = gpc_get_int ( 'id' );
             break;
       }
 
       if ( $bug_id != null )
       {
-         $source_obj = $specmanagement_database_api->get_source_row( $bug_id );
-         $work_package = $source_obj[3];
-         $ptime_obj = $specmanagement_database_api->get_ptime_row( $bug_id );
-         $ptime = $ptime_obj[2];
+         $source_obj = $specmanagement_database_api->get_source_row ( $bug_id );
+         $work_package = $source_obj[ 3 ];
+         $ptime_obj = $specmanagement_database_api->get_ptime_row ( $bug_id );
+         $ptime = $ptime_obj[ 2 ];
 
-         if ( 0 == strlen( bug_get_field( $bug_id, 'target_version' ) ) )
+         if ( 0 == strlen ( bug_get_field ( $bug_id, 'target_version' ) ) )
          {
-            $specmanagement_database_api->update_source_version( $bug_id, null );
+            $specmanagement_database_api->update_source_version ( $bug_id, null );
          }
 
-         $p_version_id = $source_obj[2];
-         if ( !is_null( $p_version_id ) )
+         $p_version_id = $source_obj[ 2 ];
+         if ( !is_null ( $p_version_id ) )
          {
-            $version_obj = $specmanagement_database_api->get_version_row_by_primary( $p_version_id );
-            $type_id = $version_obj[3];
-            $type = $specmanagement_database_api->get_type_string( $type_id );
+            $version_obj = $specmanagement_database_api->get_version_row_by_primary ( $p_version_id );
+            $type_id = $version_obj[ 3 ];
+            $type = $specmanagement_database_api->get_type_string ( $type_id );
          }
       }
 
-      if ( plugin_config_get( 'ShowFields' ) )
+      if ( plugin_config_get ( 'ShowFields' ) )
       {
          switch ( $event )
          {
             case 'EVENT_VIEW_BUG_DETAILS':
-               if ( $this->getReadLevel() || $this->getWriteLevel() || $this->getUserHasLevel() )
+               if ( $this->getReadLevel () || $this->getWriteLevel () || $this->getUserHasLevel () )
                {
-                  $specmanagement_print_api->printBugViewFields( $type, $work_package, $ptime );
+                  $specmanagement_print_api->printBugViewFields ( $type, $work_package, $ptime );
                }
                break;
             case 'EVENT_REPORT_BUG_FORM':
-               if ( $this->getWriteLevel() || $this->getUserHasLevel() )
+               if ( $this->getWriteLevel () || $this->getUserHasLevel () )
                {
-                  $specmanagement_print_api->printBugReportFields();
+                  $specmanagement_print_api->printBugReportFields ();
                }
                break;
             case 'EVENT_UPDATE_BUG_FORM':
-               if ( $this->getWriteLevel() || $this->getUserHasLevel() )
+               if ( $this->getWriteLevel () || $this->getUserHasLevel () )
                {
-                  $specmanagement_print_api->printBugUpdateFields( $type, $work_package, $ptime );
+                  $specmanagement_print_api->printBugUpdateFields ( $type, $work_package, $ptime );
                }
                break;
          }
@@ -247,44 +247,44 @@ class SpecManagementPlugin extends MantisPlugin
     * @param $event
     * @param BugData $bug
     */
-   function bugUpdateData( $event, BugData $bug )
+   function bugUpdateData ( $event, BugData $bug )
    {
-      require_once( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
+      require_once ( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       $version_id = null;
       $type_id = null;
       $p_version_id = null;
       $bug_id = $bug->id;
-      $project_id = helper_get_current_project();
-      $ptime = gpc_get_string( 'ptime', '0' );
+      $project_id = helper_get_current_project ();
+      $ptime = gpc_get_string ( 'ptime', '0' );
 
-      $type = gpc_get_string( 'types', '' );
-      $target_version = bug_get_field( $bug_id, 'target_version' );
-      $work_package = preg_replace( '/\/\/+/', '/', gpc_get_string( 'work_package', '' ) );
+      $type = gpc_get_string ( 'types', '' );
+      $target_version = bug_get_field ( $bug_id, 'target_version' );
+      $work_package = preg_replace ( '/\/\/+/', '/', gpc_get_string ( 'work_package', '' ) );
 
-      if ( !is_null( $target_version ) )
+      if ( !is_null ( $target_version ) )
       {
-         $version_id = version_get_id( $target_version );
-         $version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
-         $p_version_id = $version_obj[0];
-         $type_id = $specmanagement_database_api->get_type_id( $type );
+         $version_id = version_get_id ( $target_version );
+         $version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id ( $version_id );
+         $p_version_id = $version_obj[ 0 ];
+         $type_id = $specmanagement_database_api->get_type_id ( $type );
       }
 
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
-            $specmanagement_database_api->insert_version_row( $project_id, $version_id, $type_id );
-            $specmanagement_database_api->insert_source_row( $bug_id, $p_version_id, $work_package );
-            $specmanagement_database_api->insert_ptime_row( $bug_id, $ptime );
+            $specmanagement_database_api->insert_version_row ( $project_id, $version_id, $type_id );
+            $specmanagement_database_api->insert_source_row ( $bug_id, $p_version_id, $work_package );
+            $specmanagement_database_api->insert_ptime_row ( $bug_id, $ptime );
             break;
          case 'EVENT_UPDATE_BUG':
-            if ( strlen( $work_package ) == 0 )
+            if ( strlen ( $work_package ) == 0 )
             {
-               $work_package = $specmanagement_database_api->get_workpackage_by_bug_id( $bug_id );
+               $work_package = $specmanagement_database_api->get_workpackage_by_bug_id ( $bug_id );
             }
-            $specmanagement_database_api->update_version_row( $project_id, $version_id, $type_id );
-            $specmanagement_database_api->update_source_row( $bug_id, $p_version_id, $work_package );
-            $specmanagement_database_api->update_ptime_row( $bug_id, $ptime );
+            $specmanagement_database_api->update_version_row ( $project_id, $version_id, $type_id );
+            $specmanagement_database_api->update_source_row ( $bug_id, $p_version_id, $work_package );
+            $specmanagement_database_api->update_ptime_row ( $bug_id, $ptime );
             break;
       }
    }
@@ -297,22 +297,22 @@ class SpecManagementPlugin extends MantisPlugin
     * @param $event_type
     * @param $bug_id
     */
-   function actiongroupUpdateData( $event, $event_type, $bug_id )
+   function actiongroupUpdateData ( $event, $event_type, $bug_id )
    {
-      require_once( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
+      require_once ( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       if ( $event_type == 'UP_TARGET_VERSION' )
       {
-         $target_version = gpc_get_string( 'target_version', null );
+         $target_version = gpc_get_string ( 'target_version', null );
          $p_version_id = null;
 
-         if ( !( is_null( $target_version ) || $target_version == '' ) )
+         if ( !( is_null ( $target_version ) || $target_version == '' ) )
          {
-            $version_id = version_get_id( $target_version );
-            $version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
-            $p_version_id = $version_obj[0];
+            $version_id = version_get_id ( $target_version );
+            $version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id ( $version_id );
+            $p_version_id = $version_obj[ 0 ];
          }
-         $specmanagement_database_api->update_source_version( $bug_id, $p_version_id );
+         $specmanagement_database_api->update_source_version ( $bug_id, $p_version_id );
       }
    }
 
@@ -321,11 +321,13 @@ class SpecManagementPlugin extends MantisPlugin
     *
     * @return null|string
     */
-   function menu()
+   function menu ()
    {
-      if ( !plugin_is_installed( 'WhiteboardMenu' ) && plugin_config_get( 'ShowMenu' ) && $this->getUserHasLevel() )
+      if ( ( !plugin_is_installed ( 'WhiteboardMenu' ) || !file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
+         && plugin_config_get ( 'ShowMenu' ) && $this->getUserHasLevel ()
+      )
       {
-         return '<a href="' . plugin_page( 'choose_document' ) . '">' . plugin_lang_get( 'menu_title' ) . '</a>';
+         return '<a href="' . plugin_page ( 'choose_document' ) . '">' . plugin_lang_get ( 'menu_title' ) . '</a>';
       }
       return null;
    }
@@ -333,15 +335,15 @@ class SpecManagementPlugin extends MantisPlugin
    /**
     * Trigger the removal of plugin version data if a mantis version was removed
     */
-   function deleteVersion()
+   function deleteVersion ()
    {
-      require_once( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
+      require_once ( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
-      $version_id = gpc_get_int( 'version_id' );
-      $plugin_version_row = $specmanagement_database_api->get_plugin_version_row_by_version_id( $version_id );
-      $p_version_id = $plugin_version_row[0];
-      $specmanagement_database_api->update_source_version_set_null( $p_version_id );
-      $specmanagement_database_api->delete_version_row( $version_id );
+      $version_id = gpc_get_int ( 'version_id' );
+      $plugin_version_row = $specmanagement_database_api->get_plugin_version_row_by_version_id ( $version_id );
+      $p_version_id = $plugin_version_row[ 0 ];
+      $specmanagement_database_api->update_source_version_set_null ( $p_version_id );
+      $specmanagement_database_api->delete_version_row ( $version_id );
    }
 
    /**
@@ -350,11 +352,11 @@ class SpecManagementPlugin extends MantisPlugin
     * @param $event
     * @param $bug_id
     */
-   function deleteBugReference( $event, $bug_id )
+   function deleteBugReference ( $event, $bug_id )
    {
-      require_once( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
+      require_once ( SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
-      $specmanagement_database_api->delete_source_row_by_bug( $bug_id );
-      $specmanagement_database_api->delete_ptime_row( $bug_id );
+      $specmanagement_database_api->delete_source_row_by_bug ( $bug_id );
+      $specmanagement_database_api->delete_ptime_row ( $bug_id );
    }
 }

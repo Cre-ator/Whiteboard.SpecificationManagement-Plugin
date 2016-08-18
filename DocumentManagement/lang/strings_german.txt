@@ -1,0 +1,132 @@
+<?php
+/* Configuration page */
+
+/* Additional Bugview Fields */
+$s_plugin_DocumentManagement_bug_view_specification_req = 'Ursprung der Anforderung';
+$s_plugin_DocumentManagement_bug_view_specification_src = 'Anforderungsnummer';
+$s_plugin_DocumentManagement_bug_view_specification_wpg = 'Arbeitspaket';
+$s_plugin_DocumentManagement_bug_view_planned_time = 'Geplante Dauer';
+$s_plugin_DocumentManagement_bug_view_work_package_description = '"/" zwischen Kapitel zu Unterkapitel';
+$s_plugin_DocumentManagement_bug_view_work_package_description_detailed = 'Arbeitspakete dienen der Definition von (Unter)-Kapiteln. Ein Unterkapitel wird durch ein "/" gekennzeichnet. Beispiel: Kapitel/Unterkapitel/...';
+
+/* Configuration Page */
+$s_plugin_DocumentManagement_config_title = 'DocumentManagement - Einstellungen';
+/* --------------- */
+$s_plugin_DocumentManagement_config_caption = 'Allgemeine Einstellungen';
+$s_plugin_DocumentManagement_config_accesslevel = 'Zugriffslevel für Plugin';
+$s_plugin_DocumentManagement_config_readlevel = 'Zugriffslevel für Leserecht';
+$s_plugin_DocumentManagement_config_writelevel = 'Zugriffslevel für Schreibrecht';
+$s_plugin_DocumentManagement_config_fields = 'Felder in Eintragsfenstern anzeigen?';
+$s_plugin_DocumentManagement_config_menu = 'Plugin Menüeintrag anzeigen?';
+$s_plugin_DocumentManagement_config_footer = 'Plugin Info in Footer anzeigen?';
+/* --------------- */
+$s_plugin_DocumentManagement_config_document = 'Dokumentverwaltung';
+$s_plugin_DocumentManagement_config_version = 'Versionsverwaltung';
+$s_plugin_DocumentManagement_config_showspecissuestatus = 'Status für Eintragszähler definieren';
+$s_plugin_DocumentManagement_config_amountcols = 'Anzahl Spalten';
+$s_plugin_DocumentManagement_config_statuscol = 'Status für Spalte';
+$s_plugin_DocumentManagement_config_typeadd = 'Dokumenttyp hinzufügen';
+$s_plugin_DocumentManagement_config_add = 'Hinzufügen';
+$s_plugin_DocumentManagement_config_types = 'Verfügbare Dokumenttypen';
+$s_plugin_DocumentManagement_config_del = 'Löschen';
+$s_plugin_DocumentManagement_config_change = 'Ändern';
+/* --------------- */
+$s_plugin_DocumentManagement_config_type = 'Dokumenttypen anpassen';
+/* --------------- */
+$s_plugin_DocumentManagement_config_reset_title = 'DocumentManagement - Alle Plugin Daten entfernen';
+$s_plugin_DocumentManagement_config_reset_expl = 'Achtung, wenn Sie fortfahren werden alle im Plugin hinterlegten Daten unwiderruflich gelöscht. Fortfahren?';
+$s_plugin_DocumentManagement_config_reset_conf = 'Fortfahren';
+$s_plugin_DocumentManagement_config_reset_dont = 'Abbrechen';
+
+/* Choose Doc Page */
+$s_plugin_DocumentManagement_select_doc_title = 'Dokument erzeugen';
+$s_plugin_DocumentManagement_select_doc = 'Dokumentauswahl';
+$s_plugin_DocumentManagement_select_type = 'Dokument:';
+$s_plugin_DocumentManagement_select_version = 'Dokumentversion:';
+$s_plugin_DocumentManagement_select_confirm = 'Gewähltes Dokument erzeugen';
+
+/* Menu Area */
+$s_plugin_DocumentManagement_menu_title = 'Spezifikationen';
+$s_plugin_DocumentManagement_menu_manversions = 'Versionen';
+$s_plugin_DocumentManagement_menu_mantypes = 'Dokumenttypen verwalten';
+$s_plugin_DocumentManagement_menu_printbutton = 'Drucken';
+$s_plugin_DocumentManagement_menu_versview = 'Statistik und Fortschritt';
+$s_plugin_DocumentManagement_menu_versgraph = 'Graph';
+
+/* Editor Area */
+$s_plugin_DocumentManagement_editor_title = 'DocumentManagement';
+$s_plugin_DocumentManagement_editor_work_package_duration = 'Geplante Dauer';
+$s_plugin_DocumentManagement_editor_work_package_duration_null = '-nicht spezifiziert-';
+$s_plugin_DocumentManagement_editor_no_workpackage = 'Allgemeine Einträge';
+$s_plugin_DocumentManagement_editor_duration_unit = 'Personenstunden';
+$s_plugin_DocumentManagement_editor_bug_duration = 'Dauer';
+$s_plugin_DocumentManagement_editor_bug_attachments = 'Angehängte Dateien';
+$s_plugin_DocumentManagement_editor_bug_notes_note = 'Es sind Notizen vorhanden';
+$s_plugin_DocumentManagement_editor_expenses_overview = 'Aufwandsübersicht';
+$s_plugin_DocumentManagement_editor_expenses_overview_sum = 'Summe';
+$s_plugin_DocumentManagement_editor_no_issues = 'Diesem Dokument sind keine Einträge zugeordnet.';
+$s_plugin_DocumentManagement_editor_page = 'Seite';
+
+$s_plugin_DocumentManagement_editor_directory = 'Inhaltsverzeichnis';
+$s_plugin_DocumentManagement_editor_printpdf = 'PDF Drucken';
+$s_plugin_DocumentManagement_editor_printhtml = 'HTML Drucken';
+
+/* Changes Area */
+$s_plugin_DocumentManagement_changes_title = 'Änderungsprotokoll';
+$s_plugin_DocumentManagement_changes_inserted = 'Eintrag wurde hinzugefügt';
+$s_plugin_DocumentManagement_changes_removed = 'Eintrag wurde entfernt';
+$s_plugin_DocumentManagement_changes_edited = 'Einträg wurde geändert';
+
+
+/* Version Manager Area */
+$s_plugin_DocumentManagement_manversions_title = 'Dokument-Versionsverwaltung';
+$s_plugin_DocumentManagement_manversions_thead = 'Versionsverwaltung';
+$s_plugin_DocumentManagement_manversions_thdoctype = 'Dokumenttyp';
+$s_plugin_DocumentManagement_manversions_edit = 'Versionen bearbeiten';
+$s_plugin_DocumentManagement_manversions_edit_submit = 'Änderungen bestätigen';
+
+/* Types Manager Area */
+$s_plugin_DocumentManagement_mantypes_title = 'Document-Typenverwaltung';
+$s_plugin_DocumentManagement_mantypes_thead = 'Typenverwaltung';
+$s_plugin_DocumentManagement_mantypes_edit = 'Typen bearbeiten';
+$s_plugin_DocumentManagement_mantypes_to_pl_cfg = 'Zu Plugin-Konfiguration';
+$s_plugin_DocumentManagement_mantypes_show_print_duration = 'Geplante Dauer im Dokument anzeigen?';
+$s_plugin_DocumentManagement_mantypes_show_expenses_overview = 'Aufwandsübersicht im Dokument anzeigen?';
+$s_plugin_DocumentManagement_mantypes_show_directory = 'Inhaltsverzeichnis im Dokument anzeigen?';
+
+/* Version Overview Area */
+$s_plugin_DocumentManagement_versview_thead = 'Versionsübersicht';
+$s_plugin_DocumentManagement_versview_obsolete_flag = 'Veraltete Versionen einblenden';
+$s_plugin_DocumentManagement_versview_non_obsolete_flag = 'Veraltete Versionen ausblenden';
+$s_plugin_DocumentManagement_versview_show_zero_issues = 'Versionen mit 0 Einträgen anzeigen';
+$s_plugin_DocumentManagement_versview_non_show_zero_issues = 'Versionen mit 0 Einträgen ausblenden';
+$s_plugin_DocumentManagement_versview_scheduled = 'Scheduled';
+$s_plugin_DocumentManagement_versview_amount = 'Anzahl Einträge';
+$s_plugin_DocumentManagement_versview_progress = 'Fortschritt';
+$s_plugin_DocumentManagement_versview_duration = 'Verbleibende Dauer';
+$s_plugin_DocumentManagement_versview_duration0 = 'inkl.';
+$s_plugin_DocumentManagement_versview_duration1 = 'aus Abhängigkeiten';
+$s_plugin_DocumentManagement_versview_uncertainty = 'Unsicherheit';
+$s_plugin_DocumentManagement_versview_uncertainty_string1 = 'Dauer nicht erfasst für';
+$s_plugin_DocumentManagement_versview_uncertainty_string2 = 'Einträge';
+$s_plugin_DocumentManagement_versview_uncertainty_string3 = '% Restfortschritt';
+$s_plugin_DocumentManagement_versview_uncertainty_string4 = '=> Weitere';
+$s_plugin_DocumentManagement_versview_information = 'Hinweis';
+$s_plugin_DocumentManagement_versview_deadline = 'Termin';
+$s_plugin_DocumentManagement_versview_deadline_n = 'Termineinhaltung gefährdet!';
+$s_plugin_DocumentManagement_versview_obsolete = 'Version veraltet!';
+$s_plugin_DocumentManagement_versview_zero_issues = '0 Einträge!';
+$s_plugin_DocumentManagement_versview_theadgraph = 'Versionsgraph';
+
+/* head area of document */
+$s_plugin_DocumentManagement_head_title = 'Dokumententitel';
+$s_plugin_DocumentManagement_head_version = 'Version';
+$s_plugin_DocumentManagement_head_customer = 'Kunde';
+$s_plugin_DocumentManagement_head_project = 'Projekt';
+$s_plugin_DocumentManagement_head_date = 'Datum Druck';
+$s_plugin_DocumentManagement_head_person_in_charge = 'Verantwortlicher';
+$s_plugin_DocumentManagement_head_process = 'Fortschritt';
+$s_plugin_DocumentManagement_head_versions_past = 'Vorgänger';
+$s_plugin_DocumentManagement_head_versions_future = 'Nachfolger';
+$s_plugin_DocumentManagement_head_changes = 'Änderungen anzeigen';
+$s_plugin_DocumentManagement_head_view = 'Dokument anzeigen';

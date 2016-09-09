@@ -2,22 +2,25 @@
 
 class DocumentManagementPlugin extends MantisPlugin
 {
+   private $shortName = null;
+
    function register ()
    {
-      $this->name = 'Document Management';
+      $this->shortName = 'Document Management';
+      $this->name = 'Whiteboard.' . $this->shortName;
       $this->description = 'Generate and manage your own specified documents';
       $this->page = 'config_page';
 
-      $this->version = '1.1.55';
+      $this->version = '1.1.56';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
          'VersionManagement' => '>= 1.0.10'
       );
 
-      $this->author = 'Stefan Schwarz, Rainer Dierck';
+      $this->author = 'cbb software GmbH (Rainer Dierck, Stefan Schwarz)';
       $this->contact = '';
-      $this->url = '';
+      $this->url = 'https://github.com/Cre-ator';
    }
 
    function hooks ()
@@ -58,7 +61,7 @@ class DocumentManagementPlugin extends MantisPlugin
 
    function init ()
    {
-      require_once ( __DIR__ . '/core/specmanagement_constant_api.php' );
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_constant_api.php' );
    }
 
    function config ()
@@ -80,43 +83,114 @@ class DocumentManagementPlugin extends MantisPlugin
 
    function schema ()
    {
-      return array
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'dmApi.php' );
+      $tableArray = array ();
+
+      $sourceTable = array
       (
-         array
-         (
-            'CreateTableSQL', array ( plugin_table ( 'src' ), "
+         'CreateTableSQL', array ( plugin_table ( 'src' ), "
             id              I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id          I       NOTNULL UNSIGNED,
             p_version_id    I       UNSIGNED,
             work_package    C(250)  DEFAULT ''
             " )
-         ),
-         array
-         (
-            'CreateTableSQL', array ( plugin_table ( 'ptime' ), "
+      );
+
+      $ptimeTable = array
+      (
+         'CreateTableSQL', array ( plugin_table ( 'ptime' ), "
             id       I    NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             bug_id   I    NOTNULL UNSIGNED,
             time     I    NOTNULL UNSIGNED
             " )
-         ),
-         array
-         (
-            'CreateTableSQL', array ( plugin_table ( 'vers' ), "
+      );
+
+      $versionTable = array
+      (
+         'CreateTableSQL', array ( plugin_table ( 'vers' ), "
             id          I   NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             project_id  I   NOTNULL UNSIGNED,
             version_id  I   NOTNULL UNSIGNED,
             type_id     I   UNSIGNED
             " )
-         ),
-         array
-         (
-            'CreateTableSQL', array ( plugin_table ( 'type' ), "
+      );
+
+      $typeTable = array
+      (
+         'CreateTableSQL', array ( plugin_table ( 'type' ), "
             id           I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
             type         C(250)  NOTNULL DEFAULT '',
             opt          C(250)  DEFAULT ''
             " )
-         )
       );
+
+      $etaThresholdTable = array
+      (
+         'CreateTableSQL', array ( plugin_table ( 'etathreshold', 'whiteboard' ), "
+            id                 I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            eta_thr_from       C(250)  DEFAULT '',
+            eta_thr_to         C(250)  DEFAULT '',
+            eta_thr_unit       C(250)  DEFAULT '',
+            eta_thr_factor     C(250)  DEFAULT ''
+            " )
+      );
+
+      $etaTable = array
+      (
+         'CreateTableSQL', array ( plugin_table ( 'eta', 'whiteboard' ), "
+            id                 I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            eta_config_value   C(250)  DEFAULT '',
+            eta_user_value     C(250)  DEFAULT 0
+            " )
+      );
+
+      $workDayTable = array
+      (
+         'CreateTableSQL', array ( plugin_table ( 'workday', 'whiteboard' ), "
+            id                 I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            workday_values     C(250)  DEFAULT ''
+            " )
+      );
+
+      $whiteboardMenuTable = array
+      (
+         'CreateTableSQL', array ( plugin_table ( 'menu', 'whiteboard' ), "
+            id                   I       NOTNULL UNSIGNED AUTOINCREMENT PRIMARY,
+            plugin_name          C(250)  DEFAULT '',
+            plugin_access_level  I       UNSIGNED,
+            plugin_show_menu     I       UNSIGNED,
+            plugin_menu_path     C(250)  DEFAULT ''
+            " )
+      );
+
+      array_push ( $tableArray, $sourceTable );
+      array_push ( $tableArray, $ptimeTable );
+      array_push ( $tableArray, $versionTable );
+      array_push ( $tableArray, $typeTable );
+
+      $boolArray = dmApi::checkWhiteboardTablesExist ();
+      # add workday table if it does not exist
+      if ( !$boolArray[ 3 ] )
+      {
+         array_push ( $tableArray, $workDayTable );
+      }
+      # add eta threshold table if it does not exist
+      if ( !$boolArray[ 2 ] )
+      {
+         array_push ( $tableArray, $etaThresholdTable );
+      }
+      # add eta table if it does not exist
+      if ( !$boolArray[ 1 ] )
+      {
+         array_push ( $tableArray, $etaTable );
+      }
+      # add whiteboardmenu table if it does not exist
+      if ( !$boolArray[ 0 ] )
+      {
+         array_push ( $tableArray, $whiteboardMenuTable );
+      }
+
+      return $tableArray;
    }
 
    /**
@@ -157,9 +231,37 @@ class DocumentManagementPlugin extends MantisPlugin
    {
       if ( plugin_config_get ( 'ShowInFooter' ) && $this->getUserHasLevel () )
       {
-         return '<address>' . $this->name . '&nbsp;' . $this->version . '&nbsp;Copyright&nbsp;&copy;&nbsp;2016&nbsp;by&nbsp;' . $this->author . '</address>';
+         return '<address>' . $this->shortName . ' ' . $this->version . ' Copyright &copy; 2016 by ' . $this->author . '</address>';
       }
       return null;
+   }
+
+   /**
+    * If the whiteboard menu plugin isnt installed, show the specificationmanagement menu instead
+    *
+    * @return null|string
+    */
+   function menu ()
+   {
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'dmApi.php' );
+      if ( !dmApi::checkPluginIsRegisteredInWhiteboardMenu () )
+      {
+         dmApi::addPluginToWhiteboardMenu ();
+      }
+
+      if ( ( !plugin_is_installed ( 'WhiteboardMenu' ) || !file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
+         && plugin_config_get ( 'ShowMenu' ) && $this->getUserHasLevel ()
+      )
+      {
+         return '<a href="' . plugin_page ( 'choose_document' ) . '">' . plugin_lang_get ( 'menu_title' ) . '</a>';
+      }
+      return null;
+   }
+
+   function uninstall ()
+   {
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'dmApi.php' );
+      dmApi::removePluginFromWhiteboardMenu ();
    }
 
    /**
@@ -170,8 +272,8 @@ class DocumentManagementPlugin extends MantisPlugin
     */
    function bugViewFields ( $event )
    {
-      require_once ( __DIR__ . '/core/specmanagement_database_api.php' );
-      require_once ( __DIR__ . '/core/specmanagement_print_api.php' );
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_database_api.php' );
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_print_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       $specmanagement_print_api = new specmanagement_print_api();
       $bug_id = null;
@@ -246,7 +348,7 @@ class DocumentManagementPlugin extends MantisPlugin
     */
    function bugUpdateData ( $event, BugData $bug )
    {
-      require_once ( __DIR__ . '/core/specmanagement_database_api.php' );
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       $version_id = null;
       $type_id = null;
@@ -296,7 +398,7 @@ class DocumentManagementPlugin extends MantisPlugin
     */
    function actiongroupUpdateData ( $event, $event_type, $bug_id )
    {
-      require_once ( __DIR__ . '/core/specmanagement_database_api.php' );
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       if ( $event_type == 'UP_TARGET_VERSION' )
       {
@@ -314,27 +416,11 @@ class DocumentManagementPlugin extends MantisPlugin
    }
 
    /**
-    * If the whiteboard menu plugin isnt installed, show the specificationmanagement menu instead
-    *
-    * @return null|string
-    */
-   function menu ()
-   {
-      if ( ( !plugin_is_installed ( 'WhiteboardMenu' ) || !file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
-         && plugin_config_get ( 'ShowMenu' ) && $this->getUserHasLevel ()
-      )
-      {
-         return '<a href="' . plugin_page ( 'choose_document' ) . '">' . plugin_lang_get ( 'menu_title' ) . '</a>';
-      }
-      return null;
-   }
-
-   /**
     * Trigger the removal of plugin version data if a mantis version was removed
     */
    function deleteVersion ()
    {
-      require_once ( __DIR__ . '/core/specmanagement_database_api.php' );
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       $version_id = gpc_get_int ( 'version_id' );
       $plugin_version_row = $specmanagement_database_api->get_plugin_version_row_by_version_id ( $version_id );
@@ -351,7 +437,7 @@ class DocumentManagementPlugin extends MantisPlugin
     */
    function deleteBugReference ( $event, $bug_id )
    {
-      require_once ( __DIR__ . '/core/specmanagement_database_api.php' );
+      require_once ( __DIR__ . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_database_api.php' );
       $specmanagement_database_api = new specmanagement_database_api();
       $specmanagement_database_api->delete_source_row_by_bug ( $bug_id );
       $specmanagement_database_api->delete_ptime_row ( $bug_id );

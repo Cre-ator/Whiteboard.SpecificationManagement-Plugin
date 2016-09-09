@@ -45,7 +45,7 @@ $s_plugin_DocumentManagement_select_version = 'Document Version:';
 $s_plugin_DocumentManagement_select_confirm = 'Generate Selected Document';
 
 /* Menu Area */
-$s_plugin_DocumentManagement_menu_title = 'Documentifications';
+$s_plugin_DocumentManagement_menu_title = 'Document Management';
 $s_plugin_DocumentManagement_menu_manversions = 'Versions';
 $s_plugin_DocumentManagement_menu_mantypes = 'Manage Document Types';
 $s_plugin_DocumentManagement_menu_printbutton = 'Print';

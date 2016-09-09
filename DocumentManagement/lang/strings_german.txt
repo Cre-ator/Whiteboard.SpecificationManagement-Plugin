@@ -46,7 +46,7 @@ $s_plugin_DocumentManagement_select_version = 'Dokumentversion:';
 $s_plugin_DocumentManagement_select_confirm = 'Gewähltes Dokument erzeugen';
 
 /* Menu Area */
-$s_plugin_DocumentManagement_menu_title = 'Spezifikationen';
+$s_plugin_DocumentManagement_menu_title = 'Dokumentmanagement';
 $s_plugin_DocumentManagement_menu_manversions = 'Versionen';
 $s_plugin_DocumentManagement_menu_mantypes = 'Dokumenttypen verwalten';
 $s_plugin_DocumentManagement_menu_printbutton = 'Drucken';

@@ -1,8 +1,8 @@
 <?php
-require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_constant_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_print_api.php';
-require_once __DIR__ . '/../core/document.php';
+require_once ( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_constant_api.php' );
+require_once ( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_database_api.php' );
+require_once ( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_print_api.php' );
+require_once ( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'document.php' );
 
 $specmanagement_database_api = new specmanagement_database_api();
 $specmanagement_print_api = new specmanagement_print_api();

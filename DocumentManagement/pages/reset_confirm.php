@@ -1,6 +1,6 @@
 <?php
-require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_constant_api.php';
-require_once SPECMANAGEMENT_CORE_URI . 'specmanagement_database_api.php';
+require_once ( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_constant_api.php' );
+require_once ( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'specmanagement_database_api.php' );
 
 $specmanagement_database_api = new specmanagement_database_api();
 

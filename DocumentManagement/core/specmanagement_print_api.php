@@ -22,12 +22,15 @@ class specmanagement_print_api
       echo '<script language="javascript" type="text/javascript" src="' . SPECMANAGEMENT_PLUGIN_URL . 'files/checkbox.js"></script>';
       echo '<link rel="stylesheet" href="' . SPECMANAGEMENT_PLUGIN_URL . 'files/specmanagement.css">';
       html_page_top2();
-      if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists( config_get_global( 'plugin_path' ) . 'WhiteboardMenu' ) )
+      if ( plugin_is_installed ( 'WhiteboardMenu' )
+         && file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' )
+      )
       {
-         require_once ( __DIR__ . '/../../WhiteboardMenu/core/whiteboard_print_api.php' );
-         whiteboard_print_api::printWhiteboardMenu ();
+         require_once ( __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR .
+            'WhiteboardMenu' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'wmApi.php' );
+         echo '<link rel="stylesheet" href="plugins/WhiteboardMenu/files/whiteboardmenu.css"/>';
+         wmApi::printWhiteboardMenu ();
       }
-      $this->print_plugin_menu();
    }
 
    /**
@@ -136,38 +139,6 @@ class specmanagement_print_api
       echo '<tr>';
       echo '<td class="spacer" colspan="' . $colspan . '">&nbsp;</td>';
       echo '</tr>';
-   }
-
-   /**
-    * Prints the plugin specific menu
-    */
-   public function print_plugin_menu()
-   {
-      echo '<table align="center">';
-      echo '<tr><td colspan="3" class="center" ><font color="#8b0000" size="5">*** Plugin befindet sich in Entwicklungsphase ***</font></td></tr>';
-
-      echo '<tr>';
-
-      echo '<td>';
-      echo '[ <a href="' . plugin_page( 'manage_versions' ) . '">';
-      echo plugin_lang_get( 'menu_manversions' );
-      echo '</a> ]';
-      echo '</td>';
-
-      echo '<td>';
-      echo '[ <a href="' . plugin_page( 'version_view' ) . '">';
-      echo plugin_lang_get( 'menu_versview' );
-      echo '</a> ]';
-      echo '</td>';
-
-      echo '<td>';
-      echo '[ <a href="' . plugin_page( 'version_graph' ) . '">';
-      echo plugin_lang_get( 'menu_versgraph' );
-      echo '</a> ]';
-      echo '</td>';
-
-      echo '</tr>';
-      echo '</table>';
    }
 
    /**

@@ -118,39 +118,6 @@ echo '<input type="submit" name="changetype" class="button" value="' . plugin_la
 echo '</td>';
 echo '</tr>';
 
-$specmanagement_print_api->printSpacer ( 2 );
-
-$specmanagement_print_api->printFormTitle ( 2, 'config_version' );
-$specmanagement_print_api->printRow ();
-$specmanagement_print_api->printCategoryField ( 1, 1, 'config_showspecissuestatus' );
-$specmanagement_print_api->printRadioButton ( 1, 'ShowSpecStatCols' );
-echo '</tr>';
-if ( plugin_config_get ( 'ShowSpecStatCols' ) == ON )
-{
-   $specmanagement_print_api->printRow ();
-   $specmanagement_print_api->printCategoryField ( 1, 1, 'config_amountcols' );
-   echo '<td width="100px" colspan="1" rowspan="1">';
-   ?>
-   <label><input type="number" name="CAmount"
-                 value="<?php echo plugin_config_get ( 'CAmount', PLUGINS_SPECMANAGEMENT_COLUMN_AMOUNT ); ?>" min="1"
-                 max="<?php echo PLUGINS_SPECMANAGEMENT_MAX_COLUMNS; ?>"/></label>
-   <?php
-   echo '</td>';
-   echo '</tr>';
-   for ( $columnIndex = 1; $columnIndex <= plugin_config_get ( 'CAmount' ); $columnIndex++ )
-   {
-      $specmanagement_print_api->printRow ();
-      echo '<td class="category" colspan="1" rowspan="1">';
-      echo plugin_lang_get ( 'config_statuscol' ) . ' ' . $columnIndex . ':';
-      echo '</td>';
-      echo '<td valign="top" width="100px" colspan="1" rowspan="1">';
-      echo '<select name="CStatSelect' . $columnIndex . '">';
-      print_enum_string_option_list ( 'status', plugin_config_get ( 'CStatSelect' . $columnIndex ) );
-      echo '</select>';
-      echo '</tr>';
-   }
-}
-
 echo '<tr>';
 echo '<td class="center" colspan="2">';
 echo '<input type="submit" name="manage_doc_types" class="button" value="' . plugin_lang_get ( 'menu_mantypes' ) . '"/>&nbsp';
@@ -167,11 +134,11 @@ echo '</form>';
 /***
  * Test Area
  */
-$document = new document( 13 );# 13 -> Test_Projekt 1.0.x
-$document->setName ( 'Testdokument' );
-$bugIds = [ 0 => 1, 1 => 2, 2 => 3, 3 => 4 ];
-$document->setBugIds ( $bugIds );
-
-$document->printDocument ();
+//$document = new document( 13 );# 13 -> Test_Projekt 1.0.x
+//$document->setName ( 'Testdokument' );
+//$bugIds = [ 0 => 1, 1 => 2, 2 => 3, 3 => 4 ];
+//$document->setBugIds ( $bugIds );
+//
+//$document->printDocument ();
 
 html_page_bottom1 ();

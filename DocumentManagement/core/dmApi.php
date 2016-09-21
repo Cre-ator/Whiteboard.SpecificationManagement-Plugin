@@ -100,7 +100,7 @@ class dmApi
       $pluginName = plugin_get_current ();
       $pluginAccessLevel = ADMINISTRATOR;
       $pluginShowMenu = ON;
-      $pluginPath = '<a href="' . plugin_page ( 'choose_document' ) . '">';
+      $pluginPath = plugin_page ( 'choose_document' );
 
       $mysqli = self::initializeDbConnection ();
 

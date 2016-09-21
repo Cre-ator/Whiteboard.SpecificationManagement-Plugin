@@ -651,8 +651,6 @@ class specmanagement_database_api
          $query = "SELECT work_package FROM $plugin_src_table
             WHERE bug_id = " . $bug_id;
 
-         var_dump( $query );
-
          $result = $this->mysqli->query( $query );
          if ( 0 != $result->num_rows )
          {

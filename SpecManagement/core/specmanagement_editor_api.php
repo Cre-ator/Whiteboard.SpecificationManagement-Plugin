@@ -851,6 +851,7 @@ class specmanagement_editor_api
             {
                $work_package_spec_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs ( $p_version_id, $work_package );
                $chapters = explode ( '/', $work_package );
+
                $chapter_depth = count ( $chapters );
                if ( $chapter_depth == 1 )
                {

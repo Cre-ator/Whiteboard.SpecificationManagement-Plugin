@@ -16,12 +16,12 @@ if ( isset( $_POST['version_id'] ) )
    if ( !$print_flag )
    {
       html_page_top2();
-      if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
-      {
-         require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
-         $whiteboard_print_api = new whiteboard_print_api();
-         $whiteboard_print_api->printWhiteboardMenu();
-      }
+//      if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
+//      {
+//         require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
+//         $whiteboard_print_api = new whiteboard_print_api();
+//         $whiteboard_print_api->printWhiteboardMenu();
+//      }
    }
    calculate_page_content( $print_flag );
    if ( !$print_flag )

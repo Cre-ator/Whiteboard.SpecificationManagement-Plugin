@@ -80,7 +80,7 @@ $s_plugin_SpecManagement_changes_edited = 'Einträg wurde geändert';
 
 /* Version Manager Area */
 $s_plugin_SpecManagement_manversions_title = 'Dokument-Versionsverwaltung';
-$s_plugin_SpecManagement_manversions_thead = 'Versionsverwaltung';
+$s_plugin_SpecManagement_manversions_thead = 'Versionsverwaltung (alt)';
 $s_plugin_SpecManagement_manversions_thdoctype = 'Dokumenttyp';
 $s_plugin_SpecManagement_manversions_edit = 'Versionen bearbeiten';
 $s_plugin_SpecManagement_manversions_edit_submit = 'Änderungen bestätigen';

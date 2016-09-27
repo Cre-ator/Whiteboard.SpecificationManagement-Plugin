@@ -476,22 +476,32 @@ class specmanagement_database_api
       if ( $p_version_id != null )
       {
          $query = "SELECT DISTINCT s.work_package FROM $plugin_src_table s
-            WHERE s.p_version_id = '" . $p_version_id . "'";
+            WHERE s.p_version_id = '" . $p_version_id . "' order by s.work_package asc";
 
          $result = $this->mysqli->query( $query );
 
-         $tmp_row = null;
          $work_packages = array();
 
          if ( 0 != $result->num_rows )
          {
+            $prev_work_package = "";
             while ( $row = $result->fetch_row() )
             {
-               if ( $row[0] != $tmp_row )
+               $work_packages[] = $row[0];
+               if ($prev_work_package != $row[0] )
                {
-                  $work_packages[] = $row[0];
-                  $tmp_row = $row[0];
+                  $path = "";
+                  $chapters = explode ( '/', $row[0] );
+                  for ( $index = 0; $index < count ( $chapters ); $index++ )
+                  {
+                     if ( strlen ( $path ) > 0 )
+                        $path .= '/';
+                     $path .= $chapters [ $index ];
+                     if ( false === array_search ( $path, $work_packages ) )
+                        $work_packages[] = $path;
+                  }
                }
+               $prev_work_package = $row[0];
             }
          }
 

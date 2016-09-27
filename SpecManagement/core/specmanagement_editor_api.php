@@ -207,7 +207,7 @@ class specmanagement_editor_api
    {
       if ( $is_chapter )
       {
-         echo '<tr><td class="form-title">';
+         echo '<tr><td class="directory_chapter_title">';
          if ( !$print_flag )
          {
             echo '<a href="#' . $chapter_suffix . '">';
@@ -221,11 +221,11 @@ class specmanagement_editor_api
       }
       else
       {
-         echo '<tr><td>';
+         echo '<tr><td class="directory_chapter_item">';
          if ( !$print_flag )
          {
             echo '<a href="#' . string_display ( $bug_data[ 1 ] ) . '">';
-            echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display ( $bug_data[ 1 ] );
+            echo '/F' . $chapter_prefix . '-' . $bug_counter . '/ ' . string_display ( $bug_data[ 1 ] );
             echo '</a>';
             echo '&nbsp(';
             print_bug_link ( bug_format_id ( $bug_data[ 0 ] ) );
@@ -233,7 +233,7 @@ class specmanagement_editor_api
          }
          else
          {
-            echo $chapter_prefix . '.' . $bug_counter . ' ' . string_display ( $bug_data[ 1 ] );
+            echo '/F' . $chapter_prefix . '-' . $bug_counter . '/ ' . string_display ( $bug_data[ 1 ] );
             echo '&nbsp(' . bug_format_id ( $bug_data[ 0 ] ) . ')';
          }
       }
@@ -393,9 +393,10 @@ class specmanagement_editor_api
     */
    public function print_bug_head ( $chapter_index, $sub_chapter_index, $bug_data, $option_show_duration, $print_flag )
    {
+      echo '<tr><td class="content_chapter_item_spacer" colspan="3"></td></tr>';
       echo '<tr>';
-      echo '<td class="form-title" id="' . string_display ( $bug_data[ 1 ] ) . '">' . $chapter_index . '.' . $sub_chapter_index . '</td>';
-      echo '<td class="form-title">' . string_display ( $bug_data[ 1 ] ) . ' (';
+      echo '<td class="content_chapter_item_number" id="' . string_display ( $bug_data[ 1 ] ) . '">/F' . $chapter_index . '-' . $sub_chapter_index . '/</td>';
+      echo '<td class="content_chapter_item">' . string_display ( $bug_data[ 1 ] ) . ' (';
       if ( !$print_flag )
       {
          print_bug_link ( $bug_data[ 0 ], true );
@@ -406,7 +407,7 @@ class specmanagement_editor_api
       }
       echo ')';
       echo '</td>';
-      echo '<td class="duration_title">';
+      echo '<td class="content_chapter_item_duration">';
       if ( $option_show_duration == '1' && !( $bug_data[ 7 ] == 0 || is_null ( $bug_data[ 7 ] ) ) )
       {
          echo plugin_lang_get ( 'editor_bug_duration' ) . ': ' . $bug_data[ 7 ] . ' ' . plugin_lang_get ( 'editor_duration_unit' );
@@ -467,7 +468,7 @@ class specmanagement_editor_api
          {
             $process_string = '<span class="bar" style="width: ' . $process . '%;">' . round ( $process, 2 ) . ' %</span>';
          }
-         $this->print_doc_head_row ( 'head_process', $this->create_process_bar ( $process_string ) );
+         //$this->print_doc_head_row ( 'head_process', $this->create_process_bar ( $process_string ) );
       }
       if ( !$print_flag )
       {
@@ -485,23 +486,23 @@ class specmanagement_editor_api
    public function print_editor_table_title ( $type_string, $version_id, $print_flag )
    {
       echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get ( 'head_title' ) . '</td>';
-      echo '<td class="form-title" colspan="2">' . $type_string . ' - ' . version_get_field ( $version_id, 'version' ) . '</td>';
+      echo '<td class="document_title_label">' . plugin_lang_get ( 'head_title' ) . '</td>';
+      echo '<td class="document_title" colspan="2">' . $type_string . ' - ' . version_get_field ( $version_id, 'version' ) . '</td>';
       if ( !$print_flag )
       {
-         echo '<td class="form-title">';
+         echo '<td class="document_title_controls">';
          echo '<form action="' . plugin_page ( 'editor' ) . '" method="post">';
          echo '<span class="input">';
          echo '<input type="hidden" name="version_id" value="' . $version_id . '" />';
          echo '<input type="submit" name="print" class="button" value="' . plugin_lang_get ( 'editor_printhtml' ) . '"/>';
          echo '</span>';
          echo '</form>';
-         echo '<form method="post" name="form_set_source" action="' . plugin_page ( 'editorpdf' ) . '">';
-         echo '<span class="input">';
-         echo '<input type="hidden" name="version_id" value="' . $version_id . '" />';
-         echo '&nbsp<input type="submit" name="printtopdf" class="button" value="' . plugin_lang_get ( 'editor_printpdf' ) . '"/>';
-         echo '</span>';
-         echo '</form>';
+         //echo '<form method="post" name="form_set_source" action="' . plugin_page ( 'editorpdf' ) . '">';
+         //echo '<span class="input">';
+         //echo '<input type="hidden" name="version_id" value="' . $version_id . '" />';
+         //echo '&nbsp<input type="submit" name="printtopdf" class="button" value="' . plugin_lang_get ( 'editor_printpdf' ) . '"/>';
+         //echo '</span>';
+         //echo '</form>';
          echo '</td>';
       }
       echo '</tr>';
@@ -516,6 +517,7 @@ class specmanagement_editor_api
     */
    public function print_simple_chapter_title ( $chapter_index, $option_show_duration, $duration )
    {
+      echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
       echo '<tr>';
       echo '<td class="form-title">' . $chapter_index . '</td>';
       echo '<td class="form-title">' . plugin_lang_get ( 'editor_no_workpackage' );
@@ -527,7 +529,6 @@ class specmanagement_editor_api
       }
       echo '</td>';
       echo '</tr>';
-      echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
    }
 
    /**
@@ -540,18 +541,18 @@ class specmanagement_editor_api
     */
    public function print_chapter_document ( $chapter_index, $work_package, $option_show_duration, $duration )
    {
+      echo '<tr><td class="content_chapter_title_spacer" colspan="3"></td></tr>';
       echo '<tr>';
-      echo '<td class="form-title" id="' . $work_package . '">' . $chapter_index . '</td>';
-      echo '<td class="form-title">' . $work_package;
+      echo '<td class="content_chapter_title_number" id="' . $work_package . '">' . $chapter_index . '</td>';
+      echo '<td class="content_chapter_title">' . $work_package;
       echo '</td>';
-      echo '<td class="duration_title">';
+      echo '<td class="content_chapter_title_duration">';
       if ( $option_show_duration == '1' && !( $duration == 0 || is_null ( $duration ) ) )
       {
          echo '[' . plugin_lang_get ( 'editor_work_package_duration' ) . ': ' . $duration . ' ' . plugin_lang_get ( 'editor_duration_unit' ) . ']';
       }
       echo '</td>';
       echo '</tr>';
-      echo '<tr><td colspan="3"><hr width="100%" align="center" /></td></tr>';
    }
 
    /**
@@ -563,8 +564,8 @@ class specmanagement_editor_api
    public function print_doc_head_row ( $lang_string, $col_data )
    {
       echo '<tr>';
-      echo '<td class="field-container">' . plugin_lang_get ( $lang_string ) . '</td>';
-      echo '<td class="form-title" colspan="3">' . $col_data . '</td>';
+      echo '<td class="document_header_label">' . plugin_lang_get ( $lang_string ) . '</td>';
+      echo '<td class="document_header" colspan="3">' . $col_data . '</td>';
       echo '</tr>';
    }
 
@@ -716,12 +717,12 @@ class specmanagement_editor_api
    {
       echo '<thead>';
       echo '<tr>';
-      echo '<td class="form-title" colspan="2">' . plugin_lang_get ( 'editor_expenses_overview' ) . '</td>';
+      echo '<td class="document_eta_title" colspan="2">' . plugin_lang_get ( 'editor_expenses_overview' ) . '</td>';
       echo '</tr>';
 
       echo '<tr class="row-category">';
-      echo '<th>' . plugin_lang_get ( 'bug_view_specification_wpg' ) . '</th>';
-      echo '<th class="duration">' . plugin_lang_get ( 'bug_view_planned_time' ) . ' (' . plugin_lang_get ( 'editor_duration_unit' ) . ')</th>';
+      echo '<th class="document_eta_label">' . plugin_lang_get ( 'bug_view_specification_wpg' ) . '</th>';
+      echo '<th class="document_eta_duration">' . plugin_lang_get ( 'bug_view_planned_time' ) . ' (' . plugin_lang_get ( 'editor_duration_unit' ) . ')</th>';
       echo '</tr>';
       echo '</thead>';
    }
@@ -817,7 +818,7 @@ class specmanagement_editor_api
    {
       echo '<thead>';
       echo '<tr>';
-      echo '<td class="form-title" colspan="2">' . plugin_lang_get ( 'editor_directory' ) . '</td>';
+      echo '<td class="document_directory_title" colspan="2">' . plugin_lang_get ( 'editor_directory' ) . '</td>';
       echo '</tr>';
       echo '</thead>';
    }
@@ -851,7 +852,6 @@ class specmanagement_editor_api
             {
                $work_package_spec_bug_ids = $specmanagement_database_api->get_workpackage_spec_bugs ( $p_version_id, $work_package );
                $chapters = explode ( '/', $work_package );
-
                $chapter_depth = count ( $chapters );
                if ( $chapter_depth == 1 )
                {

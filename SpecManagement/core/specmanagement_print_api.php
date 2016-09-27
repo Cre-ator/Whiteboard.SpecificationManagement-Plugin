@@ -24,8 +24,9 @@ class specmanagement_print_api
       html_page_top2();
       if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists( config_get_global( 'plugin_path' ) . 'WhiteboardMenu' ) )
       {
-         require_once ( __DIR__ . '/../../WhiteboardMenu/core/whiteboard_print_api.php' );
-         whiteboard_print_api::printWhiteboardMenu ();
+         require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
+         $whiteboard_print_api = new whiteboard_print_api();
+         $whiteboard_print_api->printWhiteboardMenu();
       }
       $this->print_plugin_menu();
    }
@@ -144,7 +145,7 @@ class specmanagement_print_api
    public function print_plugin_menu()
    {
       echo '<table align="center">';
-      echo '<tr><td colspan="3" class="center" ><font color="#8b0000" size="5">*** Plugin befindet sich in Entwicklungsphase ***</font></td></tr>';
+      //echo '<tr><td colspan="3" class="center" ><font color="#8b0000" size="5">*** Plugin befindet sich in Entwicklungsphase ***</font></td></tr>';
 
       echo '<tr>';
 
@@ -160,11 +161,11 @@ class specmanagement_print_api
       echo '</a> ]';
       echo '</td>';
 
-      echo '<td>';
-      echo '[ <a href="' . plugin_page( 'version_graph' ) . '">';
-      echo plugin_lang_get( 'menu_versgraph' );
-      echo '</a> ]';
-      echo '</td>';
+      //echo '<td>';
+      //echo '[ <a href="' . plugin_page( 'version_graph' ) . '">';
+      //echo plugin_lang_get( 'menu_versgraph' );
+      //echo '</a> ]';
+      //echo '</td>';
 
       echo '</tr>';
       echo '</table>';
@@ -194,7 +195,7 @@ class specmanagement_print_api
       $this->print_workpackage_description_field();
       echo '</td>';
       echo '<td colspan="5">';
-      echo '<input type="text" value="' . $work_package . '" id="work_package" name="work_package" list="work_packages"/>';
+      echo '<input type="text" value="' . $work_package . '" id="work_package" name="work_package" list="work_packages" style="min-width:650px;"/>';
       echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
       if ( !is_null( $work_packages ) )
       {
@@ -265,7 +266,7 @@ class specmanagement_print_api
          echo '</td>';
          echo '<td>';
          echo '<span class="input">';
-         echo '<input type="text" id="work_package" name="work_package" list="work_packages"/>';
+         echo '<input type="text" id="work_package" name="work_package" list="work_packages" style="min-width:650px;"/>';
          echo '<button type="button" onClick="document.getElementById(\'work_package\').value=\'\';">X</button>';
          echo '<datalist id="work_packages">';
          if ( !empty( $work_packages ) )
@@ -343,13 +344,13 @@ class specmanagement_print_api
          if ( $image_previewed )
          {
             $image_previewed = false;
-            echo ' < br />';
+            echo '<br/>';
          }
 
          if ( $t_attachment['can_download'] )
          {
-            $t_href_start = ' < a href = "' . string_attribute( $t_attachment['download_url'] ) . '" > ';
-            $t_href_end = '</a > ';
+            $t_href_start = '<a href = "' . string_attribute( $t_attachment['download_url'] ) . '" >';
+            $t_href_end = '</a>';
          }
          else
          {

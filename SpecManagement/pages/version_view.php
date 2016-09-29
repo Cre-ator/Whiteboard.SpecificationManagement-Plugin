@@ -49,12 +49,12 @@ function calculate_page_content( $print_flag, $obsolete_flag, $show_zero_issues 
    if ( !$print_flag )
    {
       html_page_top2();
-      if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
-      {
-         require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
-         $whiteboard_print_api = new whiteboard_print_api();
-         $whiteboard_print_api->printWhiteboardMenu();
-      }
+//      if ( plugin_is_installed( 'WhiteboardMenu' ) && file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
+//      {
+//         require_once WHITEBOARDMENU_CORE_URI . 'whiteboard_print_api.php';
+//         $whiteboard_print_api = new whiteboard_print_api();
+//         $whiteboard_print_api->printWhiteboardMenu();
+//      }
       $specmanagement_print_api->print_plugin_menu();
       echo '<div align="center">';
       echo '<hr size="1" width="100%" />';
@@ -149,7 +149,7 @@ function print_tablebody( $amount_stat_columns, $print_flag, $show_zero_issues, 
       print_process( $status_process, $null_issues_flag );
       print_duration( $sum_duration, $add_rel_duration, $null_issues_flag );
       print_uncertainty( $uncertainty_bug_ids, $add_rel_uncertainty_bug_ids, $uncertainty_status_process, $null_issues_flag );
-      print_information( $version, $null_issues_flag, $time_delay[1] );
+      //print_information( $version, $null_issues_flag, $time_delay[1] );
       echo '</tr>';
    }
    echo '</tbody>';
@@ -366,7 +366,7 @@ function print_tablehead( $amount_stat_columns, $obsolete_flag, $show_zero_issue
    print_thead_col( 'versview_progress' );
    print_thead_col( 'versview_duration' );
    print_thead_col( 'versview_uncertainty' );
-   print_thead_col( 'versview_information' );
+   //print_thead_col( 'versview_information' );
    echo '</tr>';
    echo '</thead>';
 }

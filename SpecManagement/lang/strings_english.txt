@@ -78,7 +78,7 @@ $s_plugin_SpecManagement_changes_edited = 'Issue changed';
 
 /* Version Manager Area */
 $s_plugin_SpecManagement_manversions_title = 'Document-Versionmanager';
-$s_plugin_SpecManagement_manversions_thead = 'Versionmanager';
+$s_plugin_SpecManagement_manversions_thead = 'Versionmanager (old)';
 $s_plugin_SpecManagement_manversions_thdoctype = 'Document Type';
 $s_plugin_SpecManagement_manversions_edit = 'Edit Versions';
 $s_plugin_SpecManagement_manversions_edit_submit = 'Accept Changes';

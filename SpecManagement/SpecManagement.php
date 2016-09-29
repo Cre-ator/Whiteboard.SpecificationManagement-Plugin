@@ -8,7 +8,7 @@ class SpecManagementPlugin extends MantisPlugin
       $this->description = 'Generate and manage your own specified documents';
       $this->page = 'config_page';
 
-      $this->version = '1.1.54';
+      $this->version = '1.1.54.1';
       $this->requires = array
       (
          'MantisCore' => '1.2.0, <= 1.3.99',
@@ -260,17 +260,20 @@ class SpecManagementPlugin extends MantisPlugin
       $ptime = gpc_get_string ( 'ptime', $specmanagement_database_api->get_ptime_row ( $bug_id )[ 2 ] );
 
       $type = gpc_get_string ( 'types', '' );
-      $target_version = bug_get_field ( $bug_id, 'target_version' );
-      $work_package = preg_replace ( '/\/\/+/', '/', gpc_get_string ( 'work_package', '' ) );
-
-      if ( !is_null ( $target_version ) )
+      if ( $bug_id != null )
       {
-         $version_id = version_get_id ( $target_version );
-         $version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id ( $version_id );
-         $p_version_id = $version_obj[ 0 ];
-         $type_id = $specmanagement_database_api->get_type_id ( $type );
+         $target_version = bug_get_field ( $bug_id, 'target_version' );
+
+         if ( !is_null ( $target_version ) )
+         {
+            $version_id = version_get_id ( $target_version );
+            $version_obj = $specmanagement_database_api->get_plugin_version_row_by_version_id ( $version_id );
+            $p_version_id = $version_obj[ 0 ];
+            $type_id = $specmanagement_database_api->get_type_id ( $type );
+         }
       }
 
+      $work_package = preg_replace ( '/\/\/+/', '/', gpc_get_string ( 'work_package', '' ) );
       switch ( $event )
       {
          case 'EVENT_REPORT_BUG':
@@ -324,7 +327,7 @@ class SpecManagementPlugin extends MantisPlugin
     */
    function menu ()
    {
-      if ( ( !plugin_is_installed ( 'WhiteboardMenu' ) || !file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu' ) )
+      if ( ( !plugin_is_installed ( 'WhiteboardMenu-ALT' ) || !file_exists ( config_get_global ( 'plugin_path' ) . 'WhiteboardMenu-ALT' ) )
          && plugin_config_get ( 'ShowMenu' ) && $this->getUserHasLevel ()
       )
       {

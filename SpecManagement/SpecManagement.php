@@ -255,7 +255,21 @@ class SpecManagementPlugin extends MantisPlugin
       $version_id = null;
       $type_id = null;
       $p_version_id = null;
-      $bug_id = $bug->id;
+      
+      switch ( $event )
+      {
+         case 'EVENT_REPORT_BUG':
+            $bug_id = $bug->id;
+            break;
+         case 'EVENT_UPDATE_BUG':
+            $bug_id = gpc_get_int ( 'bug_id' );
+            break;
+         default:
+            $bug_id = null;
+            break;
+      }
+      
+      
       $project_id = helper_get_current_project ();
       $ptime = gpc_get_string ( 'ptime', $specmanagement_database_api->get_ptime_row ( $bug_id )[ 2 ] );
 
